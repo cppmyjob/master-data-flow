@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MasterDataFlow</RootNamespace>
+    <AssemblyName>MasterDataFlow</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsyncQueue.cs" />
+    <Compile Include="BaseCommand.cs" />
+    <Compile Include="BaseCommandItem.cs" />
+    <Compile Include="BaseContainter.cs" />
+    <Compile Include="Command.cs" />
+    <Compile Include="CommandBuilder.cs" />
+    <Compile Include="CommandDefinition.cs" />
+    <Compile Include="CommandDomainInstance.cs" />
+    <Compile Include="CommandInfo.cs" />
+    <Compile Include="Exceptions\IsAlreadyRunningException.cs" />
+    <Compile Include="Exceptions\WrongNextCommandException.cs" />
+    <Compile Include="Interfaces\ICommand.cs" />
+    <Compile Include="Interfaces\IDataObjectHolder.cs" />
+    <Compile Include="Exceptions\MasterDataFlowException.cs" />
+    <Compile Include="CommandRunner.cs" />
+    <Compile Include="ExecuteStatus.cs" />
+    <Compile Include="ExecutionContext.cs" />
+    <Compile Include="Interfaces\ICommandDataObject.cs" />
+    <Compile Include="Interfaces\ICommandResult.cs" />
+    <Compile Include="Interfaces\INextCommandResult.cs" />
+    <Compile Include="Interfaces\IRemoteHostContract.cs" />
+    <Compile Include="NextCommandResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Remote\Host\LocalHost.cs" />
+    <Compile Include="Remote\RemoteContainer.cs" />
+    <Compile Include="Remote\RemoteExecuteResult.cs" />
+    <Compile Include="Remote\RemoteServer.cs" />
+    <Compile Include="Results\NextStopCommandResult.cs" />
+    <Compile Include="Results\NextTypeCommandResult.cs" />
+    <Compile Include="Results\StopCommandResult.cs" />
+    <Compile Include="CommandDomain.cs" />
+    <Compile Include="SimpleContainer.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
