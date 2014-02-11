@@ -17,14 +17,18 @@ namespace MasterDataFlow.Tests
         public void ContainerExecutedTest()
         {
             // ARRANGE
-            var commandRunner = new CommandRunner();
+            var commandDomain = new CommandDomain();
+            var commandRunner = new CommandRunner(commandDomain);
             var container = new MockContainer();
             commandRunner.AddContainter(container);
             var commandDefinition = new CommandDefinition(typeof (CommandStub));
             var waiter = new ManualResetEvent(false);
 
             // ACT
-            commandRunner.Run(null, commandDefinition, null, (status, exception, dataObject) => waiter.Set());
+            commandRunner.Run(commandDefinition, null, (status, exception, dataObject) =>
+            {
+                waiter.Set();
+            });
 
             // ASSERT
             waiter.WaitOne(1000);

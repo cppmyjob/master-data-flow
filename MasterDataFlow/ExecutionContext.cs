@@ -19,13 +19,11 @@ namespace MasterDataFlow
         private readonly CommandDefinition _commandDefinition;
         private readonly ICommandDataObject _commandDataObject;
         private Exception _exception;
-        private CommandDomain _domain;
 
-        internal ExecutionContext(CommandRunner runner, CommandDomain domain, CommandDefinition commandDefinition,
+        internal ExecutionContext(CommandRunner runner, CommandDefinition commandDefinition,
             ICommandDataObject commandDataObject)
         {
             _runner = runner;
-            _domain = domain;
             _commandDefinition = commandDefinition;
             _commandDataObject = commandDataObject;
         }
@@ -33,7 +31,7 @@ namespace MasterDataFlow
         internal void Execute()
         {
             _status = ExecuteStatus.Progress;
-            _runner.Run(_domain, _commandDefinition, _commandDataObject, OnChangeStatus);
+            _runner.Run(_commandDefinition, _commandDataObject, OnChangeStatus);
         }
 
         public void OnChangeStatus(ExecuteStatus status, Exception exception, ICommandDataObject dataObject)
@@ -75,11 +73,6 @@ namespace MasterDataFlow
         public Exception Exception
         {
             get { return _exception; }
-        }
-
-        public CommandDomain Domain
-        {
-            get { return _domain; }
         }
 
         // Implement IDisposable. 

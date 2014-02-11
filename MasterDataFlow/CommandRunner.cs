@@ -18,9 +18,11 @@ namespace MasterDataFlow
         private bool _disposed = false;
         private readonly Thread _commandThread;
         private readonly AsyncQueue<CommandInfo> _queue = new AsyncQueue<CommandInfo>();
+        private CommandDomain _domain;
 
-        internal CommandRunner()
+        internal CommandRunner(CommandDomain domain)
         {
+            _domain = domain;
             _commandThread = new Thread(CommandProc);
             _commandThread.Start();
         }
@@ -31,7 +33,7 @@ namespace MasterDataFlow
             _freeContainers.Enqueue(container);
         }
 
-        public void Run(CommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, OnChangeStatus onChangeStatus)
+        public void Run(CommandDefinition commandDefinition, ICommandDataObject commandDataObject, OnChangeStatus onChangeStatus)
         {
             var info = new CommandInfo
             {
@@ -39,7 +41,6 @@ namespace MasterDataFlow
                 CommandDataObject = commandDataObject,
                 OnExecuteCommand = ProcessNextCommand,
                 OnChangeStatus = onChangeStatus,
-                Domain = domain
             };
             _queue.Enqueue(info);
         }
@@ -53,7 +54,7 @@ namespace MasterDataFlow
             }
             else
             {
-                var nextCommand = previousCommandInfo.CommandResult.FindNextCommand(previousCommandInfo.Domain);
+                var nextCommand = previousCommandInfo.CommandResult.FindNextCommand(_domain);
                 if (nextCommand == null)
                 {
                     ICommandDataObject commandDataObject = null;
@@ -66,7 +67,7 @@ namespace MasterDataFlow
                 }
                 else
                 {
-                    Run(previousCommandInfo.Domain, nextCommand.Definition, nextCommand.CommandDataObject, previousCommandInfo.OnChangeStatus);
+                    Run(nextCommand.Definition, nextCommand.CommandDataObject, previousCommandInfo.OnChangeStatus);
                 }                
             }
         }

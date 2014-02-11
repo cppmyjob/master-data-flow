@@ -9,26 +9,21 @@ namespace MasterDataFlow
 {
     public class CommandDomainInstance
     {
-        private readonly CommandRunner _commandRunner = new CommandRunner();
+        private readonly CommandRunner _commandRunner;
         private bool _disposed;
         private bool _isRunning;
         private ExecutionContext _currentContext;
-        private CommandDomain _commandDomain;
-
-        internal CommandDomainInstance()
-        {
-        
-        }
+        private readonly CommandDomain _commandDomain;
 
         public CommandDomainInstance(CommandDomain commandDomain)
         {
             _commandDomain = commandDomain;
+            _commandRunner = new CommandRunner(_commandDomain);
         }
 
         public CommandDomain CommandDomain
         {
             get { return _commandDomain; }
-            internal set { _commandDomain = value; }
         }
 
         public void AddContainter(BaseContainter container)
@@ -45,7 +40,7 @@ namespace MasterDataFlow
             var commandDefinition = _commandDomain.Find<TCommand>();
             // TODO check if commandDefinition was found
 
-            _currentContext = new ExecutionContext(_commandRunner, _commandDomain, commandDefinition, commandDataObject);
+            _currentContext = new ExecutionContext(_commandRunner, commandDefinition, commandDataObject);
             _currentContext.Execute();
             // TODO is it thread safe
             _isRunning = true;

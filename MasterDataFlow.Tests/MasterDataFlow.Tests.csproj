@@ -52,9 +52,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CommandBuilderTests.cs" />
+    <Compile Include="CommandDomainTests.cs" />
     <Compile Include="CommandRunnerTests.cs" />
     <Compile Include="Mocks\MockContainer.cs" />
     <Compile Include="CommandDomainInstanceTests.cs" />
+    <Compile Include="Mocks\MockRemoteHostContract.cs" />
+    <Compile Include="RemoteContainerTests.cs" />
     <Compile Include="TestData\Command1.cs" />
     <Compile Include="TestData\Command1DataObject.cs" />
     <Compile Include="TestData\CommandDataObjectStub.cs" />

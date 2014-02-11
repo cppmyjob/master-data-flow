@@ -13,10 +13,16 @@ namespace MasterDataFlow
     public class CommandDomain
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
+        private readonly Guid _id = Guid.NewGuid();
 
         internal IList<CommandDefinition> Definitions
         {
             get { return _definitions; }
+        }
+
+        public Guid Id
+        {
+            get { return _id; }
         }
 
         public CommandDefinition Find<TCommand>()

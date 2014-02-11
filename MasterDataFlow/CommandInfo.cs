@@ -14,6 +14,5 @@ namespace MasterDataFlow
         internal OnChangeStatus OnChangeStatus { get; set; }
         public bool IsError { get; internal set; }
         public ICommandResult CommandResult { get; internal set; }
-        public CommandDomain Domain { get; internal set; }
     }
 }
