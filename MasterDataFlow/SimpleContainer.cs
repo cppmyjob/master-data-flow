@@ -20,7 +20,7 @@ namespace MasterDataFlow
                     commandInfo.IsError = false;
                     commandInfo.CommandResult = result;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     commandInfo.IsError = true;
                     commandInfo.CommandResult = null;
