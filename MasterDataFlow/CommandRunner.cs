@@ -18,7 +18,7 @@ namespace MasterDataFlow
         private bool _disposed = false;
         private readonly Thread _commandThread;
         private readonly AsyncQueue<CommandInfo> _queue = new AsyncQueue<CommandInfo>();
-        private CommandDomain _domain;
+        private readonly CommandDomain _domain;
 
         internal CommandRunner(CommandDomain domain)
         {

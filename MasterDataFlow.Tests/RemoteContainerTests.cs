@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.Interfaces;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.Mocks;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace MasterDataFlow.Tests
 {
@@ -29,26 +31,56 @@ namespace MasterDataFlow.Tests
             _сommandDomainInstance.Dispose();
         }
 
-        //[TestMethod]
-        //public void BasicUsageTest()
-        //{
-        //    // ARRANGE
-        //    var contract = new MockRemoteHostContract();
-        //    var container = new RemoteContainer(contract);
-        //    var info = new CommandInfo();
-        //    var waiter = new ManualResetEvent(false);
+        [TestMethod]
+        public void IsExecuteWasCalledTestMoq()
+        {
+            // ARRANGE
+            int calls = 0;
+            var contract = new Mock<IRemoteHostContract>();
+            contract.Setup(t => t.Execute(It.IsAny<string>(), It.IsAny<string>())).Callback(() => calls++);
+            var container = new RemoteContainer(contract.Object);
+            var info = new CommandInfo();
+            var waiter = new ManualResetEvent(false);
 
-        //    // ACT
-        //    container.Execute(info, (containter, commandInfo) =>
-        //    {
-        //        waiter.Set();
-        //    });
+            // ACT
+            container.Execute(info, (containter, commandInfo) =>
+            {
+                waiter.Set();
+            });
 
-        //    // ASSERT
-        //    waiter.WaitOne(1000);
-        //    //Assert.IsTrue(container.IsExecuted);
+            // ASSERT
+            waiter.WaitOne(1000);
+            Assert.AreEqual(1, calls);
+        }
 
-        //}
+        [TestMethod]
+        public void ExecuteValidParametersTest()
+        {
+            // ARRANGE
+            string typeName = null;
+            string dataObject = null;
+
+            var contract = new Mock<IRemoteHostContract>();
+            contract.Setup(t => t.Execute(It.IsAny<string>(), It.IsAny<string>())).Callback<string, string>(
+                (typeNameParem, dataObjectParam) => {
+                    typeName = typeNameParem;
+                    dataObject = dataObjectParam;
+                });
+            var container = new RemoteContainer(contract.Object);
+            var info = new CommandInfo();
+            var waiter = new ManualResetEvent(false);
+
+            // ACT
+            container.Execute(info, (containter, commandInfo) =>
+            {
+                waiter.Set();
+            });
+
+            // ASSERT
+            waiter.WaitOne(1000);
+            Assert.AreEqual("", typeName);
+            //Assert.AreEqual("", dataObject);
+        }
 
     }
 }
