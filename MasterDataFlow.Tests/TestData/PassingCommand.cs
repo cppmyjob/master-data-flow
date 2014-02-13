@@ -8,8 +8,6 @@ namespace MasterDataFlow.Tests.TestData
 {
     public class PassingCommand : Command<PassingCommandDataObject>
     {
-        public object PassingCommandObject { get; set; }
-
         public override INextCommandResult<ICommandDataObject> Execute()
         {
             return NextStopCommand(new PassingCommandDataObject(DataObject.Id));

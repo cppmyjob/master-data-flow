@@ -7,7 +7,7 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow
 {
-    public class CommandDomainInstance
+    public class CommandDomainInstance : ICommandDomainInstance
     {
         private readonly CommandRunner _commandRunner;
         private bool _disposed;
@@ -34,17 +34,23 @@ namespace MasterDataFlow
         public ExecutionContext Start<TCommand>(ICommandDataObject commandDataObject)
             where TCommand : ICommand<ICommandDataObject>
         {
+            var commandType = typeof(TCommand);
+            return ((ICommandDomainInstance)this).Start(commandType, commandDataObject);
+        }
+
+        ExecutionContext ICommandDomainInstance.Start(Type commandType, ICommandDataObject commandDataObject)
+        {
             if (_isRunning)
                 throw new IsAlreadyRunningException();
 
-            var commandDefinition = _commandDomain.Find<TCommand>();
+            var commandDefinition = _commandDomain.Find(commandType);
             // TODO check if commandDefinition was found
 
             _currentContext = new ExecutionContext(_commandRunner, commandDefinition, commandDataObject);
             _currentContext.Execute();
             // TODO is it thread safe
             _isRunning = true;
-            return _currentContext;            
+            return _currentContext;
         }
 
         public ExecutionContext Stop()
@@ -101,6 +107,5 @@ namespace MasterDataFlow
 
             }
         }
-
     }
 }

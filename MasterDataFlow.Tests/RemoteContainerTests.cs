@@ -32,14 +32,32 @@ namespace MasterDataFlow.Tests
         }
 
         [TestMethod]
-        public void IsExecuteWasCalledTestMoq()
+        public void ExecuteValidParametersTest()
         {
             // ARRANGE
+            Guid domainId = Guid.Empty;
+            string typeName = null;
+            string dataObject = null;
             int calls = 0;
+
             var contract = new Mock<IRemoteHostContract>();
-            contract.Setup(t => t.Execute(It.IsAny<string>(), It.IsAny<string>())).Callback(() => calls++);
+            contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).
+                Callback<Guid, string, string>((domainIdParam, typeNameParem, dataObjectParam) =>
+                {
+                    domainId = domainIdParam;
+                    typeName = typeNameParem;
+                    dataObject = dataObjectParam;
+                    calls++;
+                });
             var container = new RemoteContainer(contract.Object);
-            var info = new CommandInfo();
+            const string guid = "1DB907FB-77C7-465F-BD60-031107374727";
+            const string domainGuid = "C2B980FF-7C4D-4B43-9935-497218492783";
+            var info = new CommandInfo
+            {
+                CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
+                CommandDataObject = new PassingCommandDataObject(new Guid(guid)),
+                CommandDomainId = new Guid(domainGuid),
+            };
             var waiter = new ManualResetEvent(false);
 
             // ACT
@@ -51,35 +69,9 @@ namespace MasterDataFlow.Tests
             // ASSERT
             waiter.WaitOne(1000);
             Assert.AreEqual(1, calls);
-        }
-
-        [TestMethod]
-        public void ExecuteValidParametersTest()
-        {
-            // ARRANGE
-            string typeName = null;
-            string dataObject = null;
-
-            var contract = new Mock<IRemoteHostContract>();
-            contract.Setup(t => t.Execute(It.IsAny<string>(), It.IsAny<string>())).Callback<string, string>(
-                (typeNameParem, dataObjectParam) => {
-                    typeName = typeNameParem;
-                    dataObject = dataObjectParam;
-                });
-            var container = new RemoteContainer(contract.Object);
-            var info = new CommandInfo();
-            var waiter = new ManualResetEvent(false);
-
-            // ACT
-            container.Execute(info, (containter, commandInfo) =>
-            {
-                waiter.Set();
-            });
-
-            // ASSERT
-            waiter.WaitOne(1000);
-            Assert.AreEqual("", typeName);
-            //Assert.AreEqual("", dataObject);
+            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", typeName);
+            Assert.AreEqual("{\"Id\" : \"" + guid + "\"}", dataObject);
+            Assert.AreEqual(new Guid(domainGuid), domainId);
         }
 
     }

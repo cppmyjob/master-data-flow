@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Remote
 {
@@ -20,8 +21,11 @@ namespace MasterDataFlow.Remote
         {
             ThreadPool.QueueUserWorkItem((commandData) =>
             {
-                _remoteHostContract.Execute(null, null);
-                //var commandInfo = (CommandInfo)commandData;
+                var commandInfo = (CommandInfo)commandData;
+                var commandTypeName = commandInfo.CommandDefinition.Command.AssemblyQualifiedName;
+                var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
+                _remoteHostContract.Execute(commandInfo.CommandDomainId, commandTypeName, dataObject);
+
                 //var commandToExecute = commandInfo.CommandDefinition.CreateInstance(info.CommandDataObject);
                 //try
                 //{

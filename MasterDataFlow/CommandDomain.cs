@@ -29,6 +29,11 @@ namespace MasterDataFlow
             where TCommand : ICommand<ICommandDataObject>
         {
             var commandType = typeof (TCommand);
+            return Find(commandType);
+        }
+
+        internal CommandDefinition Find(Type commandType)
+        {
             var result = _definitions.FirstOrDefault(t => t.Command == commandType);
             return result;
         }

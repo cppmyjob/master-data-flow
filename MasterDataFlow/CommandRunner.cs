@@ -39,6 +39,7 @@ namespace MasterDataFlow
             {
                 CommandDefinition = commandDefinition,
                 CommandDataObject = commandDataObject,
+                CommandDomainId = _domain.Id,
                 OnExecuteCommand = ProcessNextCommand,
                 OnChangeStatus = onChangeStatus,
             };

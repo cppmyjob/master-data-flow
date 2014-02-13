@@ -48,9 +48,11 @@
     <Compile Include="CommandDefinition.cs" />
     <Compile Include="CommandDomainInstance.cs" />
     <Compile Include="CommandInfo.cs" />
+    <Compile Include="CommandDomainContainer.cs" />
     <Compile Include="Exceptions\IsAlreadyRunningException.cs" />
     <Compile Include="Exceptions\WrongNextCommandException.cs" />
     <Compile Include="Interfaces\ICommand.cs" />
+    <Compile Include="Interfaces\ICommandDomainInstance.cs" />
     <Compile Include="Interfaces\IDataObjectHolder.cs" />
     <Compile Include="Exceptions\MasterDataFlowException.cs" />
     <Compile Include="CommandRunner.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="ExecutionContext.cs" />
     <Compile Include="Interfaces\ICommandDataObject.cs" />
     <Compile Include="Interfaces\ICommandResult.cs" />
+    <Compile Include="Interfaces\ICommandDomainContainer.cs" />
     <Compile Include="Interfaces\INextCommandResult.cs" />
     <Compile Include="Interfaces\IRemoteHostContract.cs" />
     <Compile Include="NextCommandResult.cs" />
@@ -65,16 +68,16 @@
     <Compile Include="Remote\Host\LocalHost.cs" />
     <Compile Include="Remote\RemoteContainer.cs" />
     <Compile Include="Remote\RemoteExecuteResult.cs" />
+    <Compile Include="Remote\RemoteHostContainer.cs" />
     <Compile Include="Remote\RemoteServer.cs" />
     <Compile Include="Results\NextStopCommandResult.cs" />
     <Compile Include="Results\NextTypeCommandResult.cs" />
     <Compile Include="Results\StopCommandResult.cs" />
     <Compile Include="CommandDomain.cs" />
+    <Compile Include="Serialization\Serializator.cs" />
     <Compile Include="SimpleContainer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Serialization\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
