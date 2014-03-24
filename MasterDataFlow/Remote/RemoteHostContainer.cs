@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Remote.Commands;
+using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Remote
 {
     public class RemoteHostContainer : IRemoteHostContract
     {
-        private readonly ICommandDomainContainer _domainResolver;
+        private readonly IRemoteContext _context;
 
-        internal RemoteHostContainer(ICommandDomainContainer domainResolver)
+        internal RemoteHostContainer(IRemoteContext context)
         {
-            _domainResolver = domainResolver;
+            _context = context;
         }
 
         public void UploadAssembly(byte[] data)
@@ -21,11 +24,10 @@ namespace MasterDataFlow.Remote
             throw new NotImplementedException();
         }
 
-        public void Execute(Guid domainId, string typeName, string dataObject)
+        public void Execute(Guid requestId, Guid domainId, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
-            var domainInstance = _domainResolver.Find(domainId);
-            //var commandType = Assembly.Load(typeName);
-            domainInstance.Start(null, null);
+            var command = new ExecuteCommand(_context, requestId, domainId, commandTypeName, dataObjectTypeName, dataObject);
+            _context.Queue.Push(command);
         }
     }
 }

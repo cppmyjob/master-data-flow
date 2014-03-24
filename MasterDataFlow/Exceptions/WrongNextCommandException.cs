@@ -11,6 +11,5 @@ namespace MasterDataFlow.Exceptions
             : base(message)
         {
         }
-
     }
 }

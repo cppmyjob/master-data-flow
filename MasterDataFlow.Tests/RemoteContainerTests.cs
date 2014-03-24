@@ -35,22 +35,26 @@ namespace MasterDataFlow.Tests
         public void ExecuteValidParametersTest()
         {
             // ARRANGE
+            Guid requestId = Guid.Empty;
             Guid domainId = Guid.Empty;
             string typeName = null;
             string dataObject = null;
+            string dataObjectTypeName = null;
             int calls = 0;
 
             var contract = new Mock<IRemoteHostContract>();
-            contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).
-                Callback<Guid, string, string>((domainIdParam, typeNameParem, dataObjectParam) =>
+            contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                Callback<Guid, Guid, string, string, string>((requestIdParam, domainIdParam, typeNameParem, dataObjectTypeNameParam, dataObjectParam) =>
                 {
+                    requestId = requestIdParam; 
                     domainId = domainIdParam;
                     typeName = typeNameParem;
+                    dataObjectTypeName = dataObjectTypeNameParam;
                     dataObject = dataObjectParam;
                     calls++;
                 });
             var container = new RemoteContainer(contract.Object);
-            const string guid = "1DB907FB-77C7-465F-BD60-031107374727";
+            const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string domainGuid = "C2B980FF-7C4D-4B43-9935-497218492783";
             var info = new CommandInfo
             {
@@ -70,8 +74,10 @@ namespace MasterDataFlow.Tests
             waiter.WaitOne(1000);
             Assert.AreEqual(1, calls);
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", typeName);
-            Assert.AreEqual("{\"Id\" : \"" + guid + "\"}", dataObject);
+            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", dataObjectTypeName);
+            Assert.AreEqual("{\"Id\":\"" + guid + "\"}", dataObject);
             Assert.AreEqual(new Guid(domainGuid), domainId);
+            Assert.AreNotEqual(Guid.Empty, requestId);
         }
 
     }

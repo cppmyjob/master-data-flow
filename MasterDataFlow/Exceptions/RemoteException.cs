@@ -5,9 +5,10 @@ using System.Text;
 
 namespace MasterDataFlow.Exceptions
 {
-    public class IsAlreadyRunningException : MasterDataFlowException
+    public class RemoteException : MasterDataFlowException
     {
-        public IsAlreadyRunningException() : base()
+        public RemoteException(string message)
+            : base(message)
         {
         }
     }

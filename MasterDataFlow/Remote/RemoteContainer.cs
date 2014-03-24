@@ -24,7 +24,10 @@ namespace MasterDataFlow.Remote
                 var commandInfo = (CommandInfo)commandData;
                 var commandTypeName = commandInfo.CommandDefinition.Command.AssemblyQualifiedName;
                 var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
-                _remoteHostContract.Execute(commandInfo.CommandDomainId, commandTypeName, dataObject);
+                string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
+
+                var requestId = Guid.NewGuid();
+                _remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
 
                 //var commandToExecute = commandInfo.CommandDefinition.CreateInstance(info.CommandDataObject);
                 //try

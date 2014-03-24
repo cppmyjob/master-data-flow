@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace MasterDataFlow.Serialization
 {
@@ -9,7 +10,8 @@ namespace MasterDataFlow.Serialization
     {
         public static string Serialize(object obj)
         {
-            return "{\"Id\" : \"1DB907FB-77C7-465F-BD60-031107374727\"}";
+            var result = JsonConvert.SerializeObject(obj);
+            return result;
         }
     }
 }
