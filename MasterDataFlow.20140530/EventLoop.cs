@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MasterDataFlow.Interfaces;
+﻿using MasterDataFlow._20140530.Interfaces;
 
-namespace MasterDataFlow
+namespace MasterDataFlow._20140530
 {
     internal class EventLoop : IEventLoop
     {
-        private AsyncQueue<BaseCommand> _queue = new AsyncQueue<BaseCommand>();
+        private readonly AsyncQueue<BaseCommand> _queue = new AsyncQueue<BaseCommand>();
+
+        internal AsyncQueue<BaseCommand> Queue
+        {
+            get { return _queue; }
+        }
 
         public void Push(BaseCommand command)
         {
@@ -20,7 +21,7 @@ namespace MasterDataFlow
             if (_queue.Count == 0)
                 return;
             var command = _queue.Dequeue();
-            var result = command.BaseExecute();
+            ICommandResult result = command.BaseExecute();
 
             if (result == null)
             {
@@ -28,6 +29,8 @@ namespace MasterDataFlow
             }
             else
             {
+                //result.FindNextCommand()
+                //_queue.Enqueue(result);
                 //var nextCommand = null;//result.FindNextCommand(_domain);
                 //if (nextCommand != null)
                 //{

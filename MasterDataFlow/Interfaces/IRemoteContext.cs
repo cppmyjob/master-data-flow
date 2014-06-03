@@ -7,7 +7,7 @@ namespace MasterDataFlow.Interfaces
 {
     internal interface IRemoteContext
     {
-        IEventLoop Queue { get; }
+        //IEventLoop Queue { get; }
         ICommandDomainContainer CommandDomainContainer { get; }
     }
 }

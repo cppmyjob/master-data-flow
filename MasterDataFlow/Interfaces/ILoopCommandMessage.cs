@@ -5,8 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Interfaces
 {
-    internal interface IEventLoop
+    public interface ILoopCommandMessage
     {
-        void Push(BaseCommand command);
     }
 }

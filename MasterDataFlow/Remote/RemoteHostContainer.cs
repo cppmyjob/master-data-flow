@@ -27,7 +27,7 @@ namespace MasterDataFlow.Remote
         public void Execute(Guid requestId, Guid domainId, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
             var command = new ExecuteCommand(_context, requestId, domainId, commandTypeName, dataObjectTypeName, dataObject);
-            _context.Queue.Push(command);
+            //_context.Queue.Push(command);
         }
     }
 }

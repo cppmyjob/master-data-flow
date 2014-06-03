@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Utils;
 
 namespace MasterDataFlow
 {
