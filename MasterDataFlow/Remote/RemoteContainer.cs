@@ -52,5 +52,10 @@ namespace MasterDataFlow.Remote
         {
             
         }
+
+        public override void Execute(Guid loopId, ILoopCommandData data, EventLoop.EventLoopCallback callback)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

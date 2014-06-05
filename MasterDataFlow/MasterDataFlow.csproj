@@ -42,7 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandEventLoopRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
+    <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
@@ -54,7 +56,7 @@
     <Compile Include="CommandDomainInstance.cs" />
     <Compile Include="CommandInfo.cs" />
     <Compile Include="CommandDomainContainer.cs" />
-    <Compile Include="EventLoop\EventLoop.cs" />
+    <Compile Include="EventLoop\BaseEventLoop.cs" />
     <Compile Include="Exceptions\IsAlreadyRunningException.cs" />
     <Compile Include="Exceptions\RemoteException.cs" />
     <Compile Include="Exceptions\WrongNextCommandException.cs" />

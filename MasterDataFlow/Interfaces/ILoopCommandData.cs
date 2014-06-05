@@ -5,8 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface ICommandResult : ILoopCommandMessage
+    public interface ILoopCommandData
     {
-        NextCommandResult FindNextCommand(CommandDomain domain);
     }
 }

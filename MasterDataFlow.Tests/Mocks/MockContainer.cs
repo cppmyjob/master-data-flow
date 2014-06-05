@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Tests.Mocks
@@ -22,6 +23,11 @@ namespace MasterDataFlow.Tests.Mocks
         }
 
         public override void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
         {
             throw new NotImplementedException();
         }

@@ -21,8 +21,8 @@ namespace MasterDataFlow.Tests
             var command = new Mock<ILoopCommand>();
             int callCount = 0;
             var paramloopId = new Guid();
-            command.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<EventLoopCallback>())).Callback<Guid, EventLoopCallback>(
-                (id, waitCallBack) =>
+            command.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>())).Callback<Guid, ILoopCommandData, EventLoopCallback>(
+                (id, data, waitCallBack) =>
                 {
                     paramloopId = id;
                     ++callCount;
@@ -46,16 +46,16 @@ namespace MasterDataFlow.Tests
             var loop = new BaseEventLoop();
 
             int commandCallCount = 0;
-            var proxyCommand = new Mock<ILoopCommand>();
-            proxyCommand.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<EventLoopCallback>())).Callback<Guid, EventLoopCallback>(
-                (id, waitCallBack) =>
+            var command = new Mock<ILoopCommand>();
+            command.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>())).Callback<Guid, ILoopCommandData, EventLoopCallback>(
+                (id, data, waitCallBack) =>
                 {
                     ++commandCallCount;
                     waitCallBack(id, EventLoopCommandStatus.Completed);
                 });
 
             int callbackCallCount = 0;
-            var loopId = loop.Push(proxyCommand.Object, (id, status, message) =>
+            var loopId = loop.Push(command.Object, (id, status, message) =>
             {
                 ++callbackCallCount;
             });
@@ -76,9 +76,9 @@ namespace MasterDataFlow.Tests
             var loop = new BaseEventLoop();
 
             int commandCallCount = 0;
-            var proxyCommand = new Mock<ILoopCommand>();
-            proxyCommand.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<EventLoopCallback>())).Callback<Guid,EventLoopCallback>(
-                (id, waitCallBack) =>
+            var command = new Mock<ILoopCommand>();
+            command.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>())).Callback<Guid, ILoopCommandData, EventLoopCallback>(
+                (id, data, waitCallBack) =>
                 {
                     ++commandCallCount;
                     waitCallBack(id, EventLoopCommandStatus.Completed);
@@ -88,7 +88,7 @@ namespace MasterDataFlow.Tests
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
             int callbackCallCount = 0;
-            var loopId = loop.Push(proxyCommand.Object, (id, status, message) =>
+            var loopId = loop.Push(command.Object, (id, status, message) =>
             {
                 ++callbackCallCount;
                 callbackId = id;

@@ -6,7 +6,7 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow
 {
-    public class CommandInfo
+    public class CommandInfo : ILoopCommandData
     {
         public CommandDefinition CommandDefinition { get; internal set; }
         public ICommandDataObject CommandDataObject { get; internal set; }

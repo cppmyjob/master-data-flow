@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="CommandBuilderTests.cs" />
     <Compile Include="CommandDomainTests.cs" />
+    <Compile Include="CommandEventLoopRunnerTests.cs" />
     <Compile Include="CommandRunnerTests.cs" />
     <Compile Include="EventLoopTests.cs" />
     <Compile Include="Mocks\MockContainer.cs" />

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.EventLoop;
+using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow
 {
@@ -35,6 +37,14 @@ namespace MasterDataFlow
         public override void Dispose()
         {
             
+        }
+
+        public override void Execute(Guid loopId, ILoopCommandData data, EventLoop.EventLoopCallback callback)
+        {
+             var commandInfo = (CommandInfo) data;
+             var commandToExecute = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandDataObject);
+             var result = commandToExecute.BaseExecute();
+            callback(loopId, EventLoopCommandStatus.Completed, result);
         }
     }
 }
