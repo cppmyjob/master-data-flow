@@ -46,6 +46,10 @@
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
+    <Compile Include="Messages\DataCommandMessage.cs" />
+    <Compile Include="Messages\FaultCommandMessage.cs" />
+    <Compile Include="Messages\ResultCommandMessage.cs" />
+    <Compile Include="Results\FaultCommandResult.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="BaseCommandItem.cs" />

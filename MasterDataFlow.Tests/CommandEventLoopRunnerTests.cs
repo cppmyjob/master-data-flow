@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
+using MasterDataFlow.Results;
 using MasterDataFlow.Tests.Mocks;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -96,7 +98,7 @@ namespace MasterDataFlow.Tests
                 .Callback<Guid, ILoopCommandData, EventLoopCallback>(
                     (id, data, waitCallBack) =>
                     {
-                        waitCallBack(id, EventLoopCommandStatus.Completed, null);
+                        waitCallBack(id, EventLoopCommandStatus.Completed, new ResultCommandMessage(new StopCommandResult()));
                     });
             _runner.AddContainter(container.Object);
             var commandDefinition = new CommandDefinition(typeof(CommandStub));
@@ -134,7 +136,76 @@ namespace MasterDataFlow.Tests
             // ASSERT
             _event.WaitOne(100);
             Assert.IsNotNull(callbackMessage);
-            Assert.IsTrue(callbackMessage is INextCommandResult<CommandDataObjectStub>);
+            Assert.IsTrue(callbackMessage is DataCommandMessage);
+            Assert.IsNull((callbackMessage as DataCommandMessage).Data);
+        }
+
+
+        [TestMethod]
+        public void PassingInputDataToResultTest()
+        {
+            // ARRANGE
+            var container = new SimpleContainer();
+            _runner.AddContainter(container);
+            var commandDefinition = new CommandDefinition(typeof(PassingCommand));
+
+            // ACT
+            var newId = Guid.NewGuid();
+            Guid callbackId = Guid.Empty;
+            var callbackStatus = EventLoopCommandStatus.NotStarted;
+            ILoopCommandMessage callbackMessage = null;
+            var originalId = _runner.Run(commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
+            {
+                callbackId = id;
+                callbackStatus = status;
+                callbackMessage = message;
+                _event.Set();
+            });
+
+            // ASSERT
+            _event.WaitOne(100);
+            Assert.AreEqual(originalId, callbackId);
+            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
+            Assert.IsNotNull(callbackMessage);
+            Assert.IsTrue(callbackMessage is DataCommandMessage);
+            var dataMessage = callbackMessage as DataCommandMessage;
+            Assert.IsNotNull(dataMessage.Data);
+            Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
+            Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
+        }
+
+
+        [TestMethod]
+        public void TwoCommandsTest()
+        {
+            // ARRANGE
+            var container = new SimpleContainer();
+            _runner.AddContainter(container);
+
+            var definition1 = new CommandDefinition(typeof(Command1));
+            var definition2 = new CommandDefinition(typeof(Command2));
+            //_сommandDomain.Register(definition1);
+            _сommandDomain.Register(definition2);
+
+            // ACT
+            Guid callbackId = Guid.Empty;
+            var callbackStatus = EventLoopCommandStatus.NotStarted;
+            ILoopCommandMessage callbackMessage = null;
+            var originalId = _runner.Run(definition1, new Command1DataObject(), (id, status, message) =>
+            {
+                callbackId = id;
+                callbackStatus = status;
+                callbackMessage = message;
+                _event.Set();
+            });
+
+
+            // ASSERT
+            _event.WaitOne(1000000);
+            Assert.AreNotEqual(Guid.Empty, callbackId);
+            Assert.AreEqual(originalId, callbackId);
+            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
+            Assert.IsNull((callbackMessage as DataCommandMessage).Data);
         }
     }
 }

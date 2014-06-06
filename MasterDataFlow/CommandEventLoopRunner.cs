@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
+using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow
@@ -63,6 +65,11 @@ namespace MasterDataFlow
                 switch (status)
                 {
                     case EventLoopCommandStatus.Completed:
+                        _runner._freeContainers.Enqueue(_containter);
+                        message = ProcessNextCommand(ref status, message);
+                        if (message == null)
+                            return;
+                        break;
                     case EventLoopCommandStatus.Fault:
                         _runner._freeContainers.Enqueue(_containter);
                         break;
@@ -72,6 +79,38 @@ namespace MasterDataFlow
                         throw new Exception("ProxyContainerCommand exception 2");
                 }
                 _callback(loopId, status, message);
+            }
+
+            private ILoopCommandMessage ProcessNextCommand(ref EventLoopCommandStatus status, ILoopCommandMessage message)
+            {
+                ICommandResult commandResult = ((ResultCommandMessage) message).CommandResult;
+                if (commandResult == null)
+                {
+                    // TODO need check that all commands were completed
+                    status = EventLoopCommandStatus.Fault;
+                    message = new FaultCommandMessage(new WrongNextCommandException(""));
+                    return message;
+                }
+                else
+                {
+                    var nextCommand = commandResult.FindNextCommand(_runner._domain);
+                    if (nextCommand == null)
+                    {
+                        ICommandDataObject commandDataObject = null;
+                        var holder = commandResult as IDataObjectHolder<ICommandDataObject>;
+                        if (holder != null)
+                        {
+                            commandDataObject = holder.DataObject;
+                        }
+                        message = new DataCommandMessage(commandDataObject);
+                        return message;
+                    }
+                    else
+                    {
+                        _runner.Run(nextCommand.Definition, nextCommand.CommandDataObject, _callback);
+                        return null;
+                    }
+                }
             }
         }
 
