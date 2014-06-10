@@ -52,13 +52,9 @@ namespace MasterDataFlow.Remote
                     string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
 
                     var requestId = Guid.NewGuid();
-                    //_remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
+                    _remoteHostContract.Execute(requestId, commandInfo.CommandDomain.Id, commandTypeName, dataObjectTypeName, dataObject);
 
-
-
-                    var commandToExecute = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandDataObject);
-                    var result = commandToExecute.BaseExecute();
-                    callback(loopId, EventLoopCommandStatus.Completed, new ResultCommandMessage(result));
+                    callback(loopId, EventLoopCommandStatus.Completed, null);
                 }
                 catch (Exception ex)
                 {

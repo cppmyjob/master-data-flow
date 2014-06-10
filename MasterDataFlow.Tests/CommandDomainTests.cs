@@ -73,7 +73,7 @@ namespace MasterDataFlow.Tests
             });
 
             // ASSERT
-            _event.WaitOne(200);
+            _event.WaitOne(1000);
             Assert.AreEqual(originalId, callbackId);
             Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
             Assert.IsNotNull(callbackMessage);

@@ -14,20 +14,22 @@ namespace MasterDataFlow.Tests
     [TestClass]
     public class RemoteContainerTests
     {
-        //private CommandDomainInstance _сommandDomainInstance;
-        private CommandDomain _сommandDomain;
+        private CommandRunner _runner;
+        private ManualResetEvent _event;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            //_сommandDomain = new CommandDomain();
-          //  _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
+            _runner = new CommandRunner();
+            _event = new ManualResetEvent(false);
+
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            //_сommandDomainInstance.Dispose();
+            _runner.Dispose();
+            _event.Dispose();
         }
 
         [TestMethod]
@@ -53,24 +55,27 @@ namespace MasterDataFlow.Tests
                     calls++;
                 });
             var container = new RemoteContainer(contract.Object);
+
             const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string domainGuid = "C2B980FF-7C4D-4B43-9935-497218492783";
+
+            var domain = new CommandDomain(new Guid(domainGuid), _runner);
+
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(guid)),
-                //CommandDomainId = new Guid(domainGuid),
+                CommandDomain = domain
             };
-            var waiter = new ManualResetEvent(false);
 
             // ACT
-            container.Execute(info, (containter, commandInfo) =>
+            container.Execute(Guid.NewGuid(), info, (id, status, message) =>
             {
-                waiter.Set();
+                _event.Set();
             });
 
             // ASSERT
-            waiter.WaitOne(1000);
+            _event.WaitOne(1000);
             Assert.AreEqual(1, calls);
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", typeName);
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", dataObjectTypeName);

@@ -14,11 +14,18 @@ namespace MasterDataFlow
     public class CommandDomain
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
-        private readonly Guid _id = Guid.NewGuid();
+        private readonly Guid _id;
         private readonly CommandRunner _runner;
+
+        internal CommandDomain(Guid id, CommandRunner runner)
+        {
+            _id = id;
+            _runner = runner;
+        }
 
         public CommandDomain(CommandRunner runner)
         {
+            _id = Guid.NewGuid();
             _runner = runner;
         }
 

@@ -58,7 +58,7 @@ namespace MasterDataFlow.Tests
             _runner.Run(new CommandDomain(_runner),  commandDefinition);
 
             // ASSERT
-            _event.WaitOne(100);
+            _event.WaitOne(1000);
             Assert.AreEqual(1, callCount);
         }
 
@@ -112,7 +112,7 @@ namespace MasterDataFlow.Tests
             });
 
             // ASSERT
-            _event.WaitOne(100);
+            _event.WaitOne(1000);
             Assert.AreNotEqual(Guid.Empty, callbackId);
             Assert.AreEqual(originalId, callbackId);
         }
@@ -134,7 +134,7 @@ namespace MasterDataFlow.Tests
             });
 
             // ASSERT
-            _event.WaitOne(100);
+            _event.WaitOne(1000);
             Assert.IsNotNull(callbackMessage);
             Assert.IsTrue(callbackMessage is DataCommandMessage);
             Assert.IsNull((callbackMessage as DataCommandMessage).Data);
@@ -163,7 +163,7 @@ namespace MasterDataFlow.Tests
             });
 
             // ASSERT
-            _event.WaitOne(100);
+            _event.WaitOne(1000);
             Assert.AreEqual(originalId, callbackId);
             Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
             Assert.IsNotNull(callbackMessage);
@@ -207,7 +207,7 @@ namespace MasterDataFlow.Tests
 
 
             // ASSERT
-            _event.WaitOne(200);
+            _event.WaitOne(1000);
             Assert.AreEqual(2, callCount);
 
             Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus[0]);
