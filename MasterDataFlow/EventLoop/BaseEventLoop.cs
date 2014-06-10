@@ -9,13 +9,14 @@ namespace MasterDataFlow.EventLoop
 
     public class BaseEventLoop
     {
-        internal class LoopItem
+        public class LoopItem
         {
-            public LoopItem()
+            public LoopItem(Guid id)
             {
-                Id = Guid.NewGuid();
+                Id = id;
                 Status = EventLoopCommandStatus.NotStarted;
             }
+
             // TODO Need to think about Guid. But it's easest way now
             public Guid Id { get; set; }
             public ILoopCommand Command { get; set; }
@@ -41,8 +42,8 @@ namespace MasterDataFlow.EventLoop
             public void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
             {
                 // TODO need check orders
-                _eventLoop._commandWaiting.RemoveItem(loopId);
-                var item = _eventLoop._commandWaiting.GetItem(_id);
+                _eventLoop.CommandWaiting.RemoveItem(loopId);
+                var item = _eventLoop.CommandWaiting.GetItem(_id);
                 if (item == null)
                 {
                     throw new Exception("!!!! 1");
@@ -56,7 +57,7 @@ namespace MasterDataFlow.EventLoop
                         {
                             // TODO Is need try catch?
                             item.InputCallback(_id, _status, _message);
-                            _eventLoop._commandWaiting.RemoveItem(_id);
+                            _eventLoop.CommandWaiting.RemoveItem(_id);
                         }
                         break;
                     case EventLoopCommandStatus.Progress:
@@ -74,7 +75,7 @@ namespace MasterDataFlow.EventLoop
         }
 
         private readonly AsyncQueue<LoopItem> _queue = new AsyncQueue<LoopItem>();
-        private readonly AsyncDictionary<Guid, LoopItem> _commandWaiting = new AsyncDictionary<Guid, LoopItem>();
+        protected readonly AsyncDictionary<Guid, LoopItem> CommandWaiting = new AsyncDictionary<Guid, LoopItem>();
 
         internal AsyncQueue<LoopItem> Queue
         {
@@ -83,13 +84,19 @@ namespace MasterDataFlow.EventLoop
 
         protected internal Guid Push(ILoopCommand command, EventLoopCallback callback = null)
         {
-            var item = new LoopItem
+            var loopId = Guid.NewGuid();
+            Push(loopId, command, callback);
+            return loopId;
+        }
+
+        protected internal void Push(Guid loopId, ILoopCommand command, EventLoopCallback callback = null)
+        {
+            var item = new LoopItem(loopId)
             {
                 Command = command,
                 InputCallback = callback
             };
             _queue.Enqueue(item);
-            return item.Id;
         }
 
         protected internal bool Loop()
@@ -97,7 +104,7 @@ namespace MasterDataFlow.EventLoop
             if (_queue.Count == 0)
                 return false;
             var item = _queue.Dequeue();
-            _commandWaiting.AddItem(item.Id, item);
+            CommandWaiting.AddItem(item.Id, item);
             item.Command.Execute(item.Id, null, WaitingCallback);
             return true;
         }

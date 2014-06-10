@@ -49,7 +49,9 @@ namespace MasterDataFlow.Tests
                     (id, data, waitCallBack) =>
                     {
                         ++callCount;
+                        waitCallBack(id, EventLoopCommandStatus.Completed, new ResultCommandMessage(new StopCommandResult()));
                         _event.Set();
+
                     });
             _runner.AddContainter(container.Object);
             var commandDefinition = new CommandDefinition(typeof (CommandStub));
@@ -58,7 +60,7 @@ namespace MasterDataFlow.Tests
             _runner.Run(commandDefinition);
 
             // ASSERT
-            _event.WaitOne(1000);
+            _event.WaitOne(100);
             Assert.AreEqual(1, callCount);
         }
 
@@ -188,24 +190,41 @@ namespace MasterDataFlow.Tests
             _сommandDomain.Register(definition2);
 
             // ACT
-            Guid callbackId = Guid.Empty;
-            var callbackStatus = EventLoopCommandStatus.NotStarted;
-            ILoopCommandMessage callbackMessage = null;
+            var callbackId = new Guid[2];
+            var callbackStatus = new EventLoopCommandStatus[2];
+            var callbackMessage = new ILoopCommandMessage[2];
+            var callCount = 0;
             var originalId = _runner.Run(definition1, new Command1DataObject(), (id, status, message) =>
             {
-                callbackId = id;
-                callbackStatus = status;
-                callbackMessage = message;
-                _event.Set();
+
+                callbackId[callCount] = id;
+                callbackStatus[callCount] = status;
+                callbackMessage[callCount] = message;
+
+                ++callCount;
+                if (callCount == 2)
+                    _event.Set();
             });
 
 
             // ASSERT
-            _event.WaitOne(1000000);
-            Assert.AreNotEqual(Guid.Empty, callbackId);
-            Assert.AreEqual(originalId, callbackId);
-            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
-            Assert.IsNull((callbackMessage as DataCommandMessage).Data);
+            _event.WaitOne(100);
+            Assert.AreEqual(2, callCount);
+
+            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus[0]);
+            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus[1]);
+
+            Assert.IsTrue(callbackMessage[0] is NextCommandMessage);
+            Assert.IsTrue(callbackMessage[1] is DataCommandMessage);
+            Assert.IsNull((callbackMessage[1] as DataCommandMessage).Data);
+
+            Assert.AreNotEqual(Guid.Empty, callbackId[0]);
+            Assert.AreNotEqual(Guid.Empty, callbackId[1]);
+
+            var secondId = (callbackMessage[0] as NextCommandMessage).LoopId;
+            Assert.AreEqual(originalId, callbackId[0]);
+            Assert.AreEqual(secondId, callbackId[1]);
+
         }
     }
 }

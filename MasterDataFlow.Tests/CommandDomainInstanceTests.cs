@@ -107,19 +107,5 @@ namespace MasterDataFlow.Tests
             Assert.IsNull(context.Exception);
         }
 
-        [TestMethod]
-        public void Test()
-        {
-            //var result = CommandResultBuilder.NextCommand<Command1>(new Command1DataObject());
-            //var command1Result = new Command1Result();
-            ////INextCommandResult
-            //var commandType = command1Result.GetType();
-            //var interfaces = commandType.GetInterfaces();
-            //Type d1 = typeof(IDictionary<,>);
-            ////Type d2 = typeof(INextCommandResult<,>);
-            ////var commadResultInterface = interfaces.FirstOrDefault(t => t == typeof(INextCommandResult<,>));
-
-        }
-
     }
 }

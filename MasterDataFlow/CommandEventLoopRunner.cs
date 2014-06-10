@@ -67,18 +67,20 @@ namespace MasterDataFlow
                     case EventLoopCommandStatus.Completed:
                         _runner._freeContainers.Enqueue(_containter);
                         message = ProcessNextCommand(ref status, message);
-                        if (message == null)
-                            return;
+                        if (message != null)
+                        {
+                            _callback(loopId, status, message);
+                        }
                         break;
                     case EventLoopCommandStatus.Fault:
                         _runner._freeContainers.Enqueue(_containter);
+                        _callback(loopId, status, message);
                         break;
                     case EventLoopCommandStatus.Progress:
-                        break;
+                        throw new NotImplementedException();
                     default:
                         throw new Exception("ProxyContainerCommand exception 2");
                 }
-                _callback(loopId, status, message);
             }
 
             private ILoopCommandMessage ProcessNextCommand(ref EventLoopCommandStatus status, ILoopCommandMessage message)
@@ -107,7 +109,10 @@ namespace MasterDataFlow
                     }
                     else
                     {
-                        _runner.Run(nextCommand.Definition, nextCommand.CommandDataObject, _callback);
+                       var loopItem = _runner.CommandWaiting.GetItem(_loopId);
+                       var newCommandLoopId = Guid.NewGuid();
+                       _callback(_loopId, status, new NextCommandMessage(newCommandLoopId));
+                       _runner.Run(newCommandLoopId, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
                         return null;
                     }
                 }
@@ -123,13 +128,19 @@ namespace MasterDataFlow
 
         public Guid Run(CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
         {
+            var loopId = Guid.NewGuid();
+            Run(loopId, commandDefinition, commandDataObject, callback);
+            return loopId;
+        }
+
+        private void Run(Guid loopId, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        {
             var command = new ProxyContainerCommand(this)
             {
                 CommandDefinition = commandDefinition,
                 CommandDataObject = commandDataObject
             };
-            var loopId = Push(command, callback);
-            return loopId;
+            Push(loopId, command, callback);
         }
 
 
