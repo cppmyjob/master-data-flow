@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandEventLoopRunner.cs" />
+    <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />

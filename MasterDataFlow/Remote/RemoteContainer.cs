@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Remote
@@ -21,30 +23,15 @@ namespace MasterDataFlow.Remote
         {
             ThreadPool.QueueUserWorkItem((commandData) =>
             {
-                var commandInfo = (CommandInfo)commandData;
-                var commandTypeName = commandInfo.CommandDefinition.Command.AssemblyQualifiedName;
-                var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
-                string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
+                //var commandInfo = (CommandInfo)commandData;
+                //var commandTypeName = commandInfo.CommandDefinition.Command.AssemblyQualifiedName;
+                //var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
+                //string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
 
-                var requestId = Guid.NewGuid();
+                //var requestId = Guid.NewGuid();
                 //_remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
 
-                //var commandToExecute = commandInfo.CommandDefinition.CreateInstance(info.CommandDataObject);
-                //try
-                //{
-                //    var result = commandToExecute.BaseExecute();
-                //    commandInfo.IsError = false;
-                //    commandInfo.CommandResult = result;
-                //}
-                //catch (Exception ex)
-                //{
-                //    commandInfo.IsError = true;
-                //    commandInfo.CommandResult = null;
-                //}
-                //finally
-                //{
-                //    onExecute(this, commandInfo);
-                //}
+
             }, info);
         }
 
@@ -55,7 +42,29 @@ namespace MasterDataFlow.Remote
 
         public override void Execute(Guid loopId, ILoopCommandData data, EventLoop.EventLoopCallback callback)
         {
-            throw new NotImplementedException();
+            ThreadPool.QueueUserWorkItem((commandData) =>
+            {
+                try
+                {
+                    var commandInfo = (CommandInfo)data;
+                    var commandTypeName = commandInfo.CommandDefinition.Command.AssemblyQualifiedName;
+                    var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
+                    string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
+
+                    var requestId = Guid.NewGuid();
+                    //_remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
+
+
+
+                    var commandToExecute = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandDataObject);
+                    var result = commandToExecute.BaseExecute();
+                    callback(loopId, EventLoopCommandStatus.Completed, new ResultCommandMessage(result));
+                }
+                catch (Exception ex)
+                {
+                    callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
+                }
+            });
         }
     }
 }

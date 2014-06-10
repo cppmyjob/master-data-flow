@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.EventLoop;
 using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
 
@@ -14,6 +15,12 @@ namespace MasterDataFlow
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
         private readonly Guid _id = Guid.NewGuid();
+        private readonly CommandRunner _runner;
+
+        public CommandDomain(CommandRunner runner)
+        {
+            _runner = runner;
+        }
 
         internal IList<CommandDefinition> Definitions
         {
@@ -41,6 +48,16 @@ namespace MasterDataFlow
         public void Register(CommandDefinition definition)
         {
             _definitions.Add(definition);
+        }
+
+        public Guid Start<TCommand>(ICommandDataObject commandDataObject, EventLoopCallback callback = null)
+            where TCommand : ICommand<ICommandDataObject>
+        {
+            var commandType = typeof(TCommand);
+
+            var commandDefinition = Find(commandType);
+            // TODO check if commandDefinition was found
+            return _runner.Run(this, commandDefinition, commandDataObject, callback);
         }
 
     }

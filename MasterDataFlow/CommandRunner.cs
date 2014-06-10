@@ -11,23 +11,22 @@ using MasterDataFlow.Utils;
 
 namespace MasterDataFlow
 {
-    internal class CommandEventLoopRunner : BaseEventLoop, IDisposable
+    public class CommandRunner : BaseEventLoop, IDisposable
     {
         private readonly IList<BaseContainter> _containers = new List<BaseContainter>();
         private readonly AsyncQueue<BaseContainter> _freeContainers = new AsyncQueue<BaseContainter>();
-        private readonly CommandDomain _domain;
         private bool _disposed = false; 
         private readonly Thread _commandThread;
 
         private class ProxyContainerCommand : ILoopCommand
         {
-            private readonly CommandEventLoopRunner _runner;
+            private readonly CommandRunner _runner;
             private Guid _loopId;
             private EventLoopCallback _callback;
             private BaseContainter _containter;
             private readonly CommandInfo _data = new CommandInfo();
 
-            public ProxyContainerCommand(CommandEventLoopRunner runner)
+            public ProxyContainerCommand(CommandRunner runner)
             {
                 _runner = runner;
             }
@@ -43,6 +42,13 @@ namespace MasterDataFlow
                 get { return _data.CommandDataObject; }
                 internal set { _data.CommandDataObject = value; }
             }
+
+            public CommandDomain CommandDomain
+            {
+                get { return _data.CommandDomain; }
+                internal set { _data.CommandDomain = value; }
+            }
+
 
             public void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
             {
@@ -95,7 +101,7 @@ namespace MasterDataFlow
                 }
                 else
                 {
-                    var nextCommand = commandResult.FindNextCommand(_runner._domain);
+                    var nextCommand = commandResult.FindNextCommand(_data.CommandDomain);
                     if (nextCommand == null)
                     {
                         ICommandDataObject commandDataObject = null;
@@ -112,43 +118,33 @@ namespace MasterDataFlow
                        var loopItem = _runner.CommandWaiting.GetItem(_loopId);
                        var newCommandLoopId = Guid.NewGuid();
                        _callback(_loopId, status, new NextCommandMessage(newCommandLoopId));
-                       _runner.Run(newCommandLoopId, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
+                       _runner.Run(newCommandLoopId, _data.CommandDomain, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
                         return null;
                     }
                 }
             }
         }
 
-        internal CommandEventLoopRunner(CommandDomain domain)
+        public CommandRunner()
         {
-            _domain = domain;
             _commandThread = new Thread(CommandProc);
             _commandThread.Start();
         }
 
-        public Guid Start<TCommand>(ICommandDataObject commandDataObject, EventLoopCallback callback = null)
-            where TCommand : ICommand<ICommandDataObject>
-        {
-            var commandType = typeof(TCommand);
-
-            var commandDefinition = _domain.Find(commandType);
-            // TODO check if commandDefinition was found
-            return Run(commandDefinition, commandDataObject, callback);
-        }
-
-        internal Guid Run(CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
+        internal Guid Run(CommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
         {
             var loopId = Guid.NewGuid();
-            Run(loopId, commandDefinition, commandDataObject, callback);
+            Run(loopId, domain, commandDefinition, commandDataObject, callback);
             return loopId;
         }
 
-        private void Run(Guid loopId, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        private void Run(Guid loopId, CommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
         {
             var command = new ProxyContainerCommand(this)
             {
                 CommandDefinition = commandDefinition,
-                CommandDataObject = commandDataObject
+                CommandDataObject = commandDataObject,
+                CommandDomain = domain
             };
             Push(loopId, command, callback);
         }

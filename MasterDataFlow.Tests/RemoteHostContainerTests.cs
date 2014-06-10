@@ -19,7 +19,7 @@ namespace MasterDataFlow.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _сommandDomain = new CommandDomain();
+           // _сommandDomain = new CommandDomain();
           //  _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
         }
 

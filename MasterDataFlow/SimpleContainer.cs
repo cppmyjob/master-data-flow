@@ -14,7 +14,6 @@ namespace MasterDataFlow
     {
         public override void Dispose()
         {
-            
         }
 
         public override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)

@@ -69,7 +69,6 @@ namespace MasterDataFlow.EventLoop
                         break;
                     default:
                         throw new Exception("!!!! 2");
-                        break;
                 }
             }
         }
