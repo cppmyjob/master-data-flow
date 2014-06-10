@@ -11,8 +11,6 @@ namespace MasterDataFlow
 
     public abstract class BaseContainter : BaseEventLoop, ILoopCommand, IDisposable
     {
-        public abstract void Execute(CommandInfo info, OnExecuteContainer onExecute);
-
         public abstract void Dispose();
 
         public ILoopCommandData Data { get; set; }

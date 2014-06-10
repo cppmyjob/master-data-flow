@@ -17,7 +17,7 @@ namespace MasterDataFlow.Remote
             _remoteHostContract = remoteHostContract;
         }
 
-        public override void Execute(CommandInfo info, OnExecuteContainer onExecute)
+        public void Execute(CommandInfo info, OnExecuteContainer onExecute)
         {
             ThreadPool.QueueUserWorkItem((commandData) =>
             {
@@ -27,7 +27,7 @@ namespace MasterDataFlow.Remote
                 string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
 
                 var requestId = Guid.NewGuid();
-                _remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
+                //_remoteHostContract.Execute(requestId, commandInfo.CommandDomainId, commandTypeName, dataObjectTypeName, dataObject);
 
                 //var commandToExecute = commandInfo.CommandDefinition.CreateInstance(info.CommandDataObject);
                 //try

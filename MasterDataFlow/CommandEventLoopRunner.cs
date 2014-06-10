@@ -126,7 +126,17 @@ namespace MasterDataFlow
             _commandThread.Start();
         }
 
-        public Guid Run(CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
+        public Guid Start<TCommand>(ICommandDataObject commandDataObject, EventLoopCallback callback = null)
+            where TCommand : ICommand<ICommandDataObject>
+        {
+            var commandType = typeof(TCommand);
+
+            var commandDefinition = _domain.Find(commandType);
+            // TODO check if commandDefinition was found
+            return Run(commandDefinition, commandDataObject, callback);
+        }
+
+        internal Guid Run(CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
         {
             var loopId = Guid.NewGuid();
             Run(loopId, commandDefinition, commandDataObject, callback);
@@ -142,7 +152,6 @@ namespace MasterDataFlow
             };
             Push(loopId, command, callback);
         }
-
 
         public void AddContainter(BaseContainter container)
         {

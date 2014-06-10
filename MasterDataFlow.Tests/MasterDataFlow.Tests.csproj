@@ -59,10 +59,7 @@
     <Compile Include="CommandBuilderTests.cs" />
     <Compile Include="CommandDomainTests.cs" />
     <Compile Include="CommandEventLoopRunnerTests.cs" />
-    <Compile Include="CommandRunnerTests.cs" />
     <Compile Include="EventLoopTests.cs" />
-    <Compile Include="Mocks\MockContainer.cs" />
-    <Compile Include="CommandDomainInstanceTests.cs" />
     <Compile Include="RemoteContainerTests.cs" />
     <Compile Include="RemoteHostContainerTests.cs" />
     <Compile Include="TestData\Command1.cs" />
@@ -86,6 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mocks\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

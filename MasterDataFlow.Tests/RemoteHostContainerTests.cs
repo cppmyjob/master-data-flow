@@ -13,20 +13,20 @@ namespace MasterDataFlow.Tests
     [TestClass]
     public class RemoteHostContainerTests
     {
-        private CommandDomainInstance _сommandDomainInstance;
+        //private CommandDomainInstance _сommandDomainInstance;
         private CommandDomain _сommandDomain;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _сommandDomain = new CommandDomain();
-            _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
+          //  _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            _сommandDomainInstance.Dispose();
+            //_сommandDomainInstance.Dispose();
         }
 
         //[TestMethod]

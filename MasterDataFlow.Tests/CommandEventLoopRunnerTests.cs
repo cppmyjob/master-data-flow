@@ -7,7 +7,6 @@ using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Results;
-using MasterDataFlow.Tests.Mocks;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -225,6 +224,41 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual(originalId, callbackId[0]);
             Assert.AreEqual(secondId, callbackId[1]);
 
+        }
+
+        [TestMethod]
+        public void StartCommandTest()
+        {
+            // ARRANGE
+            var container = new SimpleContainer();
+            _runner.AddContainter(container);
+
+            var commandDefinition = CommandBuilder.Build<PassingCommand>().Complete();
+            _сommandDomain.Register(commandDefinition);
+
+            // ACT
+            var newId = Guid.NewGuid();
+            Guid callbackId = Guid.Empty;
+            var callbackStatus = EventLoopCommandStatus.NotStarted;
+            ILoopCommandMessage callbackMessage = null;
+            var originalId = _runner.Start<PassingCommand>(new PassingCommandDataObject(newId), (id, status, message) =>
+            {
+                callbackId = id;
+                callbackStatus = status;
+                callbackMessage = message;
+                _event.Set();
+            });
+
+            // ASSERT
+            _event.WaitOne(100);
+            Assert.AreEqual(originalId, callbackId);
+            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
+            Assert.IsNotNull(callbackMessage);
+            Assert.IsTrue(callbackMessage is DataCommandMessage);
+            var dataMessage = callbackMessage as DataCommandMessage;
+            Assert.IsNotNull(dataMessage.Data);
+            Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
+            Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
         }
     }
 }

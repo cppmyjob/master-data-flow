@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Remote;
-using MasterDataFlow.Tests.Mocks;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -15,20 +14,20 @@ namespace MasterDataFlow.Tests
     [TestClass]
     public class RemoteContainerTests
     {
-        private CommandDomainInstance _сommandDomainInstance;
+        //private CommandDomainInstance _сommandDomainInstance;
         private CommandDomain _сommandDomain;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _сommandDomain = new CommandDomain();
-            _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
+          //  _сommandDomainInstance = new CommandDomainInstance(_сommandDomain);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            _сommandDomainInstance.Dispose();
+            //_сommandDomainInstance.Dispose();
         }
 
         [TestMethod]
@@ -60,7 +59,7 @@ namespace MasterDataFlow.Tests
             {
                 CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(guid)),
-                CommandDomainId = new Guid(domainGuid),
+                //CommandDomainId = new Guid(domainGuid),
             };
             var waiter = new ManualResetEvent(false);
 
