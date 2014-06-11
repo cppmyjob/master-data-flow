@@ -61,7 +61,6 @@
     <Compile Include="CommandRunnerTests.cs" />
     <Compile Include="EventLoopTests.cs" />
     <Compile Include="RemoteContainerTests.cs" />
-    <Compile Include="RemoteHostContainerTests.cs" />
     <Compile Include="TestData\Command1.cs" />
     <Compile Include="TestData\Command1DataObject.cs" />
     <Compile Include="TestData\CommandDataObjectStub.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="TestData\PassingCommand.cs" />
     <Compile Include="TestData\PassingCommandDataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteHostControllerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">

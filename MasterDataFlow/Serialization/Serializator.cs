@@ -13,5 +13,11 @@ namespace MasterDataFlow.Serialization
             var result = JsonConvert.SerializeObject(obj);
             return result;
         }
+
+        public static object Deserialize(Type type, string value)
+        {
+            var result = JsonConvert.DeserializeObject(value, type);
+            return result;
+        }
     }
 }

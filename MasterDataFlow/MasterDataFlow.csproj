@@ -44,12 +44,14 @@
   <ItemGroup>
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
+    <Compile Include="Interfaces\IRemoteCallback.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
     <Compile Include="Messages\DataCommandMessage.cs" />
     <Compile Include="Messages\FaultCommandMessage.cs" />
     <Compile Include="Messages\NextCommandMessage.cs" />
     <Compile Include="Messages\ResultCommandMessage.cs" />
+    <Compile Include="Remote\RemoteHost.cs" />
     <Compile Include="Results\FaultCommandResult.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
@@ -69,16 +71,11 @@
     <Compile Include="Interfaces\ICommandResult.cs" />
     <Compile Include="Interfaces\ILoopCommand.cs" />
     <Compile Include="Interfaces\INextCommandResult.cs" />
-    <Compile Include="Interfaces\IRemoteContext.cs" />
     <Compile Include="Interfaces\IRemoteHostContract.cs" />
     <Compile Include="NextCommandResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Remote\Commands\ExecuteCommand.cs" />
-    <Compile Include="Remote\Commands\RequestCommand.cs" />
-    <Compile Include="Remote\Host\LocalHost.cs" />
     <Compile Include="Remote\RemoteContainer.cs" />
-    <Compile Include="Remote\RemoteExecuteResult.cs" />
-    <Compile Include="Remote\RemoteHostContainer.cs" />
+    <Compile Include="Remote\RemoteHostController.cs" />
     <Compile Include="Results\NextStopCommandResult.cs" />
     <Compile Include="Results\NextTypeCommandResult.cs" />
     <Compile Include="Results\StopCommandResult.cs" />
