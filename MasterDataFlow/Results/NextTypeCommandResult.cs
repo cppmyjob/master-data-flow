@@ -26,7 +26,7 @@ namespace MasterDataFlow.Results
             get { return _dataObject; }
         }
 
-        public NextCommandResult FindNextCommand(CommandDomain domain)
+        public NextCommandResult FindNextCommand(ICommandDomain domain)
         {
             var definition = domain.Find<TCommand>();
             var result = new NextCommandResult(definition, _dataObject);

@@ -7,6 +7,6 @@ namespace MasterDataFlow.Interfaces
 {
     public interface ICommandResult
     {
-        NextCommandResult FindNextCommand(CommandDomain domain);
+        NextCommandResult FindNextCommand(ICommandDomain domain);
     }
 }

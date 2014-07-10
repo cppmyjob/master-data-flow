@@ -15,7 +15,7 @@ namespace MasterDataFlow.Results
             Exception = exception;
         }
 
-        public NextCommandResult FindNextCommand(CommandDomain domain)
+        public NextCommandResult FindNextCommand(ICommandDomain domain)
         {
             return null;
         }

@@ -10,6 +10,6 @@ namespace MasterDataFlow
     {
         public CommandDefinition CommandDefinition { get; internal set; }
         public ICommandDataObject CommandDataObject { get; internal set; }
-        public CommandDomain CommandDomain { get; internal set; }
+        public ICommandDomain CommandDomain { get; internal set; }
     }
 }

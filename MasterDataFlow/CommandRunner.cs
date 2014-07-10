@@ -43,7 +43,7 @@ namespace MasterDataFlow
                 internal set { _data.CommandDataObject = value; }
             }
 
-            public CommandDomain CommandDomain
+            public ICommandDomain CommandDomain
             {
                 get { return _data.CommandDomain; }
                 internal set { _data.CommandDomain = value; }
@@ -131,14 +131,14 @@ namespace MasterDataFlow
             _commandThread.Start();
         }
 
-        internal Guid Run(CommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
+        internal Guid Run(ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
         {
             var loopId = Guid.NewGuid();
             Run(loopId, domain, commandDefinition, commandDataObject, callback);
             return loopId;
         }
 
-        private void Run(Guid loopId, CommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        private void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
         {
             var command = new ProxyContainerCommand(this)
             {

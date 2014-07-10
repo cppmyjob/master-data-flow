@@ -13,9 +13,9 @@ namespace MasterDataFlow.Remote
     internal class RemoteHostController : IRemoteHostContract
     {
         private readonly IRemoteCallback _callback;
-        private readonly RemoteHost _remoteHost;
+        private readonly IRemoteHost _remoteHost;
 
-        public RemoteHostController(RemoteHost remoteHost, IRemoteCallback callback)
+        public RemoteHostController(IRemoteHost remoteHost, IRemoteCallback callback)
         {
             _remoteHost = remoteHost;
             _callback = callback;
@@ -38,7 +38,7 @@ namespace MasterDataFlow.Remote
             var dataObjectType = Type.GetType(dataObjectTypeName);
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
-            _remoteHost.Runner.Run(domain, definition, data, Callback);
+            _remoteHost.Run(domain, definition, data, Callback);
         }
 
         private void Callback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)

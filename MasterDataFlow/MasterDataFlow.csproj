@@ -44,9 +44,11 @@
   <ItemGroup>
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
+    <Compile Include="Interfaces\ICommandDomain.cs" />
     <Compile Include="Interfaces\IRemoteCallback.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
+    <Compile Include="Interfaces\IRemoteHost.cs" />
     <Compile Include="Messages\DataCommandMessage.cs" />
     <Compile Include="Messages\FaultCommandMessage.cs" />
     <Compile Include="Messages\NextCommandMessage.cs" />

@@ -2,44 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.Interfaces;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Remote
 {
-    internal class RemoteHost : IDisposable
+    internal class RemoteHost : IRemoteHost, IDisposable
     {
-// ReSharper disable InconsistentNaming
-        private static readonly RemoteHost _instance = new RemoteHost();
-// ReSharper restore InconsistentNaming
+//// ReSharper disable InconsistentNaming
+//        private static readonly RemoteHost _instance = new RemoteHost();
+//// ReSharper restore InconsistentNaming
 
-        public static RemoteHost Instance
-        {
-            get { return _instance; }
-        }
+//        public static RemoteHost Instance
+//        {
+//            get { return _instance; }
+//        }
 
         private readonly AsyncDictionary<Guid, CommandDomain> _domains = new AsyncDictionary<Guid, CommandDomain>();
         private readonly CommandRunner _runner = new CommandRunner();
 
-        public CommandRunner Runner
-        {
-            get { return _runner; }
-        }
-
-        public CommandDomain RegisterDomain(Guid id)
+        public ICommandDomain RegisterDomain(Guid id)
         {
             // TODO It's very not optimal locking need to rewrite
-            lock (_instance)
+            lock (this)
             {
-                var result = _domains.GetItem(id) ?? new CommandDomain(id, Runner);
+                var result = _domains.GetItem(id) ?? new CommandDomain(id, _runner);
                 return result;
             }
         }
 
-
         public void Dispose()
         {
             // TODO implement right Dispose
-            Runner.Dispose();
+            _runner.Dispose();
+        }
+
+        public Guid Run(ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
+        {
+            return _runner.Run(domain, commandDefinition, commandDataObject, callback);
         }
     }
 }
