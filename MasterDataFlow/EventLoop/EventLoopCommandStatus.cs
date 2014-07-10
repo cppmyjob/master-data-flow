@@ -10,6 +10,7 @@ namespace MasterDataFlow.EventLoop
         NotStarted = 0,
         Progress = 1,
         Completed = 2,
-        Fault = 3
+        RemoteCall = 3,
+        Fault = 4
     }
 }

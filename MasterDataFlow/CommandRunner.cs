@@ -82,6 +82,10 @@ namespace MasterDataFlow
                         _runner._freeContainers.Enqueue(_containter);
                         _callback(loopId, status, message);
                         break;
+                    case EventLoopCommandStatus.RemoteCall:
+                        _runner._freeContainers.Enqueue(_containter);
+                        _callback(loopId, status, null);
+                        break;
                     case EventLoopCommandStatus.Progress:
                         throw new NotImplementedException();
                     default:

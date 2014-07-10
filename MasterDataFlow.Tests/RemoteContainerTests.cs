@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,6 +18,70 @@ namespace MasterDataFlow.Tests
     {
         private CommandRunner _runner;
         private ManualResetEvent _event;
+
+        private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
+        private const string DomainId = "C2B980FF-7C4D-4B43-9935-497218492783";
+
+        public class RemoteHostContractMock
+        {
+            private Guid _requestId = System.Guid.Empty;
+            private Guid _domainId = System.Guid.Empty;
+            private string _typeName = null;
+            private string _dataObject = null;
+            private string _dataObjectTypeName = null;
+            private int _calls = 0;
+            private readonly Mock<IRemoteHostContract> _contract;
+
+            public RemoteHostContractMock()
+            {
+                _contract = new Mock<IRemoteHostContract>();
+                _contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                    Callback<Guid, Guid, string, string, string>((requestIdParam, domainIdParam, typeNameParam, dataObjectTypeNameParam, dataObjectParam) =>
+                    {
+                        _requestId = requestIdParam;
+                        _domainId = domainIdParam;
+                        _typeName = typeNameParam;
+                        _dataObjectTypeName = dataObjectTypeNameParam;
+                        _dataObject = dataObjectParam;
+                        _calls = Calls + 1;
+                    });                
+            }
+
+            public IRemoteHostContract Object
+            {
+                get { return _contract.Object; }
+            }
+
+            public Guid RequestId
+            {
+                get { return _requestId; }
+            }
+
+            public Guid DomainId
+            {
+                get { return _domainId; }
+            }
+
+            public string TypeName
+            {
+                get { return _typeName; }
+            }
+
+            public string DataObject
+            {
+                get { return _dataObject; }
+            }
+
+            public string DataObjectTypeName
+            {
+                get { return _dataObjectTypeName; }
+            }
+
+            public int Calls
+            {
+                get { return _calls; }
+            }
+        }
 
         [TestInitialize]
         public void TestInitialize()
@@ -36,53 +102,144 @@ namespace MasterDataFlow.Tests
         public void ExecuteValidParametersTest()
         {
             // ARRANGE
-            Guid requestId = Guid.Empty;
-            Guid domainId = Guid.Empty;
-            string typeName = null;
-            string dataObject = null;
-            string dataObjectTypeName = null;
-            int calls = 0;
-
-            var contract = new Mock<IRemoteHostContract>();
-            contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
-                Callback<Guid, Guid, string, string, string>((requestIdParam, domainIdParam, typeNameParem, dataObjectTypeNameParam, dataObjectParam) =>
-                {
-                    requestId = requestIdParam; 
-                    domainId = domainIdParam;
-                    typeName = typeNameParem;
-                    dataObjectTypeName = dataObjectTypeNameParam;
-                    dataObject = dataObjectParam;
-                    calls++;
-                });
+            var contract = new RemoteHostContractMock();
             var container = new RemoteContainer(contract.Object);
 
-            const string guid = "1db907fb-77c7-465f-bd60-031107374727";
-            const string domainGuid = "C2B980FF-7C4D-4B43-9935-497218492783";
-
-            var domain = new CommandDomain(new Guid(domainGuid), _runner);
+            var domain = new CommandDomain(new Guid(DomainId), _runner);
 
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
-                CommandDataObject = new PassingCommandDataObject(new Guid(guid)),
+                CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
                 CommandDomain = domain
             };
 
             // ACT
-            container.Execute(Guid.NewGuid(), info, (id, status, message) =>
+            container.Execute(System.Guid.NewGuid(), info, (id, status, message) =>
             {
                 _event.Set();
             });
 
             // ASSERT
             _event.WaitOne(1000);
-            Assert.AreEqual(1, calls);
-            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", typeName);
-            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", dataObjectTypeName);
-            Assert.AreEqual("{\"Id\":\"" + guid + "\"}", dataObject);
-            Assert.AreEqual(new Guid(domainGuid), domainId);
-            Assert.AreNotEqual(Guid.Empty, requestId);
+            Assert.AreEqual(1, contract.Calls);
+            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.TypeName);
+            Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.DataObjectTypeName);
+            Assert.AreEqual("{\"Id\":\"" + LoopId + "\"}", contract.DataObject);
+            Assert.AreEqual(new Guid(DomainId), contract.DomainId);
+            Assert.AreNotEqual(System.Guid.Empty, contract.RequestId);
         }
+
+        [TestMethod]
+        public void ExecuteValidCallbackTest()
+        {
+            // ARRANGE
+            var contract = new RemoteHostContractMock();
+            var container = new RemoteContainer(contract.Object);
+
+            var domain = new CommandDomain(new Guid(DomainId), _runner);
+            var info = new CommandInfo
+            {
+                CommandDefinition = new CommandDefinition(typeof(PassingCommand)),
+                CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
+                CommandDomain = domain
+            };
+
+            // ACT
+            Guid? executeId = null;
+            var executeStatus = EventLoopCommandStatus.NotStarted;
+            ILoopCommandMessage executeMessage = null;
+            container.Execute(new Guid(LoopId), info, (id, status, message) =>
+            {
+                executeId = id;
+                executeStatus = status;
+                executeMessage = message;
+                _event.Set();
+            });
+
+            // ASSERT
+            _event.WaitOne(1000);
+            Assert.AreEqual(new Guid(LoopId), executeId);
+            Assert.AreEqual(EventLoopCommandStatus.RemoteCall, executeStatus);
+            Assert.IsNull(executeMessage);
+        }
+
+
+        [TestMethod]
+        public void ExecuteValidRemoteCallbackTest()
+        {
+            // ARRANGE
+            var contract = new RemoteHostContractMock();
+            var container = new RemoteContainer(contract.Object);
+
+            var domain = new CommandDomain(new Guid(DomainId), _runner);
+            var info = new CommandInfo
+            {
+                CommandDefinition = new CommandDefinition(typeof(PassingCommand)),
+                CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
+                CommandDomain = domain
+            };
+
+            int calls = 0;
+            Guid? executeId = null;
+            var executeStatus = EventLoopCommandStatus.NotStarted;
+            ILoopCommandMessage executeMessage = null;
+            container.Execute(new Guid(LoopId), info, (id, status, message) =>
+            {
+                executeId = id;
+                executeStatus = status;
+                executeMessage = message;
+                ++calls;
+            });
+
+            // ACT
+
+            container.Callback(LoopId, EventLoopCommandStatus.Fault,
+                "MasterDataFlow.Messages.FaultCommandMessage, MasterDataFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "{\"Exception\":{\"ClassName\":\"System.Exception\",\"Message\":\"Test\",\"Data\":null,\"InnerException\":null,\"HelpURL\":null,\"StackTraceString\":null,\"RemoteStackTraceString\":null,\"RemoteStackIndex\":0,\"ExceptionMethod\":null,\"HResult\":-2146233088,\"Source\":null,\"WatsonBuckets\":null}}");
+
+            // ASSERT
+            _event.WaitOne(1000);
+            Assert.AreEqual(2, calls);
+            Assert.AreEqual(EventLoopCommandStatus.Fault, executeStatus);
+            Assert.IsTrue(executeMessage is FaultCommandMessage);
+            Assert.AreEqual("Test", ((FaultCommandMessage)executeMessage).Exception.Message);
+        }
+
+        //[TestMethod]
+        //public void PassingInputDataToResultTest()
+        //{
+        //    // ARRANGE
+        //    var contract = new RemoteHostContractMock();
+        //    var container = new RemoteContainer(contract.Object);
+        //    _runner.AddContainter(container);
+        //    var commandDefinition = new CommandDefinition(typeof(PassingCommand));
+
+        //    // ACT
+        //    var newId = System.Guid.NewGuid();
+        //    Guid callbackId = System.Guid.Empty;
+        //    var callbackStatus = EventLoopCommandStatus.NotStarted;
+        //    ILoopCommandMessage callbackMessage = null;
+        //    var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
+        //    {
+        //        callbackId = id;
+        //        callbackStatus = status;
+        //        callbackMessage = message;
+        //        _event.Set();
+        //    });
+
+        //    // ASSERT
+        //    _event.WaitOne(1000);
+        //    Assert.AreEqual(originalId, callbackId);
+        //    Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
+        //    Assert.IsNotNull(callbackMessage);
+        //    Assert.IsTrue(callbackMessage is DataCommandMessage);
+        //    var dataMessage = callbackMessage as DataCommandMessage;
+        //    Assert.IsNotNull(dataMessage.Data);
+        //    Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
+        //    Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
+        //}
+
 
     }
 }

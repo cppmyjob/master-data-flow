@@ -14,6 +14,7 @@ namespace MasterDataFlow.Remote
     public class RemoteContainer : BaseContainter, IRemoteCallback
     {
         private readonly IRemoteHostContract _remoteHostContract;
+        // TODO Remove unnecessary callbacks
         private readonly AsyncDictionary<Guid, EventLoopCallback> _callbacks = new AsyncDictionary<Guid, EventLoopCallback>();
 
         public RemoteContainer(IRemoteHostContract remoteHostContract)
@@ -26,7 +27,7 @@ namespace MasterDataFlow.Remote
             
         }
 
-        public override void Execute(Guid loopId, ILoopCommandData data, EventLoop.EventLoopCallback callback)
+        public override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
         {
             ThreadPool.QueueUserWorkItem((commandData) =>
             {
@@ -39,8 +40,7 @@ namespace MasterDataFlow.Remote
 
                     var requestId = Guid.NewGuid();
                     _remoteHostContract.Execute(requestId, commandInfo.CommandDomain.Id, commandTypeName, dataObjectTypeName, dataObject);
-
-                    callback(loopId, EventLoopCommandStatus.Completed, null);
+                    callback(loopId, EventLoopCommandStatus.RemoteCall, null);
                     _callbacks.AddItem(loopId, callback);
                 }
                 catch (Exception ex)
@@ -61,7 +61,12 @@ namespace MasterDataFlow.Remote
             }
             var callback = _callbacks.GetItem(id);
             if (callback == null)
-                throw new Exception("RemoteContainer::Callback can't find a callback");
+            {
+                string exMessage = String.Format("RemoteContainer::Callback can't find a callback for loopId {0}", loopId);
+                Logger.Instance.Error(exMessage);
+                // TODO Change Exception type
+                throw new Exception(exMessage);
+            }
             callback(id, status, message);
         }
     }

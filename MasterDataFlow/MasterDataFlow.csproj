@@ -45,6 +45,8 @@
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Interfaces\ICommandDomain.cs" />
+    <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IRemoteCallback.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Serialization\Serializator.cs" />
     <Compile Include="SimpleContainer.cs" />
     <Compile Include="Utils\AsyncDictionary.cs" />
+    <Compile Include="Utils\Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
