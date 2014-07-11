@@ -10,7 +10,7 @@ namespace MasterDataFlow.Interfaces
     {
         ICommandDomain RegisterDomain(Guid id);
 
-        Guid Run(ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null,
+        void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null,
             EventLoopCallback callback = null);
     }
 }

@@ -60,7 +60,9 @@
     <Compile Include="CommandDomainTests.cs" />
     <Compile Include="CommandRunnerTests.cs" />
     <Compile Include="EventLoopTests.cs" />
+    <Compile Include="RemoteClientContextTests.cs" />
     <Compile Include="RemoteContainerTests.cs" />
+    <Compile Include="RemoteFixtures.cs" />
     <Compile Include="TestData\Command1.cs" />
     <Compile Include="TestData\Command1DataObject.cs" />
     <Compile Include="TestData\CommandDataObjectStub.cs" />

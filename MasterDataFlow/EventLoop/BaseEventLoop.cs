@@ -61,6 +61,7 @@ namespace MasterDataFlow.EventLoop
                         }
                         break;
                     case EventLoopCommandStatus.Progress:
+                    case EventLoopCommandStatus.RemoteCall:
                         if (item.InputCallback != null)
                         {
                             // TODO Is need try catch?

@@ -11,20 +11,18 @@ using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Remote
 {
-    public class RemoteContainer : BaseContainter, IRemoteCallback
+    public class RemoteContainer : BaseContainter
     {
-        private readonly IRemoteHostContract _remoteHostContract;
-        // TODO Remove unnecessary callbacks
-        private readonly AsyncDictionary<Guid, EventLoopCallback> _callbacks = new AsyncDictionary<Guid, EventLoopCallback>();
+        private readonly IRemoteClientContext _context;
 
-        public RemoteContainer(IRemoteHostContract remoteHostContract)
+        public RemoteContainer(IRemoteClientContext remoteHostContract)
         {
-            _remoteHostContract = remoteHostContract;
+            _context = remoteHostContract;
         }
 
         public override void Dispose()
         {
-            
+            // TODO implement
         }
 
         public override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
@@ -38,36 +36,17 @@ namespace MasterDataFlow.Remote
                     var dataObject = Serializator.Serialize(commandInfo.CommandDataObject);
                     string dataObjectTypeName = commandInfo.CommandDataObject.GetType().AssemblyQualifiedName;
 
-                    var requestId = Guid.NewGuid();
-                    _remoteHostContract.Execute(requestId, commandInfo.CommandDomain.Id, commandTypeName, dataObjectTypeName, dataObject);
+                    //var requestId = Guid.NewGuid();
+                    // TODO Try to understand what should i do when exception is thrown during Execute
+                    _context.RegisterCallback(loopId, callback);
+                    _context.Contract.Execute(loopId, commandInfo.CommandDomain.Id, commandTypeName, dataObjectTypeName, dataObject);
                     callback(loopId, EventLoopCommandStatus.RemoteCall, null);
-                    _callbacks.AddItem(loopId, callback);
                 }
                 catch (Exception ex)
                 {
                     callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
                 }
             });
-        }
-
-        public void Callback(string loopId, EventLoopCommandStatus status, string messageTypeName, string messageData)
-        {
-            var id = new Guid(loopId);
-            ILoopCommandMessage message = null;
-            if (messageTypeName != null)
-            {
-                var messageType = Type.GetType(messageTypeName);
-                message = Serializator.Deserialize(messageType, messageData) as ILoopCommandMessage;
-            }
-            var callback = _callbacks.GetItem(id);
-            if (callback == null)
-            {
-                string exMessage = String.Format("RemoteContainer::Callback can't find a callback for loopId {0}", loopId);
-                Logger.Instance.Error(exMessage);
-                // TODO Change Exception type
-                throw new Exception(exMessage);
-            }
-            callback(id, status, message);
         }
     }
 }

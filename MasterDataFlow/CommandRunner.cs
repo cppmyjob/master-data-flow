@@ -95,6 +95,9 @@ namespace MasterDataFlow
 
             private ILoopCommandMessage ProcessNextCommand(ref EventLoopCommandStatus status, ILoopCommandMessage message)
             {
+                if (message is DataCommandMessage)
+                    return message;
+
                 ICommandResult commandResult = ((ResultCommandMessage) message).CommandResult;
                 if (commandResult == null)
                 {
@@ -142,7 +145,7 @@ namespace MasterDataFlow
             return loopId;
         }
 
-        private void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        internal void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
         {
             var command = new ProxyContainerCommand(this)
             {

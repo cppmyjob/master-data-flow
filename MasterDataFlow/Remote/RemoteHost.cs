@@ -31,15 +31,21 @@ namespace MasterDataFlow.Remote
             }
         }
 
+        public void AddContainter(BaseContainter container)
+        {
+            _runner.AddContainter(container);
+        }
+
+
         public void Dispose()
         {
             // TODO implement right Dispose
             _runner.Dispose();
         }
 
-        public Guid Run(ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
+        public void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
         {
-            return _runner.Run(domain, commandDefinition, commandDataObject, callback);
+            _runner.Run(loopId, domain, commandDefinition, commandDataObject, callback);
         }
     }
 }

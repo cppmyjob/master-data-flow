@@ -50,11 +50,14 @@
     <Compile Include="Interfaces\IRemoteCallback.cs" />
     <Compile Include="Interfaces\ILoopCommandData.cs" />
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
+    <Compile Include="Interfaces\IRemoteClientContext.cs" />
     <Compile Include="Interfaces\IRemoteHost.cs" />
     <Compile Include="Messages\DataCommandMessage.cs" />
     <Compile Include="Messages\FaultCommandMessage.cs" />
     <Compile Include="Messages\NextCommandMessage.cs" />
+    <Compile Include="Messages\RemoteDataCommandMessage.cs" />
     <Compile Include="Messages\ResultCommandMessage.cs" />
+    <Compile Include="Remote\RemoteClientContext.cs" />
     <Compile Include="Remote\RemoteHost.cs" />
     <Compile Include="Results\FaultCommandResult.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />

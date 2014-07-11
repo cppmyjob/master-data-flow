@@ -18,6 +18,7 @@ namespace MasterDataFlow.Tests
 
         public class RemoteHostMock
         {
+            private Guid _runLoopId = Guid.Empty;
             private ICommandDomain _runDomain = null;
             private CommandDefinition _runCommandDefinition = null;
             private ICommandDataObject _runCommandDataObject = null;
@@ -30,10 +31,12 @@ namespace MasterDataFlow.Tests
             public RemoteHostMock(ICommandDomain domain)
             {
                 _host = new Mock<IRemoteHost>();
-                _host.Setup(t => t.Run(It.IsAny<ICommandDomain>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>(), It.IsAny<EventLoopCallback>()))
-                    .Callback<ICommandDomain, CommandDefinition, ICommandDataObject, EventLoopCallback>(
-                    (domainParam, commandDefinition, commandDataObject, callback) =>
+                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandDomain>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>(), It.IsAny<EventLoopCallback>()))
+                    .Callback<Guid, ICommandDomain, CommandDefinition, ICommandDataObject, EventLoopCallback>(
+                    (loopId, domainParam, commandDefinition, commandDataObject, callback) =>
                     {
+                        // TODO check _runLoopId in tests
+                        _runLoopId = loopId;
                         _runCall = RunCall + 1;
                         _runDomain = domainParam;
                         _runCommandDefinition = commandDefinition;
@@ -85,6 +88,11 @@ namespace MasterDataFlow.Tests
             public int RunCall
             {
                 get { return _runCall; }
+            }
+
+            public Guid RunLoopId
+            {
+                get { return _runLoopId; }
             }
         }
 

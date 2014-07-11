@@ -22,7 +22,22 @@ namespace MasterDataFlow.Tests
         private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
         private const string DomainId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
-        public class RemoteHostContractMock
+        private class RemoteClientContextMock : RemoteClientContext
+        {
+            private readonly IRemoteHostContract _contract;
+
+            public RemoteClientContextMock(IRemoteHostContract contract)
+            {
+                _contract = contract;
+            }
+
+            protected override IRemoteHostContract CreateContract()
+            {
+                return _contract;
+            }
+        }
+
+        private class RemoteHostContractMock
         {
             private Guid _requestId = System.Guid.Empty;
             private Guid _domainId = System.Guid.Empty;
@@ -103,7 +118,8 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             var contract = new RemoteHostContractMock();
-            var container = new RemoteContainer(contract.Object);
+            var context = new RemoteClientContextMock(contract.Object);
+            var container = new RemoteContainer(context);
 
             var domain = new CommandDomain(new Guid(DomainId), _runner);
 
@@ -135,7 +151,8 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             var contract = new RemoteHostContractMock();
-            var container = new RemoteContainer(contract.Object);
+            var context = new RemoteClientContextMock(contract.Object);
+            var container = new RemoteContainer(context);
 
             var domain = new CommandDomain(new Guid(DomainId), _runner);
             var info = new CommandInfo
@@ -164,47 +181,6 @@ namespace MasterDataFlow.Tests
             Assert.IsNull(executeMessage);
         }
 
-
-        [TestMethod]
-        public void ExecuteValidRemoteCallbackTest()
-        {
-            // ARRANGE
-            var contract = new RemoteHostContractMock();
-            var container = new RemoteContainer(contract.Object);
-
-            var domain = new CommandDomain(new Guid(DomainId), _runner);
-            var info = new CommandInfo
-            {
-                CommandDefinition = new CommandDefinition(typeof(PassingCommand)),
-                CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-                CommandDomain = domain
-            };
-
-            int calls = 0;
-            Guid? executeId = null;
-            var executeStatus = EventLoopCommandStatus.NotStarted;
-            ILoopCommandMessage executeMessage = null;
-            container.Execute(new Guid(LoopId), info, (id, status, message) =>
-            {
-                executeId = id;
-                executeStatus = status;
-                executeMessage = message;
-                ++calls;
-            });
-
-            // ACT
-
-            container.Callback(LoopId, EventLoopCommandStatus.Fault,
-                "MasterDataFlow.Messages.FaultCommandMessage, MasterDataFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-                "{\"Exception\":{\"ClassName\":\"System.Exception\",\"Message\":\"Test\",\"Data\":null,\"InnerException\":null,\"HelpURL\":null,\"StackTraceString\":null,\"RemoteStackTraceString\":null,\"RemoteStackIndex\":0,\"ExceptionMethod\":null,\"HResult\":-2146233088,\"Source\":null,\"WatsonBuckets\":null}}");
-
-            // ASSERT
-            _event.WaitOne(1000);
-            Assert.AreEqual(2, calls);
-            Assert.AreEqual(EventLoopCommandStatus.Fault, executeStatus);
-            Assert.IsTrue(executeMessage is FaultCommandMessage);
-            Assert.AreEqual("Test", ((FaultCommandMessage)executeMessage).Exception.Message);
-        }
 
         //[TestMethod]
         //public void PassingInputDataToResultTest()

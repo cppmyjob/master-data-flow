@@ -6,6 +6,7 @@ using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Remote
@@ -38,7 +39,7 @@ namespace MasterDataFlow.Remote
             var dataObjectType = Type.GetType(dataObjectTypeName);
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
-            _remoteHost.Run(domain, definition, data, Callback);
+            _remoteHost.Run(requestId, domain, definition, data, Callback);
         }
 
         private void Callback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)
@@ -47,6 +48,14 @@ namespace MasterDataFlow.Remote
             string messageData = null;
             if (message != null)
             {
+                if (message is DataCommandMessage)
+                {
+                    var dataMessage = (DataCommandMessage) message;
+                    messageTypeName = dataMessage.Data.GetType().AssemblyQualifiedName;
+                    messageData = Serializator.Serialize(dataMessage.Data);
+                    message = new RemoteDataCommandMessage(messageTypeName, messageData);
+                }
+
                 messageTypeName = message.GetType().AssemblyQualifiedName;
                 messageData = Serializator.Serialize(message);
             }
