@@ -55,7 +55,7 @@ namespace MasterDataFlow.Tests
             var commandDefinition = new CommandDefinition(typeof (CommandStub));
 
             // ACT
-            _runner.Run(new CommandDomain(_runner),  commandDefinition);
+            _runner.Run(new CommandWorkflow(_runner),  commandDefinition);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -80,7 +80,7 @@ namespace MasterDataFlow.Tests
             var commandDefinition = new CommandDefinition(typeof(CommandStub));
 
             // ACT
-            var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition);
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -105,7 +105,7 @@ namespace MasterDataFlow.Tests
 
             // ACT
             Guid callbackId = Guid.Empty;
-            var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition, null, (id, status, message) =>
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition, null, (id, status, message) =>
             {
                 callbackId = id;
                 _event.Set();
@@ -127,7 +127,7 @@ namespace MasterDataFlow.Tests
 
             // ACT
             object callbackMessage = null;
-            var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition, null, (id, status, message) =>
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition, null, (id, status, message) =>
             {
                 callbackMessage = message;
                 _event.Set();
@@ -154,7 +154,7 @@ namespace MasterDataFlow.Tests
             Guid callbackId = Guid.Empty;
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
-            var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
             {
                 callbackId = id;
                 callbackStatus = status;
@@ -184,16 +184,16 @@ namespace MasterDataFlow.Tests
 
             var definition1 = new CommandDefinition(typeof(Command1));
             var definition2 = new CommandDefinition(typeof(Command2));
-            var сommandDomain = new CommandDomain(_runner);
-            сommandDomain.Register(definition1);
-            сommandDomain.Register(definition2);
+            var сommandWorkflow = new CommandWorkflow(_runner);
+            сommandWorkflow.Register(definition1);
+            сommandWorkflow.Register(definition2);
 
             // ACT
             var callbackId = new Guid[2];
             var callbackStatus = new EventLoopCommandStatus[2];
             var callbackMessage = new ILoopCommandMessage[2];
             var callCount = 0;
-            var originalId = _runner.Run(сommandDomain, definition1, new Command1DataObject(), (id, status, message) =>
+            var originalId = _runner.Run(сommandWorkflow, definition1, new Command1DataObject(), (id, status, message) =>
             {
 
                 callbackId[callCount] = id;

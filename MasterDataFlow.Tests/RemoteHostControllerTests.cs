@@ -19,35 +19,35 @@ namespace MasterDataFlow.Tests
         public class RemoteHostMock
         {
             private Guid _runLoopId = Guid.Empty;
-            private ICommandDomain _runDomain = null;
+            private ICommandWorkflow _runWorkflow = null;
             private CommandDefinition _runCommandDefinition = null;
             private ICommandDataObject _runCommandDataObject = null;
             private EventLoopCallback _runCallback = null;
-            private int _registerDomainCall = 0;
-            private Guid? _registerDomainGuid = null;
+            private int _registerWorkflowCall = 0;
+            private Guid? _registerWorkflowGuid = null;
             private Mock<IRemoteHost> _host;
             private int _runCall = 0;
 
-            public RemoteHostMock(ICommandDomain domain)
+            public RemoteHostMock(ICommandWorkflow workflow)
             {
                 _host = new Mock<IRemoteHost>();
-                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandDomain>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>(), It.IsAny<EventLoopCallback>()))
-                    .Callback<Guid, ICommandDomain, CommandDefinition, ICommandDataObject, EventLoopCallback>(
-                    (loopId, domainParam, commandDefinition, commandDataObject, callback) =>
+                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandWorkflow>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>(), It.IsAny<EventLoopCallback>()))
+                    .Callback<Guid, ICommandWorkflow, CommandDefinition, ICommandDataObject, EventLoopCallback>(
+                    (loopId, workflowParam, commandDefinition, commandDataObject, callback) =>
                     {
                         // TODO check _runLoopId in tests
                         _runLoopId = loopId;
                         _runCall = RunCall + 1;
-                        _runDomain = domainParam;
+                        _runWorkflow = workflowParam;
                         _runCommandDefinition = commandDefinition;
                         _runCommandDataObject = commandDataObject;
                         _runCallback = callback;
                     });
-                _host.Setup(t => t.RegisterDomain(It.IsAny<Guid>())).Callback<Guid>((id) =>
+                _host.Setup(t => t.RegisterWorkflow(It.IsAny<Guid>())).Callback<Guid>((id) =>
                 {
-                    _registerDomainCall = RegisterDomainCall + 1;
-                    _registerDomainGuid = id;
-                }).Returns(domain);
+                    _registerWorkflowCall = RegisterWorkflowCall + 1;
+                    _registerWorkflowGuid = id;
+                }).Returns(workflow);
             }
 
             public IRemoteHost Object
@@ -55,9 +55,9 @@ namespace MasterDataFlow.Tests
                 get { return _host.Object; }
             }
 
-            public ICommandDomain RunDomain
+            public ICommandWorkflow RunWorkflow
             {
-                get { return _runDomain; }
+                get { return _runWorkflow; }
             }
 
             public CommandDefinition RunCommandDefinition
@@ -75,14 +75,14 @@ namespace MasterDataFlow.Tests
                 get { return _runCallback; }
             }
 
-            public int RegisterDomainCall
+            public int RegisterWorkflowCall
             {
-                get { return _registerDomainCall; }
+                get { return _registerWorkflowCall; }
             }
 
-            public Guid? RegisterDomainGuid
+            public Guid? RegisterWorkflowGuid
             {
-                get { return _registerDomainGuid; }
+                get { return _registerWorkflowGuid; }
             }
 
             public int RunCall
@@ -96,26 +96,26 @@ namespace MasterDataFlow.Tests
             }
         }
 
-        public class CommandDomainMock
+        public class CommandWorkflowMock
         {
             private int _registerCall = 0;
             private CommandDefinition _registerCommandDefinition = null;
-            private readonly Mock<ICommandDomain> _domain = null;
+            private readonly Mock<ICommandWorkflow> _workflow = null;
 
-            public CommandDomainMock()
+            public CommandWorkflowMock()
             {
-                _domain = new Mock<ICommandDomain>();
-                _domain.Setup(t => t.Register(It.IsAny<CommandDefinition>())).Callback<CommandDefinition>(
-                    (domainCommandDefinition) =>
+                _workflow = new Mock<ICommandWorkflow>();
+                _workflow.Setup(t => t.Register(It.IsAny<CommandDefinition>())).Callback<CommandDefinition>(
+                    (workflowCommandDefinition) =>
                     {
                         _registerCall = RegisterCall + 1;
-                        _registerCommandDefinition = domainCommandDefinition;
+                        _registerCommandDefinition = workflowCommandDefinition;
                     });                
             }
 
-            public ICommandDomain Object
+            public ICommandWorkflow Object
             {
-                get { return _domain.Object; }
+                get { return _workflow.Object; }
             }
 
             public int RegisterCall
@@ -205,33 +205,33 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             var remoteCallback = new RemoteCallbackMock();
-            var domain = new CommandDomainMock();
-            var host = new RemoteHostMock(domain.Object);
+            var workflow = new CommandWorkflowMock();
+            var host = new RemoteHostMock(workflow.Object);
 
             var controller = new RemoteHostController(host.Object, remoteCallback.Object);
             var requestId = Guid.NewGuid();
-            var domainId = Guid.NewGuid();
+            var workflowId = Guid.NewGuid();
             const string commandTypeName = "MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string dataObjectTypeName = "MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string dataObject = "{\"Id\":\"" + guid + "\"}";
 
             // ACT
-            controller.Execute(requestId, domainId, commandTypeName, dataObjectTypeName, dataObject);
+            controller.Execute(requestId, workflowId, commandTypeName, dataObjectTypeName, dataObject);
             
 
             // ASSERT
-            Assert.AreEqual(1, host.RegisterDomainCall);
-            Assert.IsTrue(host.RegisterDomainGuid.HasValue);
-            Assert.AreEqual(domainId, host.RegisterDomainGuid.Value);
+            Assert.AreEqual(1, host.RegisterWorkflowCall);
+            Assert.IsTrue(host.RegisterWorkflowGuid.HasValue);
+            Assert.AreEqual(workflowId, host.RegisterWorkflowGuid.Value);
 
-            Assert.AreEqual(1, domain.RegisterCall);
-            Assert.IsNotNull(domain.RegisterCommandDefinition);
-            Assert.AreEqual(commandTypeName, domain.RegisterCommandDefinition.Command.AssemblyQualifiedName);
+            Assert.AreEqual(1, workflow.RegisterCall);
+            Assert.IsNotNull(workflow.RegisterCommandDefinition);
+            Assert.AreEqual(commandTypeName, workflow.RegisterCommandDefinition.Command.AssemblyQualifiedName);
 
             Assert.AreEqual(1, host.RunCall);
-            Assert.AreEqual(domain.Object, host.RunDomain);
-            Assert.AreEqual(domain.RegisterCommandDefinition, host.RunCommandDefinition);
+            Assert.AreEqual(workflow.Object, host.RunWorkflow);
+            Assert.AreEqual(workflow.RegisterCommandDefinition, host.RunCommandDefinition);
             Assert.IsTrue(host.RunCommandDataObject is PassingCommandDataObject);
             Assert.AreEqual(guid, ((PassingCommandDataObject)host.RunCommandDataObject).Id.ToString());
 
@@ -242,18 +242,18 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             var remoteCallback = new RemoteCallbackMock();
-            var domain = new CommandDomainMock();
-            var host = new RemoteHostMock(domain.Object);
+            var workflow = new CommandWorkflowMock();
+            var host = new RemoteHostMock(workflow.Object);
 
             var controller = new RemoteHostController(host.Object, remoteCallback.Object);
             var requestId = Guid.NewGuid();
-            var domainId = Guid.NewGuid();
+            var workflowId = Guid.NewGuid();
             const string commandTypeName = "MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string dataObjectTypeName = "MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string dataObject = "{\"Id\":\"" + guid + "\"}";
 
-            controller.Execute(requestId, domainId, commandTypeName, dataObjectTypeName, dataObject);
+            controller.Execute(requestId, workflowId, commandTypeName, dataObjectTypeName, dataObject);
             // ACT
 
             Guid callbackGuid = new Guid("33333333-3333-3333-3333-031107374727");

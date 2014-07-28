@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Utils;
 
 namespace MasterDataFlow
 {
@@ -10,19 +11,19 @@ namespace MasterDataFlow
 
     public delegate void OnCommandError(CommandInfo info);
 
-    public class CommandDomain : ICommandDomain
+    public class CommandWorkflow : ICommandWorkflow
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
         private readonly Guid _id;
         private readonly CommandRunner _runner;
 
-        internal CommandDomain(Guid id, CommandRunner runner)
+        internal CommandWorkflow(Guid id, CommandRunner runner)
         {
             _id = id;
             _runner = runner;
         }
 
-        public CommandDomain(CommandRunner runner)
+        public CommandWorkflow(CommandRunner runner)
         {
             _id = Guid.NewGuid();
             _runner = runner;

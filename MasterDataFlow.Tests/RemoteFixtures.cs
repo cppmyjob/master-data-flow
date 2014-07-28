@@ -19,7 +19,7 @@ namespace MasterDataFlow.Tests
         private ManualResetEvent _event;
 
         private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
-        private const string DomainId = "C2B980FF-7C4D-4B43-9935-497218492783";
+        private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
 
         private class RemoteClientContextMock : RemoteClientContext
@@ -68,7 +68,7 @@ namespace MasterDataFlow.Tests
             Guid callbackId = Guid.Empty;
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
-            var originalId = _runner.Run(new CommandDomain(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
             {
 
                 callbackId = id;

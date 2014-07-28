@@ -20,7 +20,7 @@ namespace MasterDataFlow.Tests
         private ManualResetEvent _event;
 
         private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
-        private const string DomainId = "C2B980FF-7C4D-4B43-9935-497218492783";
+        private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
         private class RemoteClientContextMock : RemoteClientContext
         {
@@ -40,7 +40,7 @@ namespace MasterDataFlow.Tests
         private class RemoteHostContractMock
         {
             private Guid _requestId = System.Guid.Empty;
-            private Guid _domainId = System.Guid.Empty;
+            private Guid _workflowId = System.Guid.Empty;
             private string _typeName = null;
             private string _dataObject = null;
             private string _dataObjectTypeName = null;
@@ -51,10 +51,10 @@ namespace MasterDataFlow.Tests
             {
                 _contract = new Mock<IRemoteHostContract>();
                 _contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
-                    Callback<Guid, Guid, string, string, string>((requestIdParam, domainIdParam, typeNameParam, dataObjectTypeNameParam, dataObjectParam) =>
+                    Callback<Guid, Guid, string, string, string>((requestIdParam, workflowIdParam, typeNameParam, dataObjectTypeNameParam, dataObjectParam) =>
                     {
                         _requestId = requestIdParam;
-                        _domainId = domainIdParam;
+                        _workflowId = workflowIdParam;
                         _typeName = typeNameParam;
                         _dataObjectTypeName = dataObjectTypeNameParam;
                         _dataObject = dataObjectParam;
@@ -72,9 +72,9 @@ namespace MasterDataFlow.Tests
                 get { return _requestId; }
             }
 
-            public Guid DomainId
+            public Guid WorkflowId
             {
-                get { return _domainId; }
+                get { return _workflowId; }
             }
 
             public string TypeName
@@ -121,13 +121,13 @@ namespace MasterDataFlow.Tests
             var context = new RemoteClientContextMock(contract.Object);
             var container = new RemoteContainer(context);
 
-            var domain = new CommandDomain(new Guid(DomainId), _runner);
+            var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
 
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-                CommandDomain = domain
+                CommandWorkflow = workflow
             };
 
             // ACT
@@ -142,7 +142,7 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.TypeName);
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.DataObjectTypeName);
             Assert.AreEqual("{\"Id\":\"" + LoopId + "\"}", contract.DataObject);
-            Assert.AreEqual(new Guid(DomainId), contract.DomainId);
+            Assert.AreEqual(new Guid(WorkflowId), contract.WorkflowId);
             Assert.AreNotEqual(System.Guid.Empty, contract.RequestId);
         }
 
@@ -154,12 +154,12 @@ namespace MasterDataFlow.Tests
             var context = new RemoteClientContextMock(contract.Object);
             var container = new RemoteContainer(context);
 
-            var domain = new CommandDomain(new Guid(DomainId), _runner);
+            var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof(PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-                CommandDomain = domain
+                CommandWorkflow = workflow
             };
 
             // ACT

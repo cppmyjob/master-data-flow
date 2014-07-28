@@ -26,9 +26,9 @@ namespace MasterDataFlow.Results
             get { return _dataObject; }
         }
 
-        public NextCommandResult FindNextCommand(ICommandDomain domain)
+        public NextCommandResult FindNextCommand(ICommandWorkflow workflow)
         {
-            var definition = domain.Find<TCommand>();
+            var definition = workflow.Find<TCommand>();
             var result = new NextCommandResult(definition, _dataObject);
             return result;
         }

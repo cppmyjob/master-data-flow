@@ -18,15 +18,15 @@ namespace MasterDataFlow.Remote
 //            get { return _instance; }
 //        }
 
-        private readonly AsyncDictionary<Guid, CommandDomain> _domains = new AsyncDictionary<Guid, CommandDomain>();
+        private readonly AsyncDictionary<Guid, CommandWorkflow> _workflows = new AsyncDictionary<Guid, CommandWorkflow>();
         private readonly CommandRunner _runner = new CommandRunner();
 
-        public ICommandDomain RegisterDomain(Guid id)
+        public ICommandWorkflow RegisterWorkflow(Guid id)
         {
             // TODO It's very not optimal locking need to rewrite
             lock (this)
             {
-                var result = _domains.GetItem(id) ?? new CommandDomain(id, _runner);
+                var result = _workflows.GetItem(id) ?? new CommandWorkflow(id, _runner);
                 return result;
             }
         }
@@ -43,9 +43,9 @@ namespace MasterDataFlow.Remote
             _runner.Dispose();
         }
 
-        public void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
+        public void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
         {
-            _runner.Run(loopId, domain, commandDefinition, commandDataObject, callback);
+            _runner.Run(loopId, workflow, commandDefinition, commandDataObject, callback);
         }
     }
 }

@@ -28,18 +28,18 @@ namespace MasterDataFlow.Remote
             throw new NotImplementedException();
         }
 
-        public void Execute(Guid requestId, Guid domainId, string commandTypeName, string dataObjectTypeName, string dataObject)
+        public void Execute(Guid requestId, Guid workflowId, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
-            var domain = _remoteHost.RegisterDomain(domainId);
+            var workflow = _remoteHost.RegisterWorkflow(workflowId);
             
             var commandType = Type.GetType(commandTypeName);
             var definition = new CommandDefinition(commandType);
-            domain.Register(definition);
+            workflow.Register(definition);
 
             var dataObjectType = Type.GetType(dataObjectTypeName);
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
-            _remoteHost.Run(requestId, domain, definition, data, Callback);
+            _remoteHost.Run(requestId, workflow, definition, data, Callback);
         }
 
         private void Callback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)

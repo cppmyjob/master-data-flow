@@ -8,6 +8,6 @@ namespace MasterDataFlow.Interfaces
     public interface IRemoteHostContract
     {
         void UploadAssembly(byte[] data);
-        void Execute(Guid requestId, Guid domainId, string commandTypeName, string dataObjectTypeName, string dataObject);
+        void Execute(Guid requestId, Guid workflowId, string commandTypeName, string dataObjectTypeName, string dataObject);
     }
 }

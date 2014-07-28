@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface ICommandDomain
+    public interface ICommandWorkflow
     {
         Guid Id { get; }
 

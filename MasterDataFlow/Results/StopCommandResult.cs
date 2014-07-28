@@ -8,7 +8,7 @@ namespace MasterDataFlow.Results
 {
     public class StopCommandResult : ICommandResult
     {
-        public NextCommandResult FindNextCommand(ICommandDomain domain)
+        public NextCommandResult FindNextCommand(ICommandWorkflow workflow)
         {
             return null;
         }

@@ -44,7 +44,8 @@
   <ItemGroup>
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
-    <Compile Include="Interfaces\ICommandDomain.cs" />
+    <Compile Include="GlobalId.cs" />
+    <Compile Include="Interfaces\ICommandWorkflow.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IRemoteCallback.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Remote\RemoteClientContext.cs" />
     <Compile Include="Remote\RemoteHost.cs" />
     <Compile Include="Results\FaultCommandResult.cs" />
+    <Compile Include="TrackedKey.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="BaseCommandItem.cs" />
@@ -86,7 +88,7 @@
     <Compile Include="Results\NextStopCommandResult.cs" />
     <Compile Include="Results\NextTypeCommandResult.cs" />
     <Compile Include="Results\StopCommandResult.cs" />
-    <Compile Include="CommandDomain.cs" />
+    <Compile Include="CommandWorkflow.cs" />
     <Compile Include="Serialization\Deserialization.cs" />
     <Compile Include="Serialization\Serializator.cs" />
     <Compile Include="SimpleContainer.cs" />

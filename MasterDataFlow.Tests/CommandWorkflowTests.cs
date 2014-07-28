@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MasterDataFlow.Tests
 {
     [TestClass]
-    public class CommandDomainTests
+    public class CommandWorkflowTests
     {
         private CommandRunner _runner;
         private ManualResetEvent _event;
@@ -37,13 +37,13 @@ namespace MasterDataFlow.Tests
         public void IdTests()
         {
             // ARRANGE, ACT
-            var domain1 = new CommandDomain(_runner);
-            var domain2 = new CommandDomain(_runner);
+            var workflow1 = new CommandWorkflow(_runner);
+            var workflow2 = new CommandWorkflow(_runner);
 
             // ASSERT
-            Assert.AreNotEqual(Guid.Empty, domain1.Id);
-            Assert.AreNotEqual(Guid.Empty, domain2.Id);
-            Assert.AreNotEqual(domain1.Id.ToString(), domain2.Id.ToString());
+            Assert.AreNotEqual(Guid.Empty, workflow1.Id);
+            Assert.AreNotEqual(Guid.Empty, workflow2.Id);
+            Assert.AreNotEqual(workflow1.Id.ToString(), workflow2.Id.ToString());
         }
 
 
@@ -56,15 +56,15 @@ namespace MasterDataFlow.Tests
 
 
             var commandDefinition = CommandBuilder.Build<PassingCommand>().Complete();
-            var сommandDomain = new CommandDomain(_runner);
-            сommandDomain.Register(commandDefinition);
+            var сommandWorkflow = new CommandWorkflow(_runner);
+            сommandWorkflow.Register(commandDefinition);
 
             // ACT
             var newId = Guid.NewGuid();
             Guid callbackId = Guid.Empty;
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
-            var originalId = сommandDomain.Start<PassingCommand>(new PassingCommandDataObject(newId), (id, status, message) =>
+            var originalId = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId), (id, status, message) =>
             {
                 callbackId = id;
                 callbackStatus = status;

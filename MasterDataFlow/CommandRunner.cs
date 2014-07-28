@@ -43,10 +43,10 @@ namespace MasterDataFlow
                 internal set { _data.CommandDataObject = value; }
             }
 
-            public ICommandDomain CommandDomain
+            public ICommandWorkflow CommandWorkflow
             {
-                get { return _data.CommandDomain; }
-                internal set { _data.CommandDomain = value; }
+                get { return _data.CommandWorkflow; }
+                internal set { _data.CommandWorkflow = value; }
             }
 
 
@@ -108,7 +108,7 @@ namespace MasterDataFlow
                 }
                 else
                 {
-                    var nextCommand = commandResult.FindNextCommand(_data.CommandDomain);
+                    var nextCommand = commandResult.FindNextCommand(_data.CommandWorkflow);
                     if (nextCommand == null)
                     {
                         ICommandDataObject commandDataObject = null;
@@ -125,7 +125,7 @@ namespace MasterDataFlow
                        var loopItem = _runner.CommandWaiting.GetItem(_loopId);
                        var newCommandLoopId = Guid.NewGuid();
                        _callback(_loopId, status, new NextCommandMessage(newCommandLoopId));
-                       _runner.Run(newCommandLoopId, _data.CommandDomain, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
+                       _runner.Run(newCommandLoopId, _data.CommandWorkflow, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
                         return null;
                     }
                 }
@@ -138,20 +138,20 @@ namespace MasterDataFlow
             _commandThread.Start();
         }
 
-        internal Guid Run(ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
+        internal Guid Run(ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
         {
             var loopId = Guid.NewGuid();
-            Run(loopId, domain, commandDefinition, commandDataObject, callback);
+            Run(loopId, workflow, commandDefinition, commandDataObject, callback);
             return loopId;
         }
 
-        internal void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        internal void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
         {
             var command = new ProxyContainerCommand(this)
             {
                 CommandDefinition = commandDefinition,
                 CommandDataObject = commandDataObject,
-                CommandDomain = domain
+                CommandWorkflow = workflow
             };
             Push(loopId, command, callback);
         }

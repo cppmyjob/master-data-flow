@@ -8,9 +8,9 @@ namespace MasterDataFlow.Interfaces
 {
     public interface IRemoteHost
     {
-        ICommandDomain RegisterDomain(Guid id);
+        ICommandWorkflow RegisterWorkflow(Guid id);
 
-        void Run(Guid loopId, ICommandDomain domain, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null,
+        void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null,
             EventLoopCallback callback = null);
     }
 }
