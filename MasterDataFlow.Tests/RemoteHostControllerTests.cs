@@ -31,9 +31,10 @@ namespace MasterDataFlow.Tests
             public RemoteHostMock(ICommandWorkflow workflow)
             {
                 _host = new Mock<IRemoteHost>();
-                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandWorkflow>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>(), It.IsAny<EventLoopCallback>()))
-                    .Callback<Guid, ICommandWorkflow, CommandDefinition, ICommandDataObject, EventLoopCallback>(
-                    (loopId, workflowParam, commandDefinition, commandDataObject, callback) =>
+
+                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandWorkflow>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>()))
+                    .Callback<Guid, ICommandWorkflow, CommandDefinition, ICommandDataObject>(
+                    (loopId, workflowParam, commandDefinition, commandDataObject) =>
                     {
                         // TODO check _runLoopId in tests
                         _runLoopId = loopId;
@@ -41,12 +42,13 @@ namespace MasterDataFlow.Tests
                         _runWorkflow = workflowParam;
                         _runCommandDefinition = commandDefinition;
                         _runCommandDataObject = commandDataObject;
-                        _runCallback = callback;
                     });
-                _host.Setup(t => t.RegisterWorkflow(It.IsAny<Guid>())).Callback<Guid>((id) =>
+
+                _host.Setup(t => t.RegisterWorkflow(It.IsAny<Guid>(), It.IsAny<EventLoopCallback>())).Callback<Guid, EventLoopCallback>((id, callback) =>
                 {
                     _registerWorkflowCall = RegisterWorkflowCall + 1;
                     _registerWorkflowGuid = id;
+                    _runCallback = callback;
                 }).Returns(workflow);
             }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.EventLoop;
 
 namespace MasterDataFlow.Interfaces
 {
@@ -13,5 +14,7 @@ namespace MasterDataFlow.Interfaces
             where TCommand : ICommand<ICommandDataObject>;
 
         void Register(CommandDefinition definition);
+
+        void EventLoopCallback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message = null);
     }
 }

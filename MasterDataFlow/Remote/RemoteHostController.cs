@@ -30,7 +30,7 @@ namespace MasterDataFlow.Remote
 
         public void Execute(Guid requestId, Guid workflowId, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
-            var workflow = _remoteHost.RegisterWorkflow(workflowId);
+            var workflow = _remoteHost.RegisterWorkflow(workflowId, Callback);
             
             var commandType = Type.GetType(commandTypeName);
             var definition = new CommandDefinition(commandType);
@@ -39,7 +39,9 @@ namespace MasterDataFlow.Remote
             var dataObjectType = Type.GetType(dataObjectTypeName);
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
-            _remoteHost.Run(requestId, workflow, definition, data, Callback);
+            // TODO Restore Remote Callback
+            _remoteHost.Run(requestId, workflow, definition, data);
+            //_remoteHost.Run(requestId, workflow, definition, data, Callback);
         }
 
         private void Callback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)

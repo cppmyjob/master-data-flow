@@ -11,11 +11,15 @@ namespace MasterDataFlow
 
     public delegate void OnCommandError(CommandInfo info);
 
+    public delegate void OnMessageRecieved(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message);
+
     public class CommandWorkflow : ICommandWorkflow
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
         private readonly Guid _id;
         private readonly CommandRunner _runner;
+
+        public event OnMessageRecieved MessageRecieved;
 
         internal CommandWorkflow(Guid id, CommandRunner runner)
         {
@@ -42,7 +46,7 @@ namespace MasterDataFlow
         public CommandDefinition Find<TCommand>()
             where TCommand : ICommand<ICommandDataObject>
         {
-            Type commandType = typeof (TCommand);
+            Type commandType = typeof(TCommand);
             return Find(commandType);
         }
 
@@ -51,20 +55,33 @@ namespace MasterDataFlow
             _definitions.Add(definition);
         }
 
-        public Guid Start<TCommand>(ICommandDataObject commandDataObject, EventLoopCallback callback = null)
+        public Guid Start<TCommand>(ICommandDataObject commandDataObject)
             where TCommand : ICommand<ICommandDataObject>
         {
-            Type commandType = typeof (TCommand);
+            Type commandType = typeof(TCommand);
 
             CommandDefinition commandDefinition = Find(commandType);
             // TODO check if commandDefinition was found
-            return _runner.Run(this, commandDefinition, commandDataObject, callback);
+            return _runner.Run(this, commandDefinition, commandDataObject);
+        }
+
+        private void EventLoopCallback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)
+        {
+            if (MessageRecieved != null)
+            {
+                MessageRecieved(loopId, status, message);
+            }
         }
 
         private CommandDefinition Find(Type commandType)
         {
             CommandDefinition result = _definitions.FirstOrDefault(t => t.Command == commandType);
             return result;
+        }
+
+        void ICommandWorkflow.EventLoopCallback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)
+        {
+            EventLoopCallback(loopId, status, message);
         }
     }
 }

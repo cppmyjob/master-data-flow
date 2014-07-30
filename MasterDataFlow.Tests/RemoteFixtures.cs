@@ -68,16 +68,18 @@ namespace MasterDataFlow.Tests
             Guid callbackId = Guid.Empty;
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
-            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition, new PassingCommandDataObject(newId), (id, status, message) =>
+            var workflow = new CommandWorkflow(_runner);
+            workflow.MessageRecieved += (id, status, message) =>
             {
-
                 callbackId = id;
                 callbackStatus = status;
                 callbackMessage = message;
                 ++calls;
                 if (calls == 2)
                     _event.Set();
-            });
+            }; 
+
+            var originalId = _runner.Run(workflow, commandDefinition, new PassingCommandDataObject(newId));
 
             // ASSERT
             _event.WaitOne(1000);

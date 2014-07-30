@@ -64,13 +64,14 @@ namespace MasterDataFlow.Tests
             Guid callbackId = Guid.Empty;
             var callbackStatus = EventLoopCommandStatus.NotStarted;
             ILoopCommandMessage callbackMessage = null;
-            var originalId = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId), (id, status, message) =>
+            сommandWorkflow.MessageRecieved += (id, status, message) =>
             {
                 callbackId = id;
                 callbackStatus = status;
                 callbackMessage = message;
                 _event.Set();
-            });
+            };
+            var originalId = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
 
             // ASSERT
             _event.WaitOne(1000);

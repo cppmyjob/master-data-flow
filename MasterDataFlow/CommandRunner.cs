@@ -125,7 +125,7 @@ namespace MasterDataFlow
                        var loopItem = _runner.CommandWaiting.GetItem(_loopId);
                        var newCommandLoopId = Guid.NewGuid();
                        _callback(_loopId, status, new NextCommandMessage(newCommandLoopId));
-                       _runner.Run(newCommandLoopId, _data.CommandWorkflow, nextCommand.Definition, nextCommand.CommandDataObject, loopItem.InputCallback);
+                       _runner.Run(newCommandLoopId, _data.CommandWorkflow, nextCommand.Definition, nextCommand.CommandDataObject);
                         return null;
                     }
                 }
@@ -138,14 +138,14 @@ namespace MasterDataFlow
             _commandThread.Start();
         }
 
-        internal Guid Run(ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoopCallback callback = null)
+        internal Guid Run(ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
         {
             var loopId = Guid.NewGuid();
-            Run(loopId, workflow, commandDefinition, commandDataObject, callback);
+            Run(loopId, workflow, commandDefinition, commandDataObject);
             return loopId;
         }
 
-        internal void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject, EventLoopCallback callback)
+        internal void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject)
         {
             var command = new ProxyContainerCommand(this)
             {
@@ -153,7 +153,7 @@ namespace MasterDataFlow
                 CommandDataObject = commandDataObject,
                 CommandWorkflow = workflow
             };
-            Push(loopId, command, callback);
+            Push(loopId, command, workflow.EventLoopCallback);
         }
 
         public void AddContainter(BaseContainter container)

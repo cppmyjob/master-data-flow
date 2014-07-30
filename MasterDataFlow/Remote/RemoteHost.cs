@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Utils;
 
@@ -9,24 +10,21 @@ namespace MasterDataFlow.Remote
 {
     internal class RemoteHost : IRemoteHost, IDisposable
     {
-//// ReSharper disable InconsistentNaming
-//        private static readonly RemoteHost _instance = new RemoteHost();
-//// ReSharper restore InconsistentNaming
-
-//        public static RemoteHost Instance
-//        {
-//            get { return _instance; }
-//        }
-
         private readonly AsyncDictionary<Guid, CommandWorkflow> _workflows = new AsyncDictionary<Guid, CommandWorkflow>();
         private readonly CommandRunner _runner = new CommandRunner();
 
-        public ICommandWorkflow RegisterWorkflow(Guid id)
+        public ICommandWorkflow RegisterWorkflow(Guid id, EventLoopCallback callback)
         {
             // TODO It's very not optimal locking need to rewrite
             lock (this)
             {
-                var result = _workflows.GetItem(id) ?? new CommandWorkflow(id, _runner);
+                var result = _workflows.GetItem(id);
+                if (result == null)
+                {
+                    result = new CommandWorkflow(id, _runner);
+                    result.MessageRecieved += (loopId, status, message) => callback(loopId, status, message);
+                    _workflows.AddItem(id, result);
+                }
                 return result;
             }
         }
@@ -43,9 +41,9 @@ namespace MasterDataFlow.Remote
             _runner.Dispose();
         }
 
-        public void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null, EventLoop.EventLoopCallback callback = null)
+        public void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
         {
-            _runner.Run(loopId, workflow, commandDefinition, commandDataObject, callback);
+            _runner.Run(loopId, workflow, commandDefinition, commandDataObject);
         }
     }
 }
