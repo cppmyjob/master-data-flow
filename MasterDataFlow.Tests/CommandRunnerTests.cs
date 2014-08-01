@@ -40,7 +40,7 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             int callCount = 0;
-            var container = new Mock<BaseContainter>();
+            var container = new Mock<IContainer>();
             container.Setup(
                 t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>()))
                 .Callback<Guid, ILoopCommandData, EventLoopCallback>(
@@ -67,7 +67,7 @@ namespace MasterDataFlow.Tests
         {
             // ARRANGE
             Guid containerId = Guid.Empty;
-            var container = new Mock<BaseContainter>();
+            var container = new Mock<IContainer>();
             container.Setup(
                 t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>()))
                 .Callback<Guid, ILoopCommandData, EventLoopCallback>(
@@ -92,7 +92,7 @@ namespace MasterDataFlow.Tests
         public void ContainerReturnCallbackTest()
         {
             // ARRANGE
-            var container = new Mock<BaseContainter>();
+            var container = new Mock<IContainer>();
             container.Setup(
                 t => t.Execute(It.IsAny<Guid>(), It.IsAny<ILoopCommandData>(), It.IsAny<EventLoopCallback>()))
                 .Callback<Guid, ILoopCommandData, EventLoopCallback>(

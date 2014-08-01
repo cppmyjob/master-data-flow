@@ -29,7 +29,7 @@ namespace MasterDataFlow.Remote
             }
         }
 
-        public void AddContainter(BaseContainter container)
+        public void AddContainter(BaseContainer container)
         {
             _runner.AddContainter(container);
         }

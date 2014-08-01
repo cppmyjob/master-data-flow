@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
 
-namespace MasterDataFlow
+namespace MasterDataFlow.Keys
 {
     public abstract class TrackedKey : IComparable<TrackedKey>
     {
@@ -13,14 +10,7 @@ namespace MasterDataFlow
         [JsonIgnore]
         public string Key
         {
-            get
-            {
-                if (_key == null)
-                {
-                    _key = JsonConvert.SerializeObject(this);
-                }
-                return _key;
-            }
+            get { return _key ?? (_key = JsonConvert.SerializeObject(this)); }
         }
 
         public static bool operator ==(TrackedKey a, TrackedKey b)

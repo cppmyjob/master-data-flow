@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Remote
 {
-    public class RemoteContainer : BaseContainter
+    public class RemoteContainer : BaseContainer
     {
         private readonly IRemoteClientContext _context;
 
@@ -25,7 +26,7 @@ namespace MasterDataFlow.Remote
             // TODO implement
         }
 
-        public override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
+        protected override void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
         {
             ThreadPool.QueueUserWorkItem((commandData) =>
             {
@@ -47,6 +48,16 @@ namespace MasterDataFlow.Remote
                     callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
                 }
             });
+        }
+
+        protected override void Subscribe(Guid workflowId, TrackedKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void Unsubscribe(Guid workflowId, TrackedKey key)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -13,8 +13,8 @@ namespace MasterDataFlow
 {
     public class CommandRunner : BaseEventLoop, IDisposable
     {
-        private readonly IList<BaseContainter> _containers = new List<BaseContainter>();
-        private readonly AsyncQueue<BaseContainter> _freeContainers = new AsyncQueue<BaseContainter>();
+        private readonly IList<IContainer> _containers = new List<IContainer>();
+        private readonly AsyncQueue<IContainer> _freeContainers = new AsyncQueue<IContainer>();
         private bool _disposed = false; 
         private readonly Thread _commandThread;
 
@@ -23,7 +23,7 @@ namespace MasterDataFlow
             private readonly CommandRunner _runner;
             private Guid _loopId;
             private EventLoopCallback _callback;
-            private BaseContainter _containter;
+            private IContainer _containter;
             private readonly CommandInfo _data = new CommandInfo();
 
             public ProxyContainerCommand(CommandRunner runner)
@@ -156,7 +156,7 @@ namespace MasterDataFlow
             Push(loopId, command, workflow.EventLoopCallback);
         }
 
-        public void AddContainter(BaseContainter container)
+        public void AddContainter(IContainer container)
         {
             _containers.Add(container);
             _freeContainers.Enqueue(container);

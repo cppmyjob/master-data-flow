@@ -119,7 +119,7 @@ namespace MasterDataFlow.Tests
             // ARRANGE
             var contract = new RemoteHostContractMock();
             var context = new RemoteClientContextMock(contract.Object);
-            var container = new RemoteContainer(context);
+            IContainer container = new RemoteContainer(context);
 
             var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
 
@@ -152,7 +152,7 @@ namespace MasterDataFlow.Tests
             // ARRANGE
             var contract = new RemoteHostContractMock();
             var context = new RemoteClientContextMock(contract.Object);
-            var container = new RemoteContainer(context);
+            IContainer container = new RemoteContainer(context);
 
             var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
             var info = new CommandInfo

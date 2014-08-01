@@ -73,6 +73,7 @@
     <Compile Include="TestData\PassingCommandDataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteHostControllerTests.cs" />
+    <Compile Include="SimpleContainerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">

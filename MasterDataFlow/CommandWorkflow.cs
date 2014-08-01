@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow
@@ -63,6 +64,16 @@ namespace MasterDataFlow
             CommandDefinition commandDefinition = Find(commandType);
             // TODO check if commandDefinition was found
             return _runner.Run(this, commandDefinition, commandDataObject);
+        }
+
+        public void Subscribe(TrackedKey key)
+        {
+
+        }
+
+        public void Unsubscribe(TrackedKey key)
+        {
+            throw new NotImplementedException();
         }
 
         private void EventLoopCallback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message)
