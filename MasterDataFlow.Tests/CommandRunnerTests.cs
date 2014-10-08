@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Results;
 using MasterDataFlow.Tests.TestData;
@@ -53,9 +54,11 @@ namespace MasterDataFlow.Tests
                     });
             _runner.AddContainter(container.Object);
             var commandDefinition = new CommandDefinition(typeof (CommandStub));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
-            _runner.Run(new CommandWorkflow(_runner),  commandDefinition);
+            _runner.Run(new CommandWorkflow(_runner), commandKey, commandDefinition);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -78,9 +81,11 @@ namespace MasterDataFlow.Tests
                     });
             _runner.AddContainter(container.Object);
             var commandDefinition = new CommandDefinition(typeof(CommandStub));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
-            var originalId = _runner.Run(new CommandWorkflow(_runner), commandDefinition);
+            var originalId = _runner.Run(new CommandWorkflow(_runner), commandKey, commandDefinition);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -102,6 +107,8 @@ namespace MasterDataFlow.Tests
                     });
             _runner.AddContainter(container.Object);
             var commandDefinition = new CommandDefinition(typeof(CommandStub));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
             Guid callbackId = Guid.Empty;
@@ -112,7 +119,7 @@ namespace MasterDataFlow.Tests
                 _event.Set();
             };
 
-            var originalId = _runner.Run(workflow, commandDefinition, null);
+            var originalId = _runner.Run(workflow, commandKey, commandDefinition, null);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -127,6 +134,8 @@ namespace MasterDataFlow.Tests
             var container = new SimpleContainer();
             _runner.AddContainter(container);
             var commandDefinition = new CommandDefinition(typeof(CommandStub));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
             object callbackMessage = null;
@@ -136,7 +145,7 @@ namespace MasterDataFlow.Tests
                 callbackMessage = message;
                 _event.Set();
             };
-            var originalId = _runner.Run(workflow, commandDefinition, null);
+            var originalId = _runner.Run(workflow, commandKey, commandDefinition, null);
 
             // ASSERT
             _event.WaitOne(1000);
@@ -153,6 +162,8 @@ namespace MasterDataFlow.Tests
             var container = new SimpleContainer();
             _runner.AddContainter(container);
             var commandDefinition = new CommandDefinition(typeof(PassingCommand));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
             var newId = Guid.NewGuid();
@@ -167,7 +178,7 @@ namespace MasterDataFlow.Tests
                 callbackMessage = message;
                 _event.Set();
             };
-            var originalId = _runner.Run(workflow, commandDefinition, new PassingCommandDataObject(newId));
+            var originalId = _runner.Run(workflow, commandKey, commandDefinition, new PassingCommandDataObject(newId));
 
             // ASSERT
             _event.WaitOne(1000);
@@ -194,6 +205,8 @@ namespace MasterDataFlow.Tests
             var сommandWorkflow = new CommandWorkflow(_runner);
             сommandWorkflow.Register(definition1);
             сommandWorkflow.Register(definition2);
+            const string commandId1 = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey1 = new CommandKey(new Guid(commandId1));
 
             // ACT
             var callbackId = new Guid[2];
@@ -212,7 +225,7 @@ namespace MasterDataFlow.Tests
                     _event.Set();
             };
 
-            var originalId = _runner.Run(сommandWorkflow, definition1, new Command1DataObject());
+            var originalId = _runner.Run(сommandWorkflow, commandKey1, definition1, new Command1DataObject());
 
             // ASSERT
             _event.WaitOne(1000);

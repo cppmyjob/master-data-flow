@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 
 namespace MasterDataFlow
 {
@@ -21,9 +22,10 @@ namespace MasterDataFlow
             get { return _command; }
         }
 
-        internal BaseCommand CreateInstance(ICommandDataObject commandDataObject)
+        internal BaseCommand CreateInstance(CommandKey commandKey, ICommandDataObject commandDataObject)
         {
             var instance = (BaseCommand)Activator.CreateInstance(_command);
+            instance.Key = commandKey;
             PropertyInfo prop = _command.GetProperty("DataObject", BindingFlags.Instance | BindingFlags.Public);
             // TODO need to add a some checking is DataObject exist and etc
             prop.SetValue(instance, commandDataObject, null);

@@ -28,7 +28,7 @@ namespace MasterDataFlow
                 try
                 {
                     var commandInfo = (CommandInfo) data;
-                    _commandInstance = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandDataObject);
+                    _commandInstance = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandKey, commandInfo.CommandDataObject);
                     var result = _commandInstance.BaseExecute();
                     callback(loopId, EventLoopCommandStatus.Completed, new ResultCommandMessage(result));
                 }
@@ -43,13 +43,13 @@ namespace MasterDataFlow
             });
         }
 
-        protected override void Subscribe(Guid workflowId, TrackedKey key)
+        protected override void Subscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
             // TODO Call via transaction
             throw new NotImplementedException();
         }
 
-        protected override void Unsubscribe(Guid workflowId, TrackedKey key)
+        protected override void Unsubscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
             throw new NotImplementedException();
         }

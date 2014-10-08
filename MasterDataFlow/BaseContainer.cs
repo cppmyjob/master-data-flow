@@ -20,18 +20,18 @@ namespace MasterDataFlow
             Execute(loopId, data, callback);
         }
 
-        protected abstract void Subscribe(Guid workflowId, TrackedKey key);
+        protected abstract void Subscribe(WorkflowKey workflowKey, SubscribeKey key);
 
-        protected abstract void Unsubscribe(Guid workflowId, TrackedKey key);
+        protected abstract void Unsubscribe(WorkflowKey workflowKey, SubscribeKey key);
 
-        void IContainer.Subscribe(Guid workflowId, TrackedKey key)
+        void IContainer.Subscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
-            Subscribe(workflowId, key);
+            Subscribe(workflowKey, key);
         }
 
-        void IContainer.Unsubscribe(Guid workflowId, TrackedKey key)
+        void IContainer.Unsubscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
-            Unsubscribe(workflowId, key);
+            Unsubscribe(workflowKey, key);
         }
 
     }

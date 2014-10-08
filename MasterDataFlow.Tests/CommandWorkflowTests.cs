@@ -30,13 +30,13 @@ namespace MasterDataFlow.Tests
                 return NextStopCommand();
             }
 
-            protected override void OnSubscribed(TrackedKey key)
+            protected override void OnSubscribed(BaseKey key)
             {
                 ++_subscribeCommandOnSubscribedCall;
                 _event.Set();
             }
 
-            protected override void OnUnsubscribed(TrackedKey key)
+            protected override void OnUnsubscribed(BaseKey key)
             {
                 ++_subscribeCommandOnUnsubscribedCall;
                 _event.Set();
@@ -116,9 +116,9 @@ namespace MasterDataFlow.Tests
             var workflow2 = new CommandWorkflow(_runner);
 
             // ASSERT
-            Assert.AreNotEqual(Guid.Empty, workflow1.Id);
-            Assert.AreNotEqual(Guid.Empty, workflow2.Id);
-            Assert.AreNotEqual(workflow1.Id.ToString(), workflow2.Id.ToString());
+            Assert.AreNotEqual(Guid.Empty, workflow1.Key);
+            Assert.AreNotEqual(Guid.Empty, workflow2.Key);
+            Assert.AreNotEqual(workflow1.Key.ToString(), workflow2.Key.ToString());
         }
 
 

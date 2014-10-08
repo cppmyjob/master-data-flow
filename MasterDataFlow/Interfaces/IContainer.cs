@@ -8,8 +8,8 @@ namespace MasterDataFlow.Interfaces
 {
     public interface IContainer : ILoopCommand, IDisposable
     {
-        void Subscribe(Guid workflowId, TrackedKey key);
+        void Subscribe(WorkflowKey workflowKey, SubscribeKey key);
 
-        void Unsubscribe(Guid workflowId, TrackedKey key);
+        void Unsubscribe(WorkflowKey workflowKey, SubscribeKey key);
     }
 }

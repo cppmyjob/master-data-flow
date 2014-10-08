@@ -52,13 +52,13 @@ namespace MasterDataFlow.Tests
                 return NextStopCommand();
             }
 
-            protected override void OnSubscribed(TrackedKey key)
+            protected override void OnSubscribed(BaseKey key)
             {
                 ++_commandSubscribeOnSubscribedCall;
                 _event.Set();
             }
 
-            protected override void OnUnsubscribed(TrackedKey key)
+            protected override void OnUnsubscribed(BaseKey key)
             {
                 ++_commandSubscribeOnUnsubscribedCall;
                 _event.Set();
@@ -151,18 +151,18 @@ namespace MasterDataFlow.Tests
             var loopId = Guid.NewGuid();
             var commandDefinition = CommandBuilder.Build<CommandSubscribe>().Complete();
 
-            var workflowId = Guid.NewGuid();
+            var workflowKey = new WorkflowKey();
 
             var commandInfo = new CommandInfo
             {
                 CommandDefinition = commandDefinition,
                 CommandDataObject = new CommandSubscribeDataObject(),
-                CommandWorkflow = new CommandWorkflow(workflowId, _runner)
+                CommandWorkflow = new CommandWorkflow(workflowKey, _runner)
             };
             _container.Execute(loopId, commandInfo, (id, status, message) => { });
 
             // ACT
-            _container.Subscribe(workflowId, new StringKey("test"));
+            _container.Subscribe(workflowKey, new StringKey("test"));
 
             // ASSERT
             _event.WaitOne(1000);

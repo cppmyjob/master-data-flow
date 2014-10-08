@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
@@ -61,6 +62,8 @@ namespace MasterDataFlow.Tests
             var container = new RemoteContainer(context);
             _runner.AddContainter(container);
             var commandDefinition = new CommandDefinition(typeof(PassingCommand));
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
             int calls = 0;
@@ -77,9 +80,9 @@ namespace MasterDataFlow.Tests
                 ++calls;
                 if (calls == 2)
                     _event.Set();
-            }; 
+            };
 
-            var originalId = _runner.Run(workflow, commandDefinition, new PassingCommandDataObject(newId));
+            var originalId = _runner.Run(workflow, commandKey, commandDefinition, new PassingCommandDataObject(newId));
 
             // ASSERT
             _event.WaitOne(1000);

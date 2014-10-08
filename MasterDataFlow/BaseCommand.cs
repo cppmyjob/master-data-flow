@@ -9,19 +9,22 @@ namespace MasterDataFlow
 {
     public abstract class BaseCommand 
     {
+        // TODO move setting key value to constructor
+        public CommandKey Key { get; internal set; }
+
         internal protected abstract ICommandResult BaseExecute();
 
-        protected virtual void SendMessage(TrackedKey key)
+        protected virtual void SendMessage(BaseKey key)
         {
             
         }
 
-        protected virtual void OnSubscribed(TrackedKey key)
+        protected virtual void OnSubscribed(BaseKey key)
         {
 
         }
 
-        protected virtual void OnUnsubscribed(TrackedKey key)
+        protected virtual void OnUnsubscribed(BaseKey key)
         {
             
         }

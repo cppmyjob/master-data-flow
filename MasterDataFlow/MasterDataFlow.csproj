@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
-    <Compile Include="GlobalId.cs" />
     <Compile Include="Interfaces\ICommandWorkflow.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
@@ -54,7 +53,11 @@
     <Compile Include="Interfaces\ILoopCommandMessage.cs" />
     <Compile Include="Interfaces\IRemoteClientContext.cs" />
     <Compile Include="Interfaces\IRemoteHost.cs" />
+    <Compile Include="Keys\CommandKey.cs" />
+    <Compile Include="Keys\ServiceKey.cs" />
     <Compile Include="Keys\StringKey.cs" />
+    <Compile Include="Keys\SubscribeKey.cs" />
+    <Compile Include="Keys\WorkflowKey.cs" />
     <Compile Include="Messages\DataCommandMessage.cs" />
     <Compile Include="Messages\FaultCommandMessage.cs" />
     <Compile Include="Messages\NextCommandMessage.cs" />
@@ -63,7 +66,7 @@
     <Compile Include="Remote\RemoteClientContext.cs" />
     <Compile Include="Remote\RemoteHost.cs" />
     <Compile Include="Results\FaultCommandResult.cs" />
-    <Compile Include="Keys\TrackedKey.cs" />
+    <Compile Include="Keys\BaseKey.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="BaseCommandItem.cs" />

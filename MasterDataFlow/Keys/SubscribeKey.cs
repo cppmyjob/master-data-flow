@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MasterDataFlow
+namespace MasterDataFlow.Keys
 {
-    public class GlobalId
+    public class SubscribeKey : BaseKey
     {
-        public Guid WorkflowId { get; set; }
     }
 }

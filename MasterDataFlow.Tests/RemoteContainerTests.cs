@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
@@ -40,7 +41,8 @@ namespace MasterDataFlow.Tests
         private class RemoteHostContractMock
         {
             private Guid _requestId = System.Guid.Empty;
-            private Guid _workflowId = System.Guid.Empty;
+            private WorkflowKey _workflowKey;
+            private CommandKey _commandKey;
             private string _typeName = null;
             private string _dataObject = null;
             private string _dataObjectTypeName = null;
@@ -50,11 +52,12 @@ namespace MasterDataFlow.Tests
             public RemoteHostContractMock()
             {
                 _contract = new Mock<IRemoteHostContract>();
-                _contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
-                    Callback<Guid, Guid, string, string, string>((requestIdParam, workflowIdParam, typeNameParam, dataObjectTypeNameParam, dataObjectParam) =>
+                _contract.Setup(t => t.Execute(It.IsAny<Guid>(), It.IsAny<WorkflowKey>(), It.IsAny<CommandKey>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).
+                    Callback<Guid, WorkflowKey, CommandKey, string, string, string>((requestIdParam, workflowKeyParam, commandKeyParam, typeNameParam, dataObjectTypeNameParam, dataObjectParam) =>
                     {
                         _requestId = requestIdParam;
-                        _workflowId = workflowIdParam;
+                        _workflowKey = workflowKeyParam;
+                        _commandKey = commandKeyParam;
                         _typeName = typeNameParam;
                         _dataObjectTypeName = dataObjectTypeNameParam;
                         _dataObject = dataObjectParam;
@@ -72,9 +75,9 @@ namespace MasterDataFlow.Tests
                 get { return _requestId; }
             }
 
-            public Guid WorkflowId
+            public WorkflowKey WorkflowKey
             {
-                get { return _workflowId; }
+                get { return _workflowKey; }
             }
 
             public string TypeName
@@ -95,6 +98,11 @@ namespace MasterDataFlow.Tests
             public int Calls
             {
                 get { return _calls; }
+            }
+
+            public CommandKey CommandKey
+            {
+                get { return _commandKey; }
             }
         }
 
@@ -121,13 +129,16 @@ namespace MasterDataFlow.Tests
             var context = new RemoteClientContextMock(contract.Object);
             IContainer container = new RemoteContainer(context);
 
-            var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
+            var workflow = new CommandWorkflow(new WorkflowKey(new Guid(WorkflowId)), _runner);
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-                CommandWorkflow = workflow
+                CommandWorkflow = workflow,
+                CommandKey = commandKey
             };
 
             // ACT
@@ -142,7 +153,8 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.TypeName);
             Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.DataObjectTypeName);
             Assert.AreEqual("{\"Id\":\"" + LoopId + "\"}", contract.DataObject);
-            Assert.AreEqual(new Guid(WorkflowId), contract.WorkflowId);
+            Assert.AreEqual(new Guid(WorkflowId), contract.WorkflowKey.Id);
+            Assert.AreEqual(commandKey, contract.CommandKey);
             Assert.AreNotEqual(System.Guid.Empty, contract.RequestId);
         }
 
@@ -153,13 +165,16 @@ namespace MasterDataFlow.Tests
             var contract = new RemoteHostContractMock();
             var context = new RemoteClientContextMock(contract.Object);
             IContainer container = new RemoteContainer(context);
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
-            var workflow = new CommandWorkflow(new Guid(WorkflowId), _runner);
+            var workflow = new CommandWorkflow(new WorkflowKey(new Guid(WorkflowId)), _runner);
             var info = new CommandInfo
             {
                 CommandDefinition = new CommandDefinition(typeof(PassingCommand)),
                 CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-                CommandWorkflow = workflow
+                CommandWorkflow = workflow,
+                CommandKey = commandKey
             };
 
             // ACT

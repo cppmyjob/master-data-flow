@@ -2,6 +2,7 @@
 using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
@@ -20,11 +21,12 @@ namespace MasterDataFlow.Tests
         {
             private Guid _runLoopId = Guid.Empty;
             private ICommandWorkflow _runWorkflow = null;
+            private CommandKey _runCommandKey = null;
             private CommandDefinition _runCommandDefinition = null;
             private ICommandDataObject _runCommandDataObject = null;
             private EventLoopCallback _runCallback = null;
             private int _registerWorkflowCall = 0;
-            private Guid? _registerWorkflowGuid = null;
+            private WorkflowKey _registerWorkflowKey = null;
             private Mock<IRemoteHost> _host;
             private int _runCall = 0;
 
@@ -32,22 +34,23 @@ namespace MasterDataFlow.Tests
             {
                 _host = new Mock<IRemoteHost>();
 
-                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandWorkflow>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>()))
-                    .Callback<Guid, ICommandWorkflow, CommandDefinition, ICommandDataObject>(
-                    (loopId, workflowParam, commandDefinition, commandDataObject) =>
+                _host.Setup(t => t.Run(It.IsAny<Guid>(), It.IsAny<ICommandWorkflow>(), It.IsAny<CommandKey>(), It.IsAny<CommandDefinition>(), It.IsAny<ICommandDataObject>()))
+                    .Callback<Guid, ICommandWorkflow, CommandKey, CommandDefinition, ICommandDataObject>(
+                    (loopId, workflowParam, commandKey, commandDefinition, commandDataObject) =>
                     {
                         // TODO check _runLoopId in tests
                         _runLoopId = loopId;
                         _runCall = RunCall + 1;
                         _runWorkflow = workflowParam;
+                        _runCommandKey = commandKey;
                         _runCommandDefinition = commandDefinition;
                         _runCommandDataObject = commandDataObject;
                     });
 
-                _host.Setup(t => t.RegisterWorkflow(It.IsAny<Guid>(), It.IsAny<EventLoopCallback>())).Callback<Guid, EventLoopCallback>((id, callback) =>
+                _host.Setup(t => t.RegisterWorkflow(It.IsAny<WorkflowKey>(), It.IsAny<EventLoopCallback>())).Callback<WorkflowKey, EventLoopCallback>((key, callback) =>
                 {
                     _registerWorkflowCall = RegisterWorkflowCall + 1;
-                    _registerWorkflowGuid = id;
+                    _registerWorkflowKey = key;
                     _runCallback = callback;
                 }).Returns(workflow);
             }
@@ -82,9 +85,9 @@ namespace MasterDataFlow.Tests
                 get { return _registerWorkflowCall; }
             }
 
-            public Guid? RegisterWorkflowGuid
+            public WorkflowKey RegisterWorkflowKey
             {
-                get { return _registerWorkflowGuid; }
+                get { return _registerWorkflowKey; }
             }
 
             public int RunCall
@@ -95,6 +98,11 @@ namespace MasterDataFlow.Tests
             public Guid RunLoopId
             {
                 get { return _runLoopId; }
+            }
+
+            public CommandKey RunCommandKey
+            {
+                get { return _runCommandKey; }
             }
         }
 
@@ -212,20 +220,22 @@ namespace MasterDataFlow.Tests
 
             var controller = new RemoteHostController(host.Object, remoteCallback.Object);
             var requestId = Guid.NewGuid();
-            var workflowId = Guid.NewGuid();
+            var workflowKey = new WorkflowKey();
             const string commandTypeName = "MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string dataObjectTypeName = "MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string dataObject = "{\"Id\":\"" + guid + "\"}";
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
             // ACT
-            controller.Execute(requestId, workflowId, commandTypeName, dataObjectTypeName, dataObject);
+            controller.Execute(requestId, workflowKey, commandKey, commandTypeName, dataObjectTypeName, dataObject);
             
 
             // ASSERT
             Assert.AreEqual(1, host.RegisterWorkflowCall);
-            Assert.IsTrue(host.RegisterWorkflowGuid.HasValue);
-            Assert.AreEqual(workflowId, host.RegisterWorkflowGuid.Value);
+            Assert.IsNotNull(host.RegisterWorkflowKey);
+            Assert.AreEqual(workflowKey, host.RegisterWorkflowKey);
 
             Assert.AreEqual(1, workflow.RegisterCall);
             Assert.IsNotNull(workflow.RegisterCommandDefinition);
@@ -234,6 +244,7 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual(1, host.RunCall);
             Assert.AreEqual(workflow.Object, host.RunWorkflow);
             Assert.AreEqual(workflow.RegisterCommandDefinition, host.RunCommandDefinition);
+            Assert.AreEqual(host.RunCommandKey, commandKey);
             Assert.IsTrue(host.RunCommandDataObject is PassingCommandDataObject);
             Assert.AreEqual(guid, ((PassingCommandDataObject)host.RunCommandDataObject).Id.ToString());
 
@@ -249,13 +260,15 @@ namespace MasterDataFlow.Tests
 
             var controller = new RemoteHostController(host.Object, remoteCallback.Object);
             var requestId = Guid.NewGuid();
-            var workflowId = Guid.NewGuid();
+            var workflowKey = new WorkflowKey(); 
             const string commandTypeName = "MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string dataObjectTypeName = "MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
             const string guid = "1db907fb-77c7-465f-bd60-031107374727";
             const string dataObject = "{\"Id\":\"" + guid + "\"}";
+            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
+            var commandKey = new CommandKey(new Guid(commandId));
 
-            controller.Execute(requestId, workflowId, commandTypeName, dataObjectTypeName, dataObject);
+            controller.Execute(requestId, workflowKey, commandKey, commandTypeName, dataObjectTypeName, dataObject);
             // ACT
 
             Guid callbackGuid = new Guid("33333333-3333-3333-3333-031107374727");

@@ -6,6 +6,7 @@ using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Utils;
 
@@ -30,6 +31,13 @@ namespace MasterDataFlow
             {
                 _runner = runner;
             }
+
+            public CommandKey CommandKey
+            {
+                get { return _data.CommandKey; }
+                internal set { _data.CommandKey = value; }
+            }
+
 
             public CommandDefinition CommandDefinition
             {
@@ -125,7 +133,7 @@ namespace MasterDataFlow
                        var loopItem = _runner.CommandWaiting.GetItem(_loopId);
                        var newCommandLoopId = Guid.NewGuid();
                        _callback(_loopId, status, new NextCommandMessage(newCommandLoopId));
-                       _runner.Run(newCommandLoopId, _data.CommandWorkflow, nextCommand.Definition, nextCommand.CommandDataObject);
+                       _runner.Run(newCommandLoopId, _data.CommandWorkflow, _data.CommandKey, nextCommand.Definition, nextCommand.CommandDataObject);
                         return null;
                     }
                 }
@@ -138,14 +146,14 @@ namespace MasterDataFlow
             _commandThread.Start();
         }
 
-        internal Guid Run(ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
+        internal Guid Run(ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
         {
             var loopId = Guid.NewGuid();
-            Run(loopId, workflow, commandDefinition, commandDataObject);
+            Run(loopId, workflow, commandKey, commandDefinition, commandDataObject);
             return loopId;
         }
 
-        internal void Run(Guid loopId, ICommandWorkflow workflow, CommandDefinition commandDefinition, ICommandDataObject commandDataObject)
+        internal void Run(Guid loopId, ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject)
         {
             var command = new ProxyContainerCommand(this)
             {
@@ -154,6 +162,11 @@ namespace MasterDataFlow
                 CommandWorkflow = workflow
             };
             Push(loopId, command, workflow.EventLoopCallback);
+        }
+
+        internal void Subscribe(ICommandWorkflow workflow)
+        {
+            
         }
 
         public void AddContainter(IContainer container)

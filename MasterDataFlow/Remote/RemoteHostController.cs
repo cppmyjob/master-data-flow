@@ -6,6 +6,7 @@ using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 
@@ -28,9 +29,9 @@ namespace MasterDataFlow.Remote
             throw new NotImplementedException();
         }
 
-        public void Execute(Guid requestId, Guid workflowId, string commandTypeName, string dataObjectTypeName, string dataObject)
+        public void Execute(Guid requestId, WorkflowKey workflowKey, CommandKey commandKey, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
-            var workflow = _remoteHost.RegisterWorkflow(workflowId, Callback);
+            var workflow = _remoteHost.RegisterWorkflow(workflowKey, Callback);
             
             var commandType = Type.GetType(commandTypeName);
             var definition = new CommandDefinition(commandType);
@@ -40,7 +41,7 @@ namespace MasterDataFlow.Remote
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
             // TODO Restore Remote Callback
-            _remoteHost.Run(requestId, workflow, definition, data);
+            _remoteHost.Run(requestId, workflow, commandKey, definition, data);
             //_remoteHost.Run(requestId, workflow, definition, data, Callback);
         }
 

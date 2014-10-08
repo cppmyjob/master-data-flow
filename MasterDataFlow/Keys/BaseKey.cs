@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace MasterDataFlow.Keys
 {
-    public abstract class TrackedKey : IComparable<TrackedKey>
+    public abstract class BaseKey : IComparable<BaseKey>
     {
         private string _key = null;
 
@@ -13,7 +13,7 @@ namespace MasterDataFlow.Keys
             get { return _key ?? (_key = JsonConvert.SerializeObject(this)); }
         }
 
-        public static bool operator ==(TrackedKey a, TrackedKey b)
+        public static bool operator ==(BaseKey a, BaseKey b)
         {
             // If both are null, or both are same instance, return true.
             if (System.Object.ReferenceEquals(a, b))
@@ -30,7 +30,7 @@ namespace MasterDataFlow.Keys
             return a.Key == b.Key;
         }
 
-        public static bool operator !=(TrackedKey a, TrackedKey b)
+        public static bool operator !=(BaseKey a, BaseKey b)
         {
             return !(a == b);
         }
@@ -45,7 +45,7 @@ namespace MasterDataFlow.Keys
             }
 
             // If parameter cannot be cast to Point return false.
-            var p = obj as TrackedKey;
+            var p = obj as BaseKey;
             if ((System.Object)p == null)
             {
                 return false;
@@ -55,7 +55,7 @@ namespace MasterDataFlow.Keys
             return (Key == p.Key);
         }
 
-        public bool Equals(TrackedKey p)
+        public bool Equals(BaseKey p)
         {
             // If parameter is null return false:
             if ((object)p == null)
@@ -72,7 +72,7 @@ namespace MasterDataFlow.Keys
             return Key.GetHashCode();
         }
 
-        public int CompareTo(TrackedKey other)
+        public int CompareTo(BaseKey other)
         {
             return System.String.Compare(Key, other.Key, System.StringComparison.Ordinal);
         }

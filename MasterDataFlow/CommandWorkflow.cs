@@ -17,20 +17,20 @@ namespace MasterDataFlow
     public class CommandWorkflow : ICommandWorkflow
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
-        private readonly Guid _id;
+        private readonly WorkflowKey _key;
         private readonly CommandRunner _runner;
 
         public event OnMessageRecieved MessageRecieved;
 
-        internal CommandWorkflow(Guid id, CommandRunner runner)
+        internal CommandWorkflow(WorkflowKey key, CommandRunner runner)
         {
-            _id = id;
+            _key = key;
             _runner = runner;
         }
 
         public CommandWorkflow(CommandRunner runner)
         {
-            _id = Guid.NewGuid();
+            _key = new WorkflowKey();
             _runner = runner;
         }
 
@@ -39,9 +39,9 @@ namespace MasterDataFlow
             get { return _definitions; }
         }
 
-        public Guid Id
+        public WorkflowKey Key
         {
-            get { return _id; }
+            get { return _key; }
         }
 
         public CommandDefinition Find<TCommand>()
@@ -60,18 +60,18 @@ namespace MasterDataFlow
             where TCommand : ICommand<ICommandDataObject>
         {
             Type commandType = typeof(TCommand);
-
+            var commandKey = new CommandKey();
             CommandDefinition commandDefinition = Find(commandType);
             // TODO check if commandDefinition was found
-            return _runner.Run(this, commandDefinition, commandDataObject);
+            return _runner.Run(this, commandKey, commandDefinition, commandDataObject);
         }
 
-        public void Subscribe(TrackedKey key)
+        public void Subscribe(BaseKey key)
         {
 
         }
 
-        public void Unsubscribe(TrackedKey key)
+        public void Unsubscribe(BaseKey key)
         {
             throw new NotImplementedException();
         }

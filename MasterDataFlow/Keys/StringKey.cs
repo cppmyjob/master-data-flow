@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Keys
 {
-    public class StringKey : TrackedKey
+    public class StringKey : SubscribeKey
     {
         private readonly string _value;
 

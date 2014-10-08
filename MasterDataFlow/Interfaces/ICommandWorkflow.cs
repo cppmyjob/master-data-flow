@@ -9,7 +9,7 @@ namespace MasterDataFlow.Interfaces
 {
     public interface ICommandWorkflow
     {
-        Guid Id { get; }
+        WorkflowKey Key { get; }
 
         CommandDefinition Find<TCommand>()
             where TCommand : ICommand<ICommandDataObject>;
@@ -18,8 +18,8 @@ namespace MasterDataFlow.Interfaces
 
         void EventLoopCallback(Guid loopId, EventLoopCommandStatus status, ILoopCommandMessage message = null);
 
-        void Subscribe(TrackedKey key);
+        void Subscribe(BaseKey key);
 
-        void Unsubscribe(TrackedKey key);
+        void Unsubscribe(BaseKey key);
     }
 }

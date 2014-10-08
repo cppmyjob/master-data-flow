@@ -40,7 +40,7 @@ namespace MasterDataFlow.Remote
                     //var requestId = Guid.NewGuid();
                     // TODO Try to understand what should i do when exception is thrown during Execute
                     _context.RegisterCallback(loopId, callback);
-                    _context.Contract.Execute(loopId, commandInfo.CommandWorkflow.Id, commandTypeName, dataObjectTypeName, dataObject);
+                    _context.Contract.Execute(loopId, commandInfo.CommandWorkflow.Key, commandInfo.CommandKey, commandTypeName, dataObjectTypeName, dataObject);
                     callback(loopId, EventLoopCommandStatus.RemoteCall, null);
                 }
                 catch (Exception ex)
@@ -50,12 +50,12 @@ namespace MasterDataFlow.Remote
             });
         }
 
-        protected override void Subscribe(Guid workflowId, TrackedKey key)
+        protected override void Subscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
             throw new NotImplementedException();
         }
 
-        protected override void Unsubscribe(Guid workflowId, TrackedKey key)
+        protected override void Unsubscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
             throw new NotImplementedException();
         }
