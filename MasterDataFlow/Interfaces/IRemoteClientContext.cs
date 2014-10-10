@@ -9,6 +9,6 @@ namespace MasterDataFlow.Interfaces
     public interface IRemoteClientContext
     {
         IRemoteHostContract Contract { get; }
-        void RegisterCallback(Guid loopId, EventLoopCallback callback);
+        //void RegisterCallback(Guid loopId, EventLoopCallback callback);
     }
 }

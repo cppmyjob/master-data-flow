@@ -75,6 +75,7 @@
     <Compile Include="RemoteHostControllerTests.cs" />
     <Compile Include="SimpleContainerTests.cs" />
     <Compile Include="CommandDefinitionTests.cs" />
+    <Compile Include="CommandWorkflowHubTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">

@@ -29,9 +29,11 @@ namespace MasterDataFlow.Remote
             throw new NotImplementedException();
         }
 
-        public void Execute(Guid requestId, WorkflowKey workflowKey, CommandKey commandKey, string commandTypeName, string dataObjectTypeName, string dataObject)
+        public void Execute(WorkflowKey workflowKey, CommandKey commandKey, string commandTypeName, string dataObjectTypeName, string dataObject)
         {
-            var workflow = _remoteHost.RegisterWorkflow(workflowKey, Callback);
+            // TODO Restore
+            //var workflow = _remoteHost.RegisterWorkflow(workflowKey, Callback);
+            var workflow = _remoteHost.RegisterWorkflow(workflowKey, null);
             
             var commandType = Type.GetType(commandTypeName);
             var definition = new CommandDefinition(commandType);
@@ -41,7 +43,7 @@ namespace MasterDataFlow.Remote
             var data = Serializator.Deserialize(dataObjectType, dataObject) as ICommandDataObject;
 
             // TODO Restore Remote Callback
-            _remoteHost.Run(requestId, workflow, commandKey, definition, data);
+            _remoteHost.Run(workflow, commandKey, definition, data);
             //_remoteHost.Run(requestId, workflow, definition, data, Callback);
         }
 

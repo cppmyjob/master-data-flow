@@ -11,6 +11,6 @@ namespace MasterDataFlow.Interfaces
     {
         ICommandWorkflow RegisterWorkflow(WorkflowKey key, EventLoopCallback callback);
 
-        void Run(Guid loopId, ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null);
+        void Run(ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null);
     }
 }

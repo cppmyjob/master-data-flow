@@ -7,7 +7,7 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface ICommandWorkflow
+    public interface ICommandWorkflow : INotificationReciever
     {
         WorkflowKey Key { get; }
 

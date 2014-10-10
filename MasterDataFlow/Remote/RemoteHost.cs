@@ -23,7 +23,8 @@ namespace MasterDataFlow.Remote
                 if (result == null)
                 {
                     result = new CommandWorkflow(key, _runner);
-                    result.MessageRecieved += (loopId, status, message) => callback(loopId, status, message);
+                    // TODO Restore
+                    //result.MessageRecieved += (loopId, status, message) => callback(loopId, status, message);
                     _workflows.AddItem(key, result);
                 }
                 return result;
@@ -42,9 +43,9 @@ namespace MasterDataFlow.Remote
             _runner.Dispose();
         }
 
-        public void Run(Guid loopId, ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
+        public void Run(ICommandWorkflow workflow, CommandKey commandKey, CommandDefinition commandDefinition, ICommandDataObject commandDataObject = null)
         {
-            _runner.Run(loopId, workflow, commandKey, commandDefinition, commandDataObject);
+            _runner.Run(workflow, commandKey, commandDefinition, commandDataObject);
         }
     }
 }

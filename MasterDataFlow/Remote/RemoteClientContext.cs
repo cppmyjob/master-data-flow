@@ -64,7 +64,8 @@ namespace MasterDataFlow.Remote
                 // TODO Change Exception type
                 throw new Exception(exMessage);
             }
-            callback(id, status, message);
+            // TODO Restore
+            //callback(id, status, message);
         }
     }
 }

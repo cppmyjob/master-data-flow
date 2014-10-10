@@ -8,17 +8,12 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow
 {
-    public abstract class BaseContainer : BaseEventLoop, IContainer
+    public abstract class BaseContainer : IContainer
     {
         // TODO is it necessary
         public abstract void Dispose();
 
         protected abstract void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback);
-
-        void ILoopCommand.Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback)
-        {
-            Execute(loopId, data, callback);
-        }
 
         protected abstract void Subscribe(WorkflowKey workflowKey, SubscribeKey key);
 
@@ -32,6 +27,11 @@ namespace MasterDataFlow
         void IContainer.Unsubscribe(WorkflowKey workflowKey, SubscribeKey key)
         {
             Unsubscribe(workflowKey, key);
+        }
+
+        public void Execute(INotificationReceiverKey receiverKey, CommandInfo dataInfo)
+        {
+            
         }
 
     }

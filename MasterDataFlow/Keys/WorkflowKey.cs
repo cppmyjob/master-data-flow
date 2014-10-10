@@ -2,26 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Keys
 {
-    public class WorkflowKey : ServiceKey
+    public class WorkflowKey : ServiceKey, INotificationReceiverKey
     {
-        private readonly Guid _id;
-
-        public WorkflowKey()
+        public WorkflowKey() : base()
         {
-            _id = Guid.NewGuid();
         }
 
-        public WorkflowKey(Guid id)
+        public WorkflowKey(Guid id) : base(id) 
         {
-            _id = id;
-        }
-
-        public Guid Id
-        {
-            get { return _id; }
+            
         }
     }
 }

@@ -6,8 +6,10 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface IContainer : ILoopCommand, IDisposable
+    public interface IContainer : IDisposable
     {
+        void Execute(INotificationReceiverKey notificationKey, CommandInfo dataInfo);
+
         void Subscribe(WorkflowKey workflowKey, SubscribeKey key);
 
         void Unsubscribe(WorkflowKey workflowKey, SubscribeKey key);

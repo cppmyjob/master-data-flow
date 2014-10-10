@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Keys
 {
-    public class CommandKey : ServiceKey
+    public class RunnerKey : ServiceKey, INotificationReceiverKey
     {
-        public CommandKey() : base()
+        public RunnerKey() : base()
         {
         }
 
-        public CommandKey(Guid id)
+        public RunnerKey(Guid id)
             : base(id) 
         {
             

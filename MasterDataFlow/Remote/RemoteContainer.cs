@@ -39,13 +39,15 @@ namespace MasterDataFlow.Remote
 
                     //var requestId = Guid.NewGuid();
                     // TODO Try to understand what should i do when exception is thrown during Execute
-                    _context.RegisterCallback(loopId, callback);
-                    _context.Contract.Execute(loopId, commandInfo.CommandWorkflow.Key, commandInfo.CommandKey, commandTypeName, dataObjectTypeName, dataObject);
-                    callback(loopId, EventLoopCommandStatus.RemoteCall, null);
+                    //_context.RegisterCallback(loopId, callback);
+                    _context.Contract.Execute(commandInfo.CommandWorkflow.Key, commandInfo.CommandKey, commandTypeName, dataObjectTypeName, dataObject);
+                    // TODO Restore
+                    //callback(loopId, EventLoopCommandStatus.RemoteCall, null);
                 }
                 catch (Exception ex)
                 {
-                    callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
+                    // TODO Restore
+                    //callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
                 }
             });
         }

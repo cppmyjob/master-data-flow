@@ -82,11 +82,12 @@ namespace MasterDataFlow.Tests
                     _event.Set();
             };
 
-            var originalId = _runner.Run(workflow, commandKey, commandDefinition, new PassingCommandDataObject(newId));
+            _runner.Run(workflow, commandKey, commandDefinition, new PassingCommandDataObject(newId));
 
             // ASSERT
             _event.WaitOne(1000);
-            Assert.AreEqual(originalId, callbackId);
+            Assert.Fail();
+            //Assert.AreEqual(originalId, callbackId);
             Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
             Assert.IsNotNull(callbackMessage);
             Assert.IsTrue(callbackMessage is DataCommandMessage);

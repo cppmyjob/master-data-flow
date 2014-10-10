@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.EventLoop;
+using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Interfaces
 {
     public interface ILoopCommand
     {
-        //ILoopCommandData Data { get; set; }
-        void Execute(Guid loopId, ILoopCommandData data, EventLoopCallback callback);
+        bool Execute(INotificationReceiverKey notificationKey, EventLoopCallback callback);
     }
+
 }

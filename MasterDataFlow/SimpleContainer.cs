@@ -30,11 +30,13 @@ namespace MasterDataFlow
                     var commandInfo = (CommandInfo) data;
                     _commandInstance = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandKey, commandInfo.CommandDataObject);
                     var result = _commandInstance.BaseExecute();
-                    callback(loopId, EventLoopCommandStatus.Completed, new ResultCommandMessage(result));
+                    // TODO Restore
+                    //callback(loopId, EventLoopCommandStatus.Completed, new ResultCommandMessage(result));
                 }
                 catch (Exception ex)
                 {
-                    callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
+                    // TODO Restore
+                    //callback(loopId, EventLoopCommandStatus.Fault, new FaultCommandMessage(ex));
                 }
                 finally
                 {
