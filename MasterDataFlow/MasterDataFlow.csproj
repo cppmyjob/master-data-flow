@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Actions\BaseAction.cs" />
     <Compile Include="Actions\FindContainerAndLaunchCommandAction.cs" />
+    <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="CommandRunner.cs" />
     <Compile Include="EventLoop\BaseEventLoop.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Messages\ResultCommandMessage.cs" />
     <Compile Include="Network\CommandRunnerHub.cs" />
     <Compile Include="Network\CommandWorkflowHub.cs" />
+    <Compile Include="Network\Gate.cs" />
     <Compile Include="Network\Hub.cs" />
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Network\SimpleContainerHub.cs" />
