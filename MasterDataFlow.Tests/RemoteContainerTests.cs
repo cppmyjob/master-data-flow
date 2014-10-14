@@ -27,7 +27,8 @@ namespace MasterDataFlow.Tests
         {
             private readonly IRemoteHostContract _contract;
 
-            public RemoteClientContextMock(IRemoteHostContract contract)
+            public RemoteClientContextMock(BaseKey serverGateKey, IRemoteHostContract contract)
+                : base(serverGateKey)
             {
                 _contract = contract;
             }
@@ -113,44 +114,6 @@ namespace MasterDataFlow.Tests
             _runner.Dispose();
             _event.Dispose();
         }
-
-        // TODO Restore
-        //[TestMethod]
-        //public void ExecuteValidParametersTest()
-        //{
-        //    // ARRANGE
-        //    var contract = new RemoteHostContractMock();
-        //    var context = new RemoteClientContextMock(contract.Object);
-        //    IContainer container = new RemoteContainer(context);
-
-        //    var workflow = new CommandWorkflow(new WorkflowKey(new Guid(WorkflowId)), _runner);
-        //    const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
-        //    var commandKey = new CommandKey(new Guid(commandId));
-
-        //    var info = new CommandInfo
-        //    {
-        //        CommandDefinition = new CommandDefinition(typeof (PassingCommand)),
-        //        CommandDataObject = new PassingCommandDataObject(new Guid(LoopId)),
-        //        CommandWorkflow = workflow,
-        //        CommandKey = commandKey
-        //    };
-
-        //    // ACT
-        //    container.Execute(System.Guid.NewGuid(), info, (id, status, message) =>
-        //    {
-        //        _event.Set();
-        //    });
-
-        //    // ASSERT
-        //    _event.WaitOne(1000);
-        //    Assert.AreEqual(1, contract.Calls);
-        //    Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommand, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.TypeName);
-        //    Assert.AreEqual("MasterDataFlow.Tests.TestData.PassingCommandDataObject, MasterDataFlow.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.DataObjectTypeName);
-        //    Assert.AreEqual("{\"Id\":\"" + LoopId + "\"}", contract.DataObject);
-        //    Assert.AreEqual(new Guid(WorkflowId), contract.WorkflowKey.Id);
-        //    Assert.AreEqual(commandKey, contract.CommandKey);
-        //    Assert.AreNotEqual(System.Guid.Empty, contract.RequestId);
-        //}
 
         // TODO Restore
         //[TestMethod]

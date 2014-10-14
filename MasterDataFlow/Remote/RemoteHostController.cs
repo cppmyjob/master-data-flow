@@ -8,6 +8,7 @@ using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Remote
@@ -64,7 +65,13 @@ namespace MasterDataFlow.Remote
                 messageTypeName = message.GetType().AssemblyQualifiedName;
                 messageData = Serializator.Serialize(message);
             }
-            _callback.Callback(loopId.ToString(), status, messageTypeName, messageData);
+            //_callback.Callback(loopId.ToString(), status, messageTypeName, messageData);
+        }
+
+
+        public void Send(RemotePacket packet)
+        {
+            throw new NotImplementedException();
         }
     }
 }

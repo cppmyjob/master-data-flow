@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Messages
 {
-    public class DataCommandMessage : BaseMessage, ILoopCommandMessage
+    public class StopCommandMessage : CommandMessage
     {
         private readonly ICommandDataObject _data;
 
-        public DataCommandMessage(ICommandDataObject data)
+        public StopCommandMessage(CommandKey key, ICommandDataObject data) : base(key)
         {
             _data = data;
         }

@@ -5,13 +5,13 @@ using System.Text;
 
 namespace MasterDataFlow.Exceptions
 {
-    public abstract class MasterDataFlowException : Exception
+    public class MasterDataFlowException : Exception
     {
         protected MasterDataFlowException() : base()
         {
         }
 
-        protected MasterDataFlowException(string message)
+        public MasterDataFlowException(string message)
             : base(message)
         {
         }

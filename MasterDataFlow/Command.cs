@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Results;
 
 namespace MasterDataFlow
@@ -13,7 +14,12 @@ namespace MasterDataFlow
 
         public TCommandDataObject DataObject { get; internal set; }
 
-        public abstract INextCommandResult<ICommandDataObject> Execute();
+        public abstract BaseMessage Execute();
+
+        protected BaseMessage Stop(ICommandDataObject dataObject)
+        {
+            return new StopCommandMessage(Key, dataObject);
+        }
 
         protected INextCommandResult<TCommandDataObject> NextStopCommand()
         {
@@ -32,7 +38,7 @@ namespace MasterDataFlow
             return new NextTypeCommandResult<TNextCommand>(dataObject);
         }
 
-        internal protected override ICommandResult BaseExecute()
+        internal protected override BaseMessage BaseExecute()
         {
             return Execute();
         }

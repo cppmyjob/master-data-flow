@@ -24,10 +24,11 @@ namespace MasterDataFlow.Tests
         public class SubscribeCommand : Command<CommandDataObjectStub>
         {
 
-            public override INextCommandResult<ICommandDataObject> Execute()
+            public override BaseMessage Execute()
             {
                 _event.WaitOne(10000);
-                return NextStopCommand();
+                //return NextStopCommand();
+                return null;
             }
 
             protected override void OnSubscribed(BaseKey key)
@@ -108,57 +109,7 @@ namespace MasterDataFlow.Tests
 
         }
 
-        [TestMethod]
-        public void IdTest()
-        {
-            // ARRANGE, ACT
-            var workflow1 = new CommandWorkflow(_runner);
-            var workflow2 = new CommandWorkflow(_runner);
 
-            // ASSERT
-            Assert.AreNotEqual(Guid.Empty, workflow1.Key);
-            Assert.AreNotEqual(Guid.Empty, workflow2.Key);
-            Assert.AreNotEqual(workflow1.Key.ToString(), workflow2.Key.ToString());
-        }
-
-
-        [TestMethod]
-        public void StartCommandTest()
-        {
-            // ARRANGE
-            var container = new SimpleContainer();
-            _runner.AddContainter(container);
-
-
-            var commandDefinition = CommandBuilder.Build<PassingCommand>().Complete();
-            var сommandWorkflow = new CommandWorkflow(_runner);
-            сommandWorkflow.Register(commandDefinition);
-
-            // ACT
-            var newId = Guid.NewGuid();
-            Guid callbackId = Guid.Empty;
-            var callbackStatus = EventLoopCommandStatus.NotStarted;
-            ILoopCommandMessage callbackMessage = null;
-            сommandWorkflow.MessageRecieved += (id, status, message) =>
-            {
-                callbackId = id;
-                callbackStatus = status;
-                callbackMessage = message;
-                _event.Set();
-            };
-            var originalId = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
-
-            // ASSERT
-            _event.WaitOne(1000);
-            Assert.AreEqual(originalId, callbackId);
-            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
-            Assert.IsNotNull(callbackMessage);
-            Assert.IsTrue(callbackMessage is DataCommandMessage);
-            var dataMessage = callbackMessage as DataCommandMessage;
-            Assert.IsNotNull(dataMessage.Data);
-            Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
-            Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
-        }
 
     }
 }

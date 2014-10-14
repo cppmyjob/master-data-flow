@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Messages;
 
 namespace MasterDataFlow
 {
@@ -12,7 +13,7 @@ namespace MasterDataFlow
         // TODO move setting key value to constructor
         public CommandKey Key { get; internal set; }
 
-        internal protected abstract ICommandResult BaseExecute();
+        internal protected abstract BaseMessage BaseExecute();
 
         protected virtual void SendMessage(BaseKey key)
         {

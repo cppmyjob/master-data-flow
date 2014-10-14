@@ -28,6 +28,13 @@ namespace MasterDataFlow.Tests
             private RemoteHost _remoteHost;
             private RemoteHostController _remoteController;
 
+            public RemoteClientContextMock(BaseKey serverGateKey)
+                : base(serverGateKey)
+            {
+                
+            }
+
+
             protected override IRemoteHostContract CreateContract()
             {
                 if (_remoteController == null)
@@ -58,7 +65,7 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandBasicUsage()
         {
             // ARRANGE
-            IRemoteClientContext context = new RemoteClientContextMock();
+            IRemoteClientContext context = new RemoteClientContextMock(new ServiceKey());
             var container = new RemoteContainer(context);
             _runner.AddContainter(container);
             var commandDefinition = new CommandDefinition(typeof(PassingCommand));

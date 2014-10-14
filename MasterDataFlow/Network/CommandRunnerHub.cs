@@ -7,7 +7,7 @@ using MasterDataFlow.Handlers;
 
 namespace MasterDataFlow.Network
 {
-    public class CommandRunnerHub : ThreadActionHub
+    public class CommandRunnerHub : ActionHub
     {
         public CommandRunnerHub()
         {

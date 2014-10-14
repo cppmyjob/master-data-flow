@@ -3,19 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Actions;
+using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Messages;
 
 namespace MasterDataFlow.Network
 {
-    public class CommandWorkflowHub : Hub
+    public delegate void OnMessageRecieved(BaseKey senderKey,BaseMessage message);
+
+    public class CommandWorkflowHub : EventLoopHub
     {
         private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
-        private readonly WorkflowKey _key = new WorkflowKey();
+        private readonly WorkflowKey _key;
         private CommandRunnerHub _runner;
 
-        //public event OnMessageRecieved MessageRecieved;
+        public CommandWorkflowHub()
+        {
+            _key = new WorkflowKey();
+        }
+
+        public event OnMessageRecieved MessageRecieved;
 
         internal IList<CommandDefinition> Definitions
         {
@@ -51,6 +60,8 @@ namespace MasterDataFlow.Network
             var commandKey = new CommandKey();
             CommandDefinition commandDefinition = Find(commandType);
             // TODO check if commandDefinition was found
+            if (commandDefinition == null)
+                throw new MasterDataFlowException("Can't find a command definition for " + commandType.AssemblyQualifiedName);
 
             BaseKey senderKey = _key;
             BaseKey recieverKey = _runner.Key;
@@ -84,9 +95,16 @@ namespace MasterDataFlow.Network
             return result;
         }
 
-        protected override void ProccessPacket(Interfaces.Network.IPacket packet)
+        protected override void ProccessPacket(IPacket packet)
         {
-            throw new NotImplementedException();
+            var message = packet.Body as BaseMessage;
+            if (message != null)
+            {
+                if (MessageRecieved != null)
+                {
+                    MessageRecieved(packet.SenderKey, message);
+                }
+            }
         }
 
     }

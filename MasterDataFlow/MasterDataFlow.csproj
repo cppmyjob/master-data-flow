@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\BaseAction.cs" />
+    <Compile Include="Actions\RemoteExecuteCommandAction.cs" />
+    <Compile Include="Actions\LocalExecuteCommandAction.cs" />
     <Compile Include="Actions\FindContainerAndLaunchCommandAction.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
@@ -50,6 +52,7 @@
     <Compile Include="EventLoop\BaseEventLoop.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Handlers\CommandRunnerHandler.cs" />
+    <Compile Include="Handlers\ServerGateHandler.cs" />
     <Compile Include="Interfaces\ICommandWorkflow.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
@@ -69,18 +72,25 @@
     <Compile Include="Keys\StringKey.cs" />
     <Compile Include="Keys\SubscribeKey.cs" />
     <Compile Include="Keys\WorkflowKey.cs" />
+    <Compile Include="Messages\BaseMessage.cs" />
+    <Compile Include="Messages\CommandMessage.cs" />
     <Compile Include="Messages\DataCommandMessage.cs" />
     <Compile Include="Messages\FaultCommandMessage.cs" />
     <Compile Include="Messages\NextCommandMessage.cs" />
     <Compile Include="Messages\RemoteDataCommandMessage.cs" />
     <Compile Include="Messages\ResultCommandMessage.cs" />
+    <Compile Include="Messages\StopCommandMessage.cs" />
+    <Compile Include="Network\ClientGate.cs" />
     <Compile Include="Network\CommandRunnerHub.cs" />
     <Compile Include="Network\CommandWorkflowHub.cs" />
+    <Compile Include="Network\EventLoopHub.cs" />
     <Compile Include="Network\Gate.cs" />
     <Compile Include="Network\Hub.cs" />
     <Compile Include="Network\Packet.cs" />
+    <Compile Include="Network\RemotePacket.cs" />
+    <Compile Include="Network\ServerGate.cs" />
     <Compile Include="Network\SimpleContainerHub.cs" />
-    <Compile Include="Network\ThreadActionHub.cs" />
+    <Compile Include="Network\ActionHub.cs" />
     <Compile Include="Remote\RemoteClientContext.cs" />
     <Compile Include="Remote\RemoteHost.cs" />
     <Compile Include="Results\FaultCommandResult.cs" />

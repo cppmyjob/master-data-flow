@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network;
 using MasterDataFlow.Serialization;
 using MasterDataFlow.Utils;
 
@@ -16,6 +18,10 @@ namespace MasterDataFlow.Remote
         // TODO Remove unnecessary callbacks
         private readonly AsyncDictionary<Guid, EventLoopCallback> _callbacks = new AsyncDictionary<Guid, EventLoopCallback>();
 
+        protected RemoteClientContext(BaseKey serverGateKey)
+        {
+            ServerGateKey = serverGateKey;
+        }
 
         public IRemoteHostContract Contract
         {
@@ -33,12 +39,14 @@ namespace MasterDataFlow.Remote
             }
         }
 
+        public BaseKey ServerGateKey { get; private set; }
+
         protected abstract IRemoteHostContract CreateContract();
 
-        public void RegisterCallback(Guid loopId, EventLoopCallback callback)
-        {
-            _callbacks.AddItem(loopId, callback);
-        }
+        //public void RegisterCallback(Guid loopId, EventLoopCallback callback)
+        //{
+        //    _callbacks.AddItem(loopId, callback);
+        //}
 
         public void Callback(string loopId, EventLoopCommandStatus status, string messageTypeName, string messageData)
         {
@@ -66,6 +74,11 @@ namespace MasterDataFlow.Remote
             }
             // TODO Restore
             //callback(id, status, message);
+        }
+
+        public void Send(RemotePacket packet)
+        {
+            throw new NotImplementedException();
         }
     }
 }

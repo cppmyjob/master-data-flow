@@ -16,7 +16,7 @@ namespace MasterDataFlow.Serialization
 
         public static object Deserialize(Type type, string value)
         {
-            var result = JsonConvert.DeserializeObject(value, type);
+            var result = JsonConvert.DeserializeObject(value, type, new JsonSerializerSettings());
             return result;
         }
     }

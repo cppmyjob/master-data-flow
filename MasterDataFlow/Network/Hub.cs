@@ -46,23 +46,28 @@ namespace MasterDataFlow.Network
         {
             if (_queue.Count == 0)
                 return false;
-            var item = _queue.Dequeue();
+            var packet = _queue.Dequeue();
 
-            if (item.RecieverKey == Key)
+            if (packet.RecieverKey == Key)
             {
-                ProccessPacket(item);
+                ProccessPacket(packet);
                 return true;
             }
-            var reciever = _connectedHubs.GetItem(item.RecieverKey);
+            var reciever = _connectedHubs.GetItem(packet.RecieverKey);
             if (reciever != null)
             {
-                reciever.Send(item);
+                reciever.Send(packet);
             }
             else
             {
-                _queue.Enqueue(item);
+                ProcessUndeliveredPacket(packet);
             }
             return true;
+        }
+
+        protected virtual void ProcessUndeliveredPacket(IPacket packet)
+        {
+            
         }
     }
 }

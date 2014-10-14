@@ -3,6 +3,7 @@ using System.Threading;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Messages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MasterDataFlow.Tests
@@ -17,9 +18,10 @@ namespace MasterDataFlow.Tests
 
         private class CommandSuccess : Command<CommandSuccessDataObject>
         {
-            public override INextCommandResult<ICommandDataObject> Execute()
+            public override BaseMessage Execute()
             {
-                return NextStopCommand();
+                //return NextStopCommand();
+                return null;
             }
         }
 
@@ -30,7 +32,7 @@ namespace MasterDataFlow.Tests
 
         private class CommandFault : Command<CommandFaultDataObject>
         {
-            public override INextCommandResult<ICommandDataObject> Execute()
+            public override BaseMessage Execute()
             {
                 throw new Exception();
             }
@@ -46,10 +48,11 @@ namespace MasterDataFlow.Tests
 
         private class CommandSubscribe : Command<CommandSubscribeDataObject>
         {
-            public override INextCommandResult<ICommandDataObject> Execute()
+            public override BaseMessage Execute()
             {
                 _event.WaitOne();
-                return NextStopCommand();
+                //return NextStopCommand();
+                return null;
             }
 
             protected override void OnSubscribed(BaseKey key)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
@@ -21,7 +22,8 @@ namespace MasterDataFlow.Tests
         {
             private readonly IRemoteHostContract _contract;
 
-            public RemoteClientContextMock(IRemoteHostContract contract)
+            public RemoteClientContextMock(BaseKey serverGateKey, IRemoteHostContract contract)
+                : base(serverGateKey)
             {
                 _contract = contract;
             }

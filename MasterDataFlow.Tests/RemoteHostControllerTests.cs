@@ -145,19 +145,19 @@ namespace MasterDataFlow.Tests
             public RemoteCallbackMock()
             {
                 _contract = new Mock<IRemoteCallback>();
-                _contract.Setup(
-                    t =>
-                        t.Callback(It.IsAny<string>(), It.IsAny<EventLoopCommandStatus>(), It.IsAny<string>(),
-                            It.IsAny<string>()))
-                    .Callback<string, EventLoopCommandStatus, string, string>(
-                        (loopId, status, messageTypeName, messageData) =>
-                        {
-                            _call = Call + 1;
-                            _loopId = loopId;
-                            _status = status;
-                            _messageTypeName = messageTypeName;
-                            _messageData = messageData;
-                        });
+                //_contract.Setup(
+                //    t =>
+                //        t.Callback(It.IsAny<string>(), It.IsAny<EventLoopCommandStatus>(), It.IsAny<string>(),
+                //            It.IsAny<string>()))
+                //    .Callback<string, EventLoopCommandStatus, string, string>(
+                //        (loopId, status, messageTypeName, messageData) =>
+                //        {
+                //            _call = Call + 1;
+                //            _loopId = loopId;
+                //            _status = status;
+                //            _messageTypeName = messageTypeName;
+                //            _messageData = messageData;
+                //        });
             }
 
             public IRemoteCallback Object
