@@ -10,7 +10,6 @@ namespace MasterDataFlow.Interfaces
 
     public interface IRemoteCallback
     {
-        //void Callback(string loopId, EventLoopCommandStatus status, string messageTypeName, string messageData);
         void Send(RemotePacket packet);
     }
 }

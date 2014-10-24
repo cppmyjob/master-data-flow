@@ -94,7 +94,7 @@ namespace MasterDataFlow.Tests
 
 
             // ASSERT
-            _event.WaitOne(10000);
+            _event.WaitOne(200);
             Assert.AreEqual(1, _executeCommandCall);
 
         }
@@ -135,7 +135,7 @@ namespace MasterDataFlow.Tests
             var commandKey = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
 
             // ASSERT
-            _event.WaitOne(1000);
+            _event.WaitOne(200);
             Assert.AreEqual(container.Key, callbackSenderKey);
             var commandMessage = callbackMessage as CommandMessage;
             Assert.IsNotNull(commandMessage);
@@ -147,5 +147,53 @@ namespace MasterDataFlow.Tests
             Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
             Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
         }
+
+
+        //[TestMethod]
+        //public void SubscribePassingTest()
+        //{
+        //    // ARRANGE
+        //    var container = new SimpleContainer();
+        //    _runner.AddContainter(container);
+
+        //    var commandDefinition = CommandBuilder.Build<SubscribeCommand>().Complete();
+        //    var сommandWorkflow = new CommandWorkflow(_runner);
+        //    сommandWorkflow.Register(commandDefinition);
+
+        //    // ACT
+        //    сommandWorkflow.Start<SubscribeCommand>(null);
+
+        //    сommandWorkflow.Subscribe(new StringKey("test"));
+
+        //    // ASSERT
+        //    _event.WaitOne(1000);
+        //    Assert.AreEqual(1, _subscribeCommandOnSubscribedCall);
+
+        //}
+
+
+        //// TODO to implement
+        //[TestMethod]
+        //[Ignore]
+        //public void StartWithNullDataTest()
+        //{
+        //    // ARRANGE
+        //    var container = new SimpleContainer();
+        //    _runner.AddContainter(container);
+
+        //    var commandDefinition = CommandBuilder.Build<SubscribeCommand>().Complete();
+        //    var сommandWorkflow = new CommandWorkflow(_runner);
+        //    сommandWorkflow.Register(commandDefinition);
+
+        //    // ACT
+        //    сommandWorkflow.Start<SubscribeCommand>(null);
+
+        //    сommandWorkflow.Subscribe(new StringKey("test"));
+
+        //    // ASSERT
+        //    _event.WaitOne(1000);
+        //    Assert.AreEqual(1, _subscribeCommandOnSubscribedCall);
+
+        //}
     }
 }

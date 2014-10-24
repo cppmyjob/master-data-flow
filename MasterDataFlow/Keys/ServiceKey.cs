@@ -7,7 +7,7 @@ namespace MasterDataFlow.Keys
 {
     public class ServiceKey : BaseKey
     {
-        private readonly Guid _id;
+        private Guid _id;
 
         public ServiceKey()
         {
@@ -22,6 +22,8 @@ namespace MasterDataFlow.Keys
         public Guid Id
         {
             get { return _id; }
+            private set { _id = value; }
         }
+
     }
 }

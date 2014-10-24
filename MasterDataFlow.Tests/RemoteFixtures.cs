@@ -7,7 +7,7 @@ using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
-using MasterDataFlow.Remote;
+using MasterDataFlow.Network;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,48 +16,63 @@ namespace MasterDataFlow.Tests
     [TestClass]
     public class RemoteFixtures
     {
-        private CommandRunner _runner;
-        private ManualResetEvent _event;
+        private static ManualResetEvent _event;
+
+        private static int _executeCommandCall = 0;
 
         private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
         private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
 
-        private class RemoteClientContextMock : RemoteClientContext
+        private class RemoteClientContextMock : IRemoteClientContext
         {
-            private RemoteHost _remoteHost;
-            private RemoteHostController _remoteController;
+            private ServerGate _serverGate;
 
-            public RemoteClientContextMock(BaseKey serverGateKey)
-                : base(serverGateKey)
+            public RemoteClientContextMock(ServerGate serverGate)
             {
-                
+                _serverGate = serverGate;
             }
 
 
-            protected override IRemoteHostContract CreateContract()
+            public IRemoteHostContract Contract
             {
-                if (_remoteController == null)
-                {
-                    _remoteHost = new RemoteHost();
-                    _remoteHost.AddContainter(new SimpleContainer());
-                    _remoteController = new RemoteHostController(_remoteHost, this);
-                }
-                return _remoteController;
+                get { return _serverGate; } 
+            }
+
+            public BaseKey ServerGateKey
+            {
+                get { return _serverGate.Key; }
+            }
+        }
+
+        public class ExecuteCommand : Command<CommandDataObjectStub>
+        {
+
+            public override BaseMessage Execute()
+            {
+                ++_executeCommandCall;
+                _event.Set();
+                return Stop(null);
+            }
+
+            protected override void OnSubscribed(BaseKey key)
+            {
+            }
+
+            protected override void OnUnsubscribed(BaseKey key)
+            {
             }
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _runner = new CommandRunner();
             _event = new ManualResetEvent(false);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            _runner.Dispose();
             _event.Dispose();
         }
 
@@ -65,44 +80,30 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandBasicUsage()
         {
             // ARRANGE
-            IRemoteClientContext context = new RemoteClientContextMock(new ServiceKey());
-            var container = new RemoteContainer(context);
-            _runner.AddContainter(container);
-            var commandDefinition = new CommandDefinition(typeof(PassingCommand));
-            const string commandId = "8CC9A7EC-AF69-4EBC-BF2C-072E85212BB1";
-            var commandKey = new CommandKey(new Guid(commandId));
+            var remoteCommandRunner = new CommandRunnerHub();
+            var serverGate = new ServerGate();
+            serverGate.ConnectHub(remoteCommandRunner);
+            var remoteClientContext = new RemoteClientContextMock(serverGate);
+            var remoteContainer = new SimpleContainerHub();
+            remoteCommandRunner.ConnectHub(remoteContainer);
+
+            var runner = new CommandRunnerHub();
+
+            var clientGate = new ClientGate(remoteClientContext);
+            runner.ConnectHub(clientGate);
+
+            var commandDefinition = CommandBuilder.Build<ExecuteCommand>().Complete();
+            var сommandWorkflow = new CommandWorkflowHub();
+            сommandWorkflow.Register(commandDefinition);
+            runner.ConnectHub(сommandWorkflow);
 
             // ACT
-            int calls = 0;
-            var newId = Guid.NewGuid();
-            Guid callbackId = Guid.Empty;
-            var callbackStatus = EventLoopCommandStatus.NotStarted;
-            ILoopCommandMessage callbackMessage = null;
-            var workflow = new CommandWorkflow(_runner);
-            workflow.MessageRecieved += (id, status, message) =>
-            {
-                callbackId = id;
-                callbackStatus = status;
-                callbackMessage = message;
-                ++calls;
-                if (calls == 2)
-                    _event.Set();
-            };
-
-            _runner.Run(workflow, commandKey, commandDefinition, new PassingCommandDataObject(newId));
+            сommandWorkflow.Start<ExecuteCommand>(null);
 
             // ASSERT
-            _event.WaitOne(1000);
-            Assert.Fail();
-            //Assert.AreEqual(originalId, callbackId);
-            Assert.AreEqual(EventLoopCommandStatus.Completed, callbackStatus);
-            Assert.IsNotNull(callbackMessage);
-            Assert.IsTrue(callbackMessage is DataCommandMessage);
-            var dataMessage = callbackMessage as DataCommandMessage;
-            Assert.IsNotNull(dataMessage.Data);
-            Assert.IsTrue(dataMessage.Data is PassingCommandDataObject);
-            Assert.AreEqual(newId, ((PassingCommandDataObject)dataMessage.Data).Id);
-            
+            _event.WaitOne(200);
+            Assert.AreEqual(1, _executeCommandCall);
+
         }
     }
 }

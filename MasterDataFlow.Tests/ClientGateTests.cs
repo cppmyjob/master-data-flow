@@ -8,7 +8,6 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
-using MasterDataFlow.Remote;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -24,19 +23,25 @@ namespace MasterDataFlow.Tests
         private const string RunnerId = "4BB7C70B-F088-4D09-B06D-CC1CF64580CE";
         private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
-        private class RemoteClientContextMock : RemoteClientContext
+        private class RemoteClientContextMock : IRemoteClientContext
         {
+            private readonly BaseKey _serverGateKey;
             private readonly IRemoteHostContract _contract;
 
             public RemoteClientContextMock(BaseKey serverGateKey, IRemoteHostContract contract)
-                : base(serverGateKey)
             {
+                _serverGateKey = serverGateKey;
                 _contract = contract;
             }
 
-            protected override IRemoteHostContract CreateContract()
+            public IRemoteHostContract Contract
             {
-                return _contract;
+                get { return _contract; }
+            }
+
+            public BaseKey ServerGateKey
+            {
+                get { return _serverGateKey; }
             }
         }
 

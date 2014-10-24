@@ -12,6 +12,7 @@ namespace MasterDataFlow.Network
     public class ClientGate : Gate
     {
         private readonly IRemoteClientContext _context;
+        private CommandRunnerHub _runner;
 
         public ClientGate(IRemoteClientContext remoteHostContract)
         {
@@ -21,6 +22,12 @@ namespace MasterDataFlow.Network
         public BaseKey ServerGateKey
         {
             get { return _context.ServerGateKey; } 
+        }
+
+        public override void AcceptHub(IHub hub)
+        {
+            // TODO Check CommandRunnerHub
+            _runner = (CommandRunnerHub)hub;
         }
 
         protected override void ProccessPacket(IPacket packet)

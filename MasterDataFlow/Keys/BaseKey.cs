@@ -1,16 +1,49 @@
 ﻿using System;
+using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace MasterDataFlow.Keys
 {
     public abstract class BaseKey : IComparable<BaseKey>
     {
+        public class BaseKeyDefaultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+        {
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                //TODO: Maybe cache
+                var prop = base.CreateProperty(member, memberSerialization);
+
+                if (!prop.Writable)
+                {
+                    var property = member as PropertyInfo;
+                    if (property != null)
+                    {
+                        var hasPrivateSetter = property.GetSetMethod(true) != null;
+                        prop.Writable = hasPrivateSetter;
+                    }
+                }
+                return prop;
+            }
+        }
+
         private string _key = null;
 
         [JsonIgnore]
         public string Key
         {
             get { return _key ?? (_key = JsonConvert.SerializeObject(this)); }
+        }
+
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+                            {
+                                ContractResolver = new BaseKeyDefaultContractResolver()
+                            };
+
+        public static T DeserializeKey<T>(string value) where T : BaseKey
+        {
+            var result = JsonConvert.DeserializeObject<T>(value, JsonSerializerSettings);
+            return result;
         }
 
         public static bool operator ==(BaseKey a, BaseKey b)

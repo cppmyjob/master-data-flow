@@ -74,8 +74,8 @@ namespace MasterDataFlow.Handlers
             var info = new RemoteExecuteCommandAction.Info
             {
                 CommandType = action.CommandInfo.CommandDefinition.Command.AssemblyQualifiedName,
-                DataObject = Serialization.Serializator.Serialize(action.CommandInfo.CommandDataObject),
-                DataObjectType = action.CommandInfo.CommandDataObject.GetType().AssemblyQualifiedName,
+                DataObject = action.CommandInfo.CommandDataObject != null ? Serialization.Serializator.Serialize(action.CommandInfo.CommandDataObject) : null,
+                DataObjectType = action.CommandInfo.CommandDataObject != null ? action.CommandInfo.CommandDataObject.GetType().AssemblyQualifiedName : null,
                 WorkflowKey = action.CommandInfo.WorkflowKey.Key,
                 CommandKey = action.CommandInfo.CommandKey.Key
             };

@@ -8,7 +8,7 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Network
 {
-    public abstract class Gate : EventLoopHub
+    public abstract class Gate : ActionHub
     {
         private readonly ServiceKey _key = new ServiceKey();
 

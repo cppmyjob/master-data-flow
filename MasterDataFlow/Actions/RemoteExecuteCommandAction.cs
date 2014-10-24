@@ -12,7 +12,7 @@ namespace MasterDataFlow.Actions
         public class Info
         {
             public string CommandType { get; set; }
-            public object DataObject { get; set; }
+            public string DataObject { get; set; }
             public string DataObjectType { get; set; }
             public string WorkflowKey { get; set; }
             public string CommandKey { get; set; }        

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.Actions;
 using MasterDataFlow.Handlers;
+using MasterDataFlow.Interfaces.Network;
 
 namespace MasterDataFlow.Network
 {
@@ -13,5 +14,12 @@ namespace MasterDataFlow.Network
         {
             RegisterHandler(new CommandRunnerHandler());
         }
+
+        public override void AcceptHub(IHub hub)
+        {
+            // TODO call when hub is ServerGate
+            //throw new NotSupportedException();
+        }
+
     }
 }
