@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow", "MasterDataFlow\MasterDataFlow.csproj", "{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests", "MasterDataFlow.Tests\MasterDataFlow.Tests.csproj", "{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Transport.Wcf", "MasterDataFlow.Transport.Wcf\MasterDataFlow.Transport.Wcf.csproj", "{8C5D0E00-D309-4A05-A42F-0B8E55F630DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Server", "MasterDataFlow.Server\MasterDataFlow.Server.csproj", "{2A322A3B-A6DF-4D71-9412-48659438EBB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Remote.Host", "MasterDataFlow.Remote.Host\MasterDataFlow.Remote.Host.csproj", "{3F7C6433-1E6A-4035-A50F-F2A234CC7288}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Client", "MasterDataFlow.Client\MasterDataFlow.Client.csproj", "{59669367-52A5-49A7-8AEC-DCABFC8F0E14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +25,14 @@ Global
 		{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C5D0E00-D309-4A05-A42F-0B8E55F630DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C5D0E00-D309-4A05-A42F-0B8E55F630DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C5D0E00-D309-4A05-A42F-0B8E55F630DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C5D0E00-D309-4A05-A42F-0B8E55F630DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3F7C6433-1E6A-4035-A50F-F2A234CC7288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3F7C6433-1E6A-4035-A50F-F2A234CC7288}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3F7C6433-1E6A-4035-A50F-F2A234CC7288}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3F7C6433-1E6A-4035-A50F-F2A234CC7288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A322A3B-A6DF-4D71-9412-48659438EBB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A322A3B-A6DF-4D71-9412-48659438EBB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A322A3B-A6DF-4D71-9412-48659438EBB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A322A3B-A6DF-4D71-9412-48659438EBB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59669367-52A5-49A7-8AEC-DCABFC8F0E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59669367-52A5-49A7-8AEC-DCABFC8F0E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59669367-52A5-49A7-8AEC-DCABFC8F0E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59669367-52A5-49A7-8AEC-DCABFC8F0E14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

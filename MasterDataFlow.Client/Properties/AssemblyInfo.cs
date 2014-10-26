@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MasterDataFlow.Remote.Host")]
+[assembly: AssemblyTitle("MasterDataFlow.Client")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MasterDataFlow.Remote.Host")]
+[assembly: AssemblyProduct("MasterDataFlow.Client")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2ce97d44-9e29-4ddd-96fe-167cca6c1c97")]
+[assembly: Guid("27146e0b-61cf-45c9-8440-9b632b73d585")]
 
 // Version information for an assembly consists of the following four values:
 //

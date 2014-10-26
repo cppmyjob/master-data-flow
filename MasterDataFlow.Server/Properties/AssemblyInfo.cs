@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MasterDataFlow.Transport.Wcf")]
+[assembly: AssemblyTitle("MasterDataFlow.Server")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MasterDataFlow.Transport.Wcf")]
+[assembly: AssemblyProduct("MasterDataFlow.Server")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("13f52d64-1456-42cc-bb81-bed1548886a3")]
+[assembly: Guid("70f84c81-2aac-46cc-8342-385298f5ea01")]
 
 // Version information for an assembly consists of the following four values:
 //
