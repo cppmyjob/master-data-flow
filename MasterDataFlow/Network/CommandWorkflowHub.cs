@@ -24,6 +24,7 @@ namespace MasterDataFlow.Network
             _key = new WorkflowKey();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public event OnMessageRecieved MessageRecieved;
 
         internal IList<CommandDefinition> Definitions

@@ -11,9 +11,9 @@ using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace MasterDataFlow.Tests.New
+namespace MasterDataFlow.Tests
 {
-    [TestClass]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable"), TestClass]
     public class ServerGateTests 
     {
         private ManualResetEvent _event;

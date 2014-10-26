@@ -5,6 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Exceptions
 {
+    [Serializable]
     public class MasterDataFlowException : Exception
     {
         protected MasterDataFlowException() : base()

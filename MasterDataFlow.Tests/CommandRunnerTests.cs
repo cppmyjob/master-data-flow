@@ -14,7 +14,7 @@ using Moq;
 namespace MasterDataFlow.Tests
 {
 
-    [TestClass]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable"), TestClass]
     public class CommandRunnerTests
     {
         //private CommandRunner _runner;
