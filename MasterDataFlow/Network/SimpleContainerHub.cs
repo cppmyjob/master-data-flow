@@ -10,7 +10,7 @@ namespace MasterDataFlow.Network
 {
     public class SimpleContainerHub : EventLoopHub
     {
-        private ServiceKey _key = new ServiceKey();
+        private readonly ServiceKey _key = new ServiceKey();
         private CommandRunnerHub _runner;
 
         public override BaseKey Key

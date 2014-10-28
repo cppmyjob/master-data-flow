@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.EventLoop;
+using MasterDataFlow.Network;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface INotificationReciever
+
+    public interface IGateCallback
     {
-        INotificationReceiverKey RecieverKey { get; }
-        void Notify(object data);
+        void Send(RemotePacket packet);
     }
 }

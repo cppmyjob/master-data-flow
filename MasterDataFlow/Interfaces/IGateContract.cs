@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MasterDataFlow.EventLoop;
+using MasterDataFlow.Interfaces.Network;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
 
 namespace MasterDataFlow.Interfaces
 {
-
-    public interface IRemoteCallback
+    public interface IGateContract
     {
+        void UploadAssembly(byte[] data);
         void Send(RemotePacket packet);
     }
 }

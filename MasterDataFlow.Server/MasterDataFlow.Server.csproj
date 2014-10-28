@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -39,9 +40,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wcf\Server.cs" />
+    <Compile Include="WcfServer.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Contract\MasterDataFlow.Contract.csproj">
+      <Project>{e0b47b30-7585-41e4-a0b0-4e4674006fee}</Project>
+      <Name>MasterDataFlow.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
+      <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
+      <Name>MasterDataFlow</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

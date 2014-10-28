@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -7,7 +8,7 @@ namespace MasterDataFlow.Keys
 {
     public abstract class BaseKey : IComparable<BaseKey>
     {
-        public class BaseKeyDefaultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+        public class BaseKeyDefaultContractResolver : DefaultContractResolver
         {
             protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
@@ -27,12 +28,33 @@ namespace MasterDataFlow.Keys
             }
         }
 
-        private string _key = null;
+        private string _key;
+
+        private static readonly Dictionary<string, Type> KeyTypesResolverDirect = new Dictionary<string, Type>();
+        private static readonly Dictionary<Type, string> KeyTypesResolverReverse = new Dictionary<Type, string>();
+
+        protected static void AddKeyResolving(string prefix, Type type)
+        {
+            // TODO i am not sure that the lock is needed
+            lock (KeyTypesResolverDirect)
+            {
+                KeyTypesResolverDirect.Add(prefix, type);
+                KeyTypesResolverReverse.Add(type, prefix);
+            }
+        }
 
         [JsonIgnore]
         public string Key
         {
-            get { return _key ?? (_key = JsonConvert.SerializeObject(this)); }
+            get
+            {
+                if (_key != null)
+                    return _key;
+                var type = GetType();
+                var prefix = KeyTypesResolverReverse[type];
+                _key = prefix+":"+JsonConvert.SerializeObject(this);
+                return _key;
+            }
         }
 
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
@@ -40,9 +62,14 @@ namespace MasterDataFlow.Keys
                                 ContractResolver = new BaseKeyDefaultContractResolver()
                             };
 
-        public static T DeserializeKey<T>(string value) where T : BaseKey
+        public static BaseKey DeserializeKey(string value)
         {
-            var result = JsonConvert.DeserializeObject<T>(value, JsonSerializerSettings);
+            if (String.IsNullOrEmpty(value))
+                return null;
+            var dividerPosition = value.IndexOf(':');
+            var prefix = value.Substring(0, dividerPosition);
+            var type = KeyTypesResolverDirect[prefix];
+            var result = (BaseKey)JsonConvert.DeserializeObject(value.Substring(dividerPosition + 1), type, JsonSerializerSettings);
             return result;
         }
 

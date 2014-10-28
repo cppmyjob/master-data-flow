@@ -7,6 +7,11 @@ namespace MasterDataFlow.Keys
 {
     public class CommandKey : ServiceKey
     {
+        static CommandKey()
+        {
+            AddKeyResolving("cmk", typeof(CommandKey));
+        }
+
         public CommandKey() : base()
         {
         }

@@ -24,7 +24,7 @@ namespace MasterDataFlow.Tests
         private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
 
-        private class RemoteClientContextMock : IRemoteClientContext
+        private class RemoteClientContextMock : IClientContext
         {
             private ServerGate _serverGate;
 
@@ -34,7 +34,7 @@ namespace MasterDataFlow.Tests
             }
 
 
-            public IRemoteHostContract Contract
+            public IGateContract Contract
             {
                 get { return _serverGate; } 
             }
@@ -42,6 +42,11 @@ namespace MasterDataFlow.Tests
             public BaseKey ServerGateKey
             {
                 get { return _serverGate.Key; }
+            }
+
+            public void Dispose()
+            {
+                
             }
         }
 

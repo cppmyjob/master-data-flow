@@ -7,6 +7,11 @@ namespace MasterDataFlow.Keys
 {
     public class ServiceKey : BaseKey
     {
+        static ServiceKey()
+        {
+            AddKeyResolving("sk", typeof(ServiceKey));
+        }
+
         private Guid _id;
 
         public ServiceKey()

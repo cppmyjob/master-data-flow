@@ -10,7 +10,17 @@ namespace MasterDataFlow.Network
 {
     public abstract class Gate : ActionHub
     {
-        private readonly ServiceKey _key = new ServiceKey();
+        private readonly ServiceKey _key;
+
+        protected Gate()
+        {
+            _key = new ServiceKey();
+        }
+
+        protected Gate(ServiceKey key)
+        {
+            _key = key;
+        }
 
         public override BaseKey Key
         {

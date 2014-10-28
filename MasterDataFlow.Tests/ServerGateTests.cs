@@ -67,7 +67,7 @@ namespace MasterDataFlow.Tests
             string bodyTypeName = bodyObject.GetType().AssemblyQualifiedName;
             var body = Serialization.Serializator.Serialize(bodyObject);
 
-            var remotePacket = new RemotePacket(senderKey, recieverKey, bodyTypeName, body);
+            var remotePacket = new RemotePacket(senderKey.Key, recieverKey.Key, bodyTypeName, body);
             serverMock.Object.Send(remotePacket);
 
             _event.WaitOne(200);
@@ -121,7 +121,7 @@ namespace MasterDataFlow.Tests
             string bodyTypeName = bodyObject.GetType().AssemblyQualifiedName;
             var body = Serialization.Serializator.Serialize(bodyObject);
 
-            var remotePacket = new RemotePacket(senderKey, recieverKey, bodyTypeName, body);
+            var remotePacket = new RemotePacket(senderKey.Key, recieverKey.Key, bodyTypeName, body);
             serverGate.Send(remotePacket);
 
             _event.WaitOne(200);

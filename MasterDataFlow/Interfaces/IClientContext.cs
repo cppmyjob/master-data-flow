@@ -7,9 +7,9 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface IRemoteClientContext
+    public interface IClientContext : IDisposable
     {
-        IRemoteHostContract Contract { get; }
+        IGateContract Contract { get; }
         BaseKey ServerGateKey { get; }
     }
 }

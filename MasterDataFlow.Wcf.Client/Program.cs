@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Text;
+using MasterDataFlow.Client;
+using MasterDataFlow.Keys;
+using MasterDataFlow.Network;
+
+namespace MasterDataFlow.Wcf.Client
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            using (var clientContext = new WcfClientContext(new ServiceKey(new Guid(ConfigurationManager.AppSettings["ServerGateKey"]))))
+            {
+                var runner = new CommandRunnerHub();
+                var clientGate = new ClientGate(clientContext);
+                runner.ConnectHub(clientGate);
+                var commandDefinition = CommandBuilder.Build<MathCommand>().Complete();
+                var сommandWorkflow = new CommandWorkflowHub();
+                сommandWorkflow.Register(commandDefinition);
+                runner.ConnectHub(сommandWorkflow);
+
+                var dataObject = new MathCommand.MathCommandDataObject()
+                {
+                    Expression = "33 + 44"
+                };
+                сommandWorkflow.Start<MathCommand>(dataObject);
+                Console.ReadLine();
+            }
+        }
+    }
+}

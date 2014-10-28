@@ -5,16 +5,32 @@ using System.Text;
 using MasterDataFlow.Handlers;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
 {
-    public class ServerGate : Gate, IRemoteHostContract
+    public class ServerGate : Gate, IGateContract
     {
         public ServerGate()
         {
             RegisterHandler(new ServerGateHandler());
+        }
+
+        public ServerGate(ServiceKey key) : base(key)
+        {
+            RegisterHandler(new ServerGateHandler());
+        }
+
+        public BaseKey ClientGateKey { get; internal set; }
+
+        protected override void ProcessUndeliveredPacket(IPacket packet)
+        {
+            if (packet.RecieverKey == ClientGateKey)
+            {
+                
+            }
         }
 
         public void UploadAssembly(byte[] data)
@@ -26,7 +42,9 @@ namespace MasterDataFlow.Network
         {
             var bodyType = Type.GetType(remotePacket.TypeName);
             var body = Serializator.Deserialize(bodyType, (string)remotePacket.Body);
-            var packet = new Packet(remotePacket.SenderKey, remotePacket.RecieverKey, body);
+            var senderKey = BaseKey.DeserializeKey(remotePacket.SenderKey);
+            var recieverKey = BaseKey.DeserializeKey(remotePacket.RecieverKey);
+            var packet = new Packet(senderKey, recieverKey, body);
             Send(packet);
         }
     }

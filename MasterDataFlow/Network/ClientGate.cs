@@ -11,10 +11,12 @@ namespace MasterDataFlow.Network
 {
     public class ClientGate : Gate
     {
-        private readonly IRemoteClientContext _context;
+        private readonly IClientContext _context;
         private CommandRunnerHub _runner;
+        private bool _isServerGateInitializated = false;
+        private object _syncObject = new object();
 
-        public ClientGate(IRemoteClientContext remoteHostContract)
+        public ClientGate(IClientContext remoteHostContract)
         {
             _context = remoteHostContract;
         }
@@ -37,12 +39,36 @@ namespace MasterDataFlow.Network
 
         protected override void ProcessUndeliveredPacket(IPacket packet)
         {
-            string bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
+            // TODO it needs another way for passing ClientGateKey to server side
+            lock (_syncObject)
+            {
+                if (!_isServerGateInitializated)
+                {
+                    InitializateServerGate();
+                    _isServerGateInitializated = true;
+                }
+            }
+
+            var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
             // TODO need more flexible serialization way
             var body = Serialization.Serializator.Serialize(packet.Body);
-            var remotePacket = new RemotePacket(packet.SenderKey, packet.RecieverKey, bodyTypeName, body);
+            var remotePacket = new RemotePacket(packet.SenderKey.Key, packet.RecieverKey.Key, bodyTypeName, body);
             _context.Contract.Send(remotePacket);
+
         }
 
+        private void InitializateServerGate()
+        {
+            return;
+            var sendClientGateKeyAction = new SendClientGateKeyAction()
+            {
+                ClientGateKey = Key.Key
+            };
+            var bodyTypeName = sendClientGateKeyAction.GetType().AssemblyQualifiedName;
+            // TODO need more flexible serialization way
+            var body = Serialization.Serializator.Serialize(sendClientGateKeyAction);
+            var remotePacket = new RemotePacket(Key.Key, ServerGateKey.Key, bodyTypeName, body);
+            _context.Contract.Send(remotePacket);
+        }
     }
 }

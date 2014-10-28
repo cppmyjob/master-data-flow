@@ -6,8 +6,13 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Keys
 {
-    public class WorkflowKey : ServiceKey, INotificationReceiverKey
+    public class WorkflowKey : ServiceKey
     {
+        static WorkflowKey()
+        {
+            AddKeyResolving("wfk", typeof(WorkflowKey));
+        }
+
         public WorkflowKey() : base()
         {
         }

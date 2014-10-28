@@ -46,6 +46,8 @@
     <Compile Include="Actions\RemoteExecuteCommandAction.cs" />
     <Compile Include="Actions\LocalExecuteCommandAction.cs" />
     <Compile Include="Actions\FindContainerAndLaunchCommandAction.cs" />
+    <Compile Include="Actions\SendClientGateKeyAction.cs" />
+    <Compile Include="Actions\UploadTypeAction.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
@@ -53,16 +55,12 @@
     <Compile Include="Handlers\ServerGateHandler.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
-    <Compile Include="Interfaces\INotificationReceiverKey.cs" />
-    <Compile Include="Interfaces\INotificationReciever.cs" />
-    <Compile Include="Interfaces\IRemoteCallback.cs" />
-    <Compile Include="Interfaces\IRemoteClientContext.cs" />
+    <Compile Include="Interfaces\IGateCallback.cs" />
+    <Compile Include="Interfaces\IClientContext.cs" />
     <Compile Include="Interfaces\Network\IHub.cs" />
     <Compile Include="Interfaces\Network\IPacket.cs" />
     <Compile Include="Keys\CommandKey.cs" />
-    <Compile Include="Keys\RunnerKey.cs" />
     <Compile Include="Keys\ServiceKey.cs" />
-    <Compile Include="Keys\StringKey.cs" />
     <Compile Include="Keys\SubscribeKey.cs" />
     <Compile Include="Keys\WorkflowKey.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
@@ -90,7 +88,7 @@
     <Compile Include="Interfaces\IDataObjectHolder.cs" />
     <Compile Include="Exceptions\MasterDataFlowException.cs" />
     <Compile Include="Interfaces\ICommandDataObject.cs" />
-    <Compile Include="Interfaces\IRemoteHostContract.cs" />
+    <Compile Include="Interfaces\IGateContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\Deserialization.cs" />
     <Compile Include="Serialization\Serializator.cs" />

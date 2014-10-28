@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
+
+namespace MasterDataFlow.Client
+{
+    public class WcfClientContext : IClientContext
+    {
+        private readonly ServiceKey _serverGateKey;
+        // Flag: Has Dispose already been called? 
+        private bool _disposed = false;
+        private readonly WcfClient _client;
+
+        public WcfClientContext(ServiceKey serverGateKey)
+        {
+            _serverGateKey = serverGateKey;
+            _client = new WcfClient();
+        }
+
+        public IGateContract Contract
+        {
+            get { return _client.Channel; }
+        }
+
+        public BaseKey ServerGateKey
+        {
+            get { return _serverGateKey; }
+        }
+
+       // Public implementation of Dispose pattern callable by consumers. 
+       public void Dispose()
+       { 
+          Dispose(true);
+          GC.SuppressFinalize(this);           
+       }
+
+       // Protected implementation of Dispose pattern. 
+       protected virtual void Dispose(bool disposing)
+       {
+          if (_disposed)
+             return; 
+
+          if (disposing) {
+              // Free any other managed objects here. 
+              //
+              _client.Dispose();
+          }
+
+          // Free any unmanaged objects here. 
+          //
+          _disposed = true;
+       }
+
+       ~WcfClientContext()
+       {
+          Dispose(false);
+       }
+    }
+}

@@ -23,18 +23,18 @@ namespace MasterDataFlow.Tests
         private const string RunnerId = "4BB7C70B-F088-4D09-B06D-CC1CF64580CE";
         private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
 
-        private class RemoteClientContextMock : IRemoteClientContext
+        private class RemoteClientContextMock : IClientContext
         {
             private readonly BaseKey _serverGateKey;
-            private readonly IRemoteHostContract _contract;
+            private readonly IGateContract _contract;
 
-            public RemoteClientContextMock(BaseKey serverGateKey, IRemoteHostContract contract)
+            public RemoteClientContextMock(BaseKey serverGateKey, IGateContract contract)
             {
                 _serverGateKey = serverGateKey;
                 _contract = contract;
             }
 
-            public IRemoteHostContract Contract
+            public IGateContract Contract
             {
                 get { return _contract; }
             }
@@ -43,18 +43,23 @@ namespace MasterDataFlow.Tests
             {
                 get { return _serverGateKey; }
             }
+
+            public void Dispose()
+            {
+                
+            }
         }
 
         private class RemoteHostContractMock
         {
 
-            private readonly Mock<IRemoteHostContract> _contract;
+            private readonly Mock<IGateContract> _contract;
             private RemotePacket _packet;
             private int _calls = 0;
 
             public RemoteHostContractMock(ManualResetEvent @event)
             {
-                _contract = new Mock<IRemoteHostContract>();
+                _contract = new Mock<IGateContract>();
                 _contract.Setup(t => t.Send(It.IsAny<RemotePacket>())).Callback<RemotePacket>((packet) =>
                 {
                     _packet = packet;
@@ -63,7 +68,7 @@ namespace MasterDataFlow.Tests
                 });
             }
 
-            public IRemoteHostContract Object
+            public IGateContract Object
             {
                 get { return _contract.Object; }
             }
@@ -126,8 +131,8 @@ namespace MasterDataFlow.Tests
             // ASSERT
             _event.WaitOne(1000);
             Assert.AreEqual(1, contract.Calls);
-            Assert.AreEqual(runnerKey, contract.Packet.SenderKey);
-            Assert.AreEqual(serverGateKey, contract.Packet.RecieverKey);
+            Assert.AreEqual(runnerKey.Key, contract.Packet.SenderKey);
+            Assert.AreEqual(serverGateKey.Key, contract.Packet.RecieverKey);
             Assert.AreEqual("MasterDataFlow.Actions.RemoteExecuteCommandAction, MasterDataFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.Packet.TypeName);
 
             var bodyType = Type.GetType(contract.Packet.TypeName);
