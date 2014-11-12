@@ -94,12 +94,26 @@ namespace MasterDataFlow.Handlers
 
         private void SendUploadTypeCommand(RemoteExecuteCommandAction action, IPacket packet)
         {
-            var uploadAction = new UploadTypeAction();
-            uploadAction.UploadType = action.CommandInfo.DataObjectType;
-            Parent.Send(new Packet(Parent.Key, _clientGateKey, uploadAction));
-
-            Thread.Sleep(100);
-            Parent.Send(packet);
+            var accumulatorKey = UploadTypeAction.ActionName;
+            Parent.Accumulator.Lock(accumulatorKey);
+            try
+            {
+                if (Parent.Accumulator.GetStatus(accumulatorKey) == HubAccumulatorStatus.Free)
+                {
+                    var uploadAction = new UploadTypeAction
+                    {
+                        UploadType = action.CommandInfo.DataObjectType
+                    };
+                    Parent.Send(new Packet(Parent.Key, _clientGateKey, uploadAction));
+                    Parent.Accumulator.SetBusyStatus(accumulatorKey);
+                }
+                // TODO it needs to use accumulator key with UploadType
+                Parent.Accumulator.Add(accumulatorKey, packet);
+            }
+            finally
+            {
+                Parent.Accumulator.UnLock(accumulatorKey);
+            }
         }
     }
 }

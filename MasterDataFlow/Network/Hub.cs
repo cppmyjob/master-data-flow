@@ -12,6 +12,7 @@ namespace MasterDataFlow.Network
     {
         private readonly AsyncDictionary<BaseKey, IHub> _connectedHubs = new AsyncDictionary<BaseKey, IHub>();
         private readonly AsyncQueue<IPacket> _queue = new AsyncQueue<IPacket>();
+        private readonly HubAccumulator _accumulator = new HubAccumulator();
 
         public abstract BaseKey Key { get; }
 
@@ -38,6 +39,12 @@ namespace MasterDataFlow.Network
         {
             _queue.Enqueue(packet);
             return SendStatus.Ok;
+        }
+
+
+        public IHubAccumulator Accumulator
+        {
+            get { return _accumulator; }
         }
 
         protected abstract void ProccessPacket(IPacket packet);
@@ -69,5 +76,6 @@ namespace MasterDataFlow.Network
         {
             
         }
+
     }
 }

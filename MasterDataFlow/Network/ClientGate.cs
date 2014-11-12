@@ -59,7 +59,6 @@ namespace MasterDataFlow.Network
 
         private void InitializateServerGate()
         {
-            return;
             var sendClientGateKeyAction = new SendClientGateKeyAction()
             {
                 ClientGateKey = Key.Key
@@ -69,6 +68,8 @@ namespace MasterDataFlow.Network
             var body = Serialization.Serializator.Serialize(sendClientGateKeyAction);
             var remotePacket = new RemotePacket(Key.Key, ServerGateKey.Key, bodyTypeName, body);
             _context.Contract.Send(remotePacket);
+
+            //Accumulator.Add(ClientGateKeyRecievedAction.ActionName,);
         }
     }
 }
