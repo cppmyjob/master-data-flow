@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Actions;
+using MasterDataFlow.Actions.ClientGateKey;
+using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
 {
@@ -13,12 +17,21 @@ namespace MasterDataFlow.Network
     {
         private readonly IClientContext _context;
         private CommandRunnerHub _runner;
-        private bool _isServerGateInitializated = false;
-        private object _syncObject = new object();
 
         public ClientGate(IClientContext remoteHostContract)
         {
             _context = remoteHostContract;
+            _context.GateCallbackPacketRecieved += OnGateCallbackPacketRecievedHandler;
+            Accumulator.Lock(ClientGateKeyRecievedAction.ActionName);
+            try
+            {
+                SendClientKey();
+                Accumulator.SetBusyStatus(ClientGateKeyRecievedAction.ActionName);
+            }
+            finally
+            {
+                Accumulator.UnLock(ClientGateKeyRecievedAction.ActionName);
+            }
         }
 
         public BaseKey ServerGateKey
@@ -34,21 +47,90 @@ namespace MasterDataFlow.Network
 
         protected override void ProccessPacket(IPacket packet)
         {
+            if (packet.Body == null)
+                // TODO Exception?
+                return;
+            var action = packet.Body as BaseAction;
+            if (action == null)
+                // TODO Exception?
+                return;
+            switch (action.Name)
+            {
+                case ClientGateKeyRecievedAction.ActionName:
+                    ProcessClientGateKeyRecievedAction();
+                    break;
+                case UploadTypeRequestAction.ActionName:
+                    ProcessUploadTypeAction(action as UploadTypeRequestAction);
+                    break;
+                default:
+                    // TODO Exception?
+                    break;
+            }
+        }
 
+        private void OnGateCallbackPacketRecievedHandler(RemotePacket remotePacket)
+        {
+            var bodyType = Type.GetType(remotePacket.TypeName);
+            var body = Serializator.Deserialize(bodyType, (string)remotePacket.Body);
+            var senderKey = BaseKey.DeserializeKey(remotePacket.SenderKey);
+            var recieverKey = BaseKey.DeserializeKey(remotePacket.RecieverKey);
+            var packet = new Packet(senderKey, recieverKey, body);
+            Send(packet);            
+        }
+
+        private void ProcessUploadTypeAction(UploadTypeRequestAction action)
+        {
+            var actionType = Type.GetType(action.TypeName);
+            string path = actionType.Assembly.Location;
+            var assemblyFilename = Path.GetFileName(path);
+            using (var stream = File.OpenRead(path))
+            {
+                var buffer = new byte[stream.Length];
+                stream.Read(buffer, 0, buffer.Length);
+                var responseAction = new UploadTypeResponseAction
+                {
+                    TypeName = action.TypeName,
+                    AssemblyData = buffer,
+                    AssemblyName = assemblyFilename
+                };
+                Send(new Packet(Key, ServerGateKey, responseAction));
+            }
+        }
+
+        private void ProcessClientGateKeyRecievedAction()
+        {
+            Accumulator.Lock(ClientGateKeyRecievedAction.ActionName);
+            try
+            {
+                var packets = Accumulator.Extract(ClientGateKeyRecievedAction.ActionName);
+                foreach (var packet in packets)
+                {
+                    Send(packet);
+                }
+            }
+            finally
+            {
+                Accumulator.UnLock(ClientGateKeyRecievedAction.ActionName);
+            }
         }
 
         protected override void ProcessUndeliveredPacket(IPacket packet)
         {
-            // TODO it needs another way for passing ClientGateKey to server side
-            lock (_syncObject)
+            Accumulator.Lock(ClientGateKeyRecievedAction.ActionName);
+            try
             {
-                if (!_isServerGateInitializated)
+                if (Accumulator.GetStatus(ClientGateKeyRecievedAction.ActionName) == HubAccumulatorStatus.Busy)
                 {
-                    InitializateServerGate();
-                    _isServerGateInitializated = true;
+                    Accumulator.Add(ClientGateKeyRecievedAction.ActionName, packet);
+                    return;
                 }
             }
+            finally
+            {
+                Accumulator.UnLock(ClientGateKeyRecievedAction.ActionName);
+            }
 
+            // TODO Merge with SendClientKey begin from var bodyTypeName =.....
             var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
             // TODO need more flexible serialization way
             var body = Serialization.Serializator.Serialize(packet.Body);
@@ -57,7 +139,7 @@ namespace MasterDataFlow.Network
 
         }
 
-        private void InitializateServerGate()
+        private void SendClientKey()
         {
             var sendClientGateKeyAction = new SendClientGateKeyAction()
             {
@@ -68,8 +150,6 @@ namespace MasterDataFlow.Network
             var body = Serialization.Serializator.Serialize(sendClientGateKeyAction);
             var remotePacket = new RemotePacket(Key.Key, ServerGateKey.Key, bodyTypeName, body);
             _context.Contract.Send(remotePacket);
-
-            //Accumulator.Add(ClientGateKeyRecievedAction.ActionName,);
         }
     }
 }

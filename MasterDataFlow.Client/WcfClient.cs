@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using MasterDataFlow.Contract;
 using MasterDataFlow.Interfaces;
@@ -8,16 +9,22 @@ using MasterDataFlow.Network;
 
 namespace MasterDataFlow.Client
 {
-    public class WcfClient : IDisposable
+    public class WcfClient : IWcfGateCallback, IDisposable
     {
         private readonly ClientInternal _client;
         private bool _disposed = false;
+        //private readonly IWcfGateContract _channel;
+        private IGateCallback _callback;
 
         private class ClientInternal : System.ServiceModel.ClientBase<IWcfGateContract>, IGateContract
         {
-            public void UploadAssembly(byte[] data)
+            public ClientInternal(InstanceContext context) : base(context)
             {
-                Channel.UploadAssembly(data);
+            }
+
+            public void UploadAssembly(string typeName, byte[] data)
+            {
+                Channel.UploadAssembly(typeName, data);
             }
 
             public void Send(RemotePacket packet)
@@ -26,9 +33,15 @@ namespace MasterDataFlow.Client
             }
         }
 
-        public WcfClient()
+        public WcfClient(IGateCallback callback)
         {
-            _client = new ClientInternal();
+            _callback = callback;
+            //_client = new ClientInternal();
+
+            var ctx = new InstanceContext(this);
+            _client = new ClientInternal(ctx);
+            //_channel = new DuplexChannelFactory<IWcfGateContract>(ctx).CreateChannel();
+
         }
 
         public IGateContract Channel
@@ -94,6 +107,11 @@ namespace MasterDataFlow.Client
             // Calling Dispose(false) is optimal in terms of 
             // readability and maintainability.
             Dispose(false);
+        }
+
+        void IWcfGateCallback.Send(RemotePacket packet)
+        {
+            _callback.Send(packet);
         }
 
     }

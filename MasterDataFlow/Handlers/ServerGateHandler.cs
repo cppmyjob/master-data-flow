@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.Actions;
+using MasterDataFlow.Actions.ClientGateKey;
+using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
@@ -20,7 +24,7 @@ namespace MasterDataFlow.Handlers
 
         public override string[] SupportedActions
         {
-            get { return new [] {RemoteExecuteCommandAction.ActionName}; }
+            get { return new[] { RemoteExecuteCommandAction.ActionName, SendClientGateKeyAction.ActionName, UploadTypeResponseAction.ActionName}; }
         }
 
 
@@ -37,10 +41,13 @@ namespace MasterDataFlow.Handlers
             switch (actionName)
             {
                 case RemoteExecuteCommandAction.ActionName:
-                    RemoteExecuteCommandActionProcess((RemoteExecuteCommandAction)packet.Body, packet);
+                    ProcessRemoteExecuteCommandAction((RemoteExecuteCommandAction)packet.Body, packet);
                     break;
                 case SendClientGateKeyAction.ActionName:
-                    SendClientGateKeyActionProcess((SendClientGateKeyAction) packet.Body);
+                    ProcessSendClientGateKeyAction((SendClientGateKeyAction) packet.Body);
+                    break;
+                case UploadTypeResponseAction.ActionName:
+                    ProcessUploadTypeResponseAction((UploadTypeResponseAction) packet.Body);
                     break;
                 default:
                     // TODO Send Error Exception
@@ -48,13 +55,48 @@ namespace MasterDataFlow.Handlers
             }
         }
 
-        private void SendClientGateKeyActionProcess(SendClientGateKeyAction action)
+        private Assembly _tempAssembly = null;
+
+        private void ProcessUploadTypeResponseAction(UploadTypeResponseAction body)
         {
-            _clientGateKey = BaseKey.DeserializeKey(action.ClientGateKey);
-            ((ServerGate) Parent).ClientGateKey = _clientGateKey;
+            var accumulatorKey = UploadTypeResponseAction.ActionName;
+            Parent.Accumulator.Lock(accumulatorKey);
+            try
+            {
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                 var assemblyFilename = Path.Combine(path, body.AssemblyName);
+                //var assemblyFilename = Path.Combine(path, "MasterDataFlow.Wcf.Client.dll");
+                if (File.Exists(assemblyFilename))
+                    File.Delete(assemblyFilename);
+                using (var stream = File.Create(assemblyFilename))
+                {
+                    stream.Write(body.AssemblyData, 0, body.AssemblyData.Length);
+                }
+
+                _tempAssembly = Assembly.LoadFile(assemblyFilename);
+                //_tempAssembly = Assembly.Load(body.AssemblyData);
+                //AppDomain.CurrentDomain.Load(body.AssemblyData);
+                var packets = Parent.Accumulator.Extract(accumulatorKey);
+                foreach (var packet in packets)
+                {
+                    Parent.Send(packet);
+                }
+            }
+            finally
+            {
+                Parent.Accumulator.UnLock(accumulatorKey);
+            }
         }
 
-        private void RemoteExecuteCommandActionProcess(RemoteExecuteCommandAction action, IPacket packet)
+        private void ProcessSendClientGateKeyAction(SendClientGateKeyAction action)
+        {
+             _clientGateKey = BaseKey.DeserializeKey(action.ClientGateKey);
+             ((ServerGate) Parent).ClientGateKey = _clientGateKey;
+            var responseAction = new ClientGateKeyRecievedAction();
+            Parent.Send(new Packet(Parent.Key, _clientGateKey, responseAction));
+        }
+
+        private void ProcessRemoteExecuteCommandAction(RemoteExecuteCommandAction action, IPacket packet)
         {
             var allRunners = _commandRunnerHubs.GetItems();
             if (allRunners.Count == 0)
@@ -63,7 +105,12 @@ namespace MasterDataFlow.Handlers
             ICommandDataObject dataObject = null;
             if (action.CommandInfo.DataObjectType != null)
             {
-                var dataObjectType = Type.GetType(action.CommandInfo.DataObjectType);
+                
+                Type dataObjectType;
+                if (_tempAssembly == null)
+                    dataObjectType = Type.GetType(action.CommandInfo.DataObjectType);
+                else
+                    dataObjectType = _tempAssembly.GetType(action.CommandInfo.DataObjectType);
                 if (dataObjectType == null)
                 {
                     SendUploadTypeCommand(action, packet);
@@ -72,7 +119,11 @@ namespace MasterDataFlow.Handlers
                 dataObject = (ICommandDataObject) Serialization.Serializator.Deserialize(dataObjectType, action.CommandInfo.DataObject);
             }
 
-            var commandType = Type.GetType(action.CommandInfo.CommandType);
+            Type commandType;
+            if (_tempAssembly == null)
+                commandType = Type.GetType(action.CommandInfo.CommandType);
+            else
+                commandType = _tempAssembly.GetType(action.CommandInfo.CommandType);
             var commandDefinition = new CommandDefinition(commandType);
 
             BaseKey senderKey = Parent.Key;
@@ -94,15 +145,15 @@ namespace MasterDataFlow.Handlers
 
         private void SendUploadTypeCommand(RemoteExecuteCommandAction action, IPacket packet)
         {
-            var accumulatorKey = UploadTypeAction.ActionName;
+            var accumulatorKey = UploadTypeResponseAction.ActionName;
             Parent.Accumulator.Lock(accumulatorKey);
             try
             {
                 if (Parent.Accumulator.GetStatus(accumulatorKey) == HubAccumulatorStatus.Free)
                 {
-                    var uploadAction = new UploadTypeAction
+                    var uploadAction = new UploadTypeRequestAction
                     {
-                        UploadType = action.CommandInfo.DataObjectType
+                        TypeName = action.CommandInfo.DataObjectType
                     };
                     Parent.Send(new Packet(Parent.Key, _clientGateKey, uploadAction));
                     Parent.Accumulator.SetBusyStatus(accumulatorKey);

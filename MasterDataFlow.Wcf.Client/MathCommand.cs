@@ -24,6 +24,7 @@ namespace MasterDataFlow.Wcf.Client
         {
             var dt = new DataTable();
             var v = dt.Compute(DataObject.Expression, "");
+            Console.WriteLine(DataObject.Expression + " = " +v.ToString());
             return Stop(new MathCommandResult() {Result = v.ToString()});
         }
     }

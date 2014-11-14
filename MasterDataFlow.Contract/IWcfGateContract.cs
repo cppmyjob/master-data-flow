@@ -10,11 +10,11 @@ using MasterDataFlow.Network;
 
 namespace MasterDataFlow.Contract
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IWcfGateCallback))]
     public interface IWcfGateContract
     {
         [OperationContract]
-        void UploadAssembly(byte[] data);
+        void UploadAssembly(string typeName, byte[] data);
 
         [OperationContract]
         void Send(RemotePacket packet);

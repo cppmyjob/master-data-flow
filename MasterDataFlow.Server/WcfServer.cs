@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using MasterDataFlow.Contract;
+using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
 
@@ -14,10 +16,30 @@ namespace MasterDataFlow.Server
         // TODO Create separate config section for server side configuration
         private static readonly ServerGate Gate = CreateDefaultServerGate();
 
+
+        private static IWcfGateCallback _callback;
+
+        private class GateCallback : IGateCallback
+        {
+            //private IWcfGateCallback Proxy
+            //{
+            //    get
+            //    {
+            //        return OperationContext.Current.GetCallbackChannel<IWcfGateCallback>();
+            //    }
+            //}
+
+            public void Send(RemotePacket packet)
+            {
+                //Proxy.Send(packet);
+                WcfServer._callback.Send(packet);
+            }
+        }
+
         // TODO implement dynamic configuration based on client request
         private static ServerGate CreateDefaultServerGate()
         {
-            var result = new ServerGate(new ServiceKey(new Guid(ConfigurationManager.AppSettings["ServerGateKey"])));
+            var result = new ServerGate(new ServiceKey(new Guid(ConfigurationManager.AppSettings["ServerGateKey"])), new GateCallback());
             var remoteCommandRunner = new CommandRunnerHub();
             result.ConnectHub(remoteCommandRunner);
             var remoteContainer = new SimpleContainerHub();
@@ -25,14 +47,16 @@ namespace MasterDataFlow.Server
             return result;
         }
 
-        public void UploadAssembly(byte[] data)
+        public void UploadAssembly(string typeName, byte[] data)
         {
-            Gate.UploadAssembly(data);
+            Gate.UploadAssembly(typeName, data);
         }
 
         public void Send(RemotePacket packet)
         {
+            _callback = OperationContext.Current.GetCallbackChannel<IWcfGateCallback>();
             Gate.Send(packet);
         }
+
     }
 }

@@ -48,6 +48,9 @@ namespace MasterDataFlow.Tests
             {
                 
             }
+
+
+            public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
         }
 
         private class RemoteHostContractMock

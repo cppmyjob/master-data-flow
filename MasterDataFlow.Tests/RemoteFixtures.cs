@@ -48,6 +48,9 @@ namespace MasterDataFlow.Tests
             {
                 
             }
+
+
+            public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
         }
 
         public class ExecuteCommand : Command<CommandDataObjectStub>

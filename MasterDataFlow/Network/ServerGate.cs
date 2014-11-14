@@ -13,13 +13,16 @@ namespace MasterDataFlow.Network
 {
     public class ServerGate : Gate, IGateContract
     {
+        private IGateCallback _callback;
+
         public ServerGate()
         {
             RegisterHandler(new ServerGateHandler());
         }
 
-        public ServerGate(ServiceKey key) : base(key)
+        public ServerGate(ServiceKey key, IGateCallback callback) : base(key)
         {
+            _callback = callback;
             RegisterHandler(new ServerGateHandler());
         }
 
@@ -29,11 +32,18 @@ namespace MasterDataFlow.Network
         {
             if (packet.RecieverKey == ClientGateKey)
             {
-                
+                if (_callback != null)
+                {
+                    var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
+                    // TODO need more flexible serialization way
+                    var body = Serialization.Serializator.Serialize(packet.Body);
+                    var remotePacket = new RemotePacket(packet.SenderKey.Key, packet.RecieverKey.Key, bodyTypeName, body);
+                    _callback.Send(remotePacket); 
+                }
             }
         }
 
-        public void UploadAssembly(byte[] data)
+        public void UploadAssembly(string typeName, byte[] data)
         {
             throw new NotImplementedException();
         }

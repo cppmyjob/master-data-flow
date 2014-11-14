@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.Contract;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Client
 {
-    public class WcfClientContext : IClientContext
+    public class WcfClientContext : IClientContext, IGateCallback
     {
         private readonly ServiceKey _serverGateKey;
         // Flag: Has Dispose already been called? 
@@ -17,7 +18,7 @@ namespace MasterDataFlow.Client
         public WcfClientContext(ServiceKey serverGateKey)
         {
             _serverGateKey = serverGateKey;
-            _client = new WcfClient();
+            _client = new WcfClient(this);
         }
 
         public IGateContract Contract
@@ -29,6 +30,8 @@ namespace MasterDataFlow.Client
         {
             get { return _serverGateKey; }
         }
+
+        public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
 
        // Public implementation of Dispose pattern callable by consumers. 
        public void Dispose()
@@ -58,5 +61,14 @@ namespace MasterDataFlow.Client
        {
           Dispose(false);
        }
+
+       void IGateCallback.Send(Network.RemotePacket packet)
+       {
+           if (GateCallbackPacketRecieved != null)
+           {
+               GateCallbackPacketRecieved(packet);
+           }
+       }
+
     }
 }

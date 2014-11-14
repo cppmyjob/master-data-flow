@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IWcfGateCallback.cs" />
     <Compile Include="IWcfGateContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

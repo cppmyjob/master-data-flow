@@ -10,7 +10,7 @@ namespace MasterDataFlow.Interfaces
 {
     public interface IGateContract
     {
-        void UploadAssembly(byte[] data);
+        void UploadAssembly(string typeName, byte[] data);
         void Send(RemotePacket packet);
     }
 }

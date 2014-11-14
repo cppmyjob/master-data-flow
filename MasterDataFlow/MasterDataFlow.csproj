@@ -43,12 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\BaseAction.cs" />
-    <Compile Include="Actions\ClientGateKeyRecievedAction.cs" />
+    <Compile Include="Actions\ClientGateKey\ClientGateKeyRecievedAction.cs" />
     <Compile Include="Actions\RemoteExecuteCommandAction.cs" />
     <Compile Include="Actions\LocalExecuteCommandAction.cs" />
     <Compile Include="Actions\FindContainerAndLaunchCommandAction.cs" />
-    <Compile Include="Actions\SendClientGateKeyAction.cs" />
-    <Compile Include="Actions\UploadTypeAction.cs" />
+    <Compile Include="Actions\ClientGateKey\SendClientGateKeyAction.cs" />
+    <Compile Include="Actions\UploadType\UploadTypeResponseAction.cs" />
+    <Compile Include="Actions\UploadType\UploadTypeRequestAction.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
