@@ -8,6 +8,7 @@ using System.Threading;
 using MasterDataFlow.Actions;
 using MasterDataFlow.Actions.ClientGateKey;
 using MasterDataFlow.Actions.UploadType;
+using MasterDataFlow.Assemblies;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
@@ -16,11 +17,13 @@ using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Handlers
 {
+    // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
     public class ServerGateHandler : BaseHandler
     {
         private readonly AsyncDictionary<BaseKey, CommandRunnerHub> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunnerHub>();
 
         private BaseKey _clientGateKey;
+        private AssemblyLoader _assemblyLoader = new AssemblyLoader();
 
         public override string[] SupportedActions
         {
@@ -55,27 +58,13 @@ namespace MasterDataFlow.Handlers
             }
         }
 
-        private Assembly _tempAssembly = null;
-
         private void ProcessUploadTypeResponseAction(UploadTypeResponseAction body)
         {
             var accumulatorKey = UploadTypeResponseAction.ActionName;
             Parent.Accumulator.Lock(accumulatorKey);
             try
             {
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                 var assemblyFilename = Path.Combine(path, body.AssemblyName);
-                //var assemblyFilename = Path.Combine(path, "MasterDataFlow.Wcf.Client.dll");
-                if (File.Exists(assemblyFilename))
-                    File.Delete(assemblyFilename);
-                using (var stream = File.Create(assemblyFilename))
-                {
-                    stream.Write(body.AssemblyData, 0, body.AssemblyData.Length);
-                }
-
-                _tempAssembly = Assembly.LoadFile(assemblyFilename);
-                //_tempAssembly = Assembly.Load(body.AssemblyData);
-                //AppDomain.CurrentDomain.Load(body.AssemblyData);
+                _assemblyLoader.Load(body.AssemblyData);
                 var packets = Parent.Accumulator.Extract(accumulatorKey);
                 foreach (var packet in packets)
                 {
@@ -106,11 +95,7 @@ namespace MasterDataFlow.Handlers
             if (action.CommandInfo.DataObjectType != null)
             {
                 
-                Type dataObjectType;
-                if (_tempAssembly == null)
-                    dataObjectType = Type.GetType(action.CommandInfo.DataObjectType);
-                else
-                    dataObjectType = _tempAssembly.GetType(action.CommandInfo.DataObjectType);
+                Type dataObjectType = _assemblyLoader.GetLoadedType(action.CommandInfo.DataObjectType);
                 if (dataObjectType == null)
                 {
                     SendUploadTypeCommand(action, packet);
@@ -119,11 +104,13 @@ namespace MasterDataFlow.Handlers
                 dataObject = (ICommandDataObject) Serialization.Serializator.Deserialize(dataObjectType, action.CommandInfo.DataObject);
             }
 
-            Type commandType;
-            if (_tempAssembly == null)
-                commandType = Type.GetType(action.CommandInfo.CommandType);
-            else
-                commandType = _tempAssembly.GetType(action.CommandInfo.CommandType);
+            Type commandType = _assemblyLoader.GetLoadedType(action.CommandInfo.CommandType);
+            if (commandType == null)
+            {
+                SendUploadTypeCommand(action, packet);
+                return;
+            }
+
             var commandDefinition = new CommandDefinition(commandType);
 
             BaseKey senderKey = Parent.Key;

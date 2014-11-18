@@ -50,6 +50,7 @@
     <Compile Include="Actions\ClientGateKey\SendClientGateKeyAction.cs" />
     <Compile Include="Actions\UploadType\UploadTypeResponseAction.cs" />
     <Compile Include="Actions\UploadType\UploadTypeRequestAction.cs" />
+    <Compile Include="Assemblies\AssemblyLoader.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />

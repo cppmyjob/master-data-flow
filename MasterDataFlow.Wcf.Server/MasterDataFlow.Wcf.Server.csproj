@@ -54,6 +54,10 @@
       <Project>{2a322a3b-a6df-4d71-9412-48659438ebb4}</Project>
       <Name>MasterDataFlow.Server</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
+      <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
+      <Name>MasterDataFlow</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
