@@ -79,6 +79,9 @@
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Network\HubAccumulator.cs" />
     <Compile Include="Network\RemotePacket.cs" />
+    <Compile Include="Network\Routing\RequestPacket.cs" />
+    <Compile Include="Network\Routing\Route.cs" />
+    <Compile Include="Network\Routing\RouteTable.cs" />
     <Compile Include="Network\ServerGate.cs" />
     <Compile Include="Network\SimpleContainerHub.cs" />
     <Compile Include="Network\ActionHub.cs" />
