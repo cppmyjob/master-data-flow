@@ -15,6 +15,7 @@ namespace MasterDataFlow.Interfaces
     {
         IGateContract Contract { get; }
         BaseKey ServerGateKey { get; }
+        bool IsNeedSendKey { get; }
         event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
     }
 }

@@ -13,5 +13,6 @@
 
         public byte[] AssemblyData { get; set; }
         public string AssemblyName { get; set; }
+        public string WorkflowKey { get; set; }
     }
 }

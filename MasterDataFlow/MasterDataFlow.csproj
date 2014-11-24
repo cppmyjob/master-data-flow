@@ -56,6 +56,7 @@
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Handlers\CommandRunnerHandler.cs" />
     <Compile Include="Handlers\ServerGateHandler.cs" />
+    <Compile Include="Interfaces\ICommandFactory.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
     <Compile Include="Interfaces\IGateCallback.cs" />

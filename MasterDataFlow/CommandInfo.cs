@@ -9,9 +9,10 @@ namespace MasterDataFlow
 {
     public class CommandInfo
     {
-        public CommandDefinition CommandDefinition { get; internal set; }
+        public Type CommandType { get; internal set; }
         public ICommandDataObject CommandDataObject { get; internal set; }
         public WorkflowKey WorkflowKey { get; internal set; }
         public CommandKey CommandKey { get; internal set; }
+        public ICommandFactory CommandFactory { get; internal set; }
     }
 }

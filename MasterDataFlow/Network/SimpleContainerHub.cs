@@ -34,7 +34,7 @@ namespace MasterDataFlow.Network
             try
             {
                 var commandInfo = action.CommandInfo;
-                var commandInstance = commandInfo.CommandDefinition.CreateInstance(commandInfo.CommandKey, commandInfo.CommandDataObject);
+                var commandInstance = commandInfo.CommandFactory.CreateInstance(commandInfo.WorkflowKey, commandInfo.CommandKey, commandInfo.CommandType, commandInfo.CommandDataObject);
                 var result = commandInstance.BaseExecute();
                 var resultPacket = new Packet(Key, commandInfo.WorkflowKey, result);
                 _runner.Send(resultPacket);

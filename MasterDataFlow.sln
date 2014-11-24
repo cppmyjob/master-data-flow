@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow", "MasterDataFlow\MasterDataFlow.csproj", "{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests", "MasterDataFlow.Tests\MasterDataFlow.Tests.csproj", "{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50} = {811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236} = {CE8E34E9-8067-4321-86A6-6180A9DBF236}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Server", "MasterDataFlow.Server\MasterDataFlow.Server.csproj", "{2A322A3B-A6DF-4D71-9412-48659438EBB4}"
 EndProject
@@ -20,6 +24,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Contract", "MasterDataFlow.Contract\MasterDataFlow.Contract.csproj", "{E0B47B30-7585-41E4-A0B0-4E4674006FEE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wcf", "Wcf", "{8786644A-0C24-44F8-82BC-75BD2BEC1BE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9B682F02-8450-48AA-AACD-555F7603F9D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests.ExternalAssembly", "MasterDataFlow.Tests.ExternalAssembly\MasterDataFlow.Tests.ExternalAssembly.csproj", "{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests.ExternalAssembly.Second", "MasterDataFlow.Tests.ExternalAssembly.Second\MasterDataFlow.Tests.ExternalAssembly.Second.csproj", "{CE8E34E9-8067-4321-86A6-6180A9DBF236}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,13 +65,24 @@ Global
 		{E0B47B30-7585-41E4-A0B0-4E4674006FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0B47B30-7585-41E4-A0B0-4E4674006FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0B47B30-7585-41E4-A0B0-4E4674006FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 		{E1458973-5FAD-4522-9720-E3A621D672A9} = {8786644A-0C24-44F8-82BC-75BD2BEC1BE9}
 		{CB6D9F25-95BD-4769-BED6-4C0ABC960EC5} = {8786644A-0C24-44F8-82BC-75BD2BEC1BE9}
 		{8786644A-0C24-44F8-82BC-75BD2BEC1BE9} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
+		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
+		{CE8E34E9-8067-4321-86A6-6180A9DBF236} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 	EndGlobalSection
 EndGlobal

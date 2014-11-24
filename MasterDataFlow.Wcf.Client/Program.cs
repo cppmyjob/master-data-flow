@@ -18,9 +18,7 @@ namespace MasterDataFlow.Wcf.Client
                 var runner = new CommandRunnerHub();
                 var clientGate = new ClientGate(clientContext);
                 runner.ConnectHub(clientGate);
-                var commandDefinition = CommandBuilder.Build<MathCommand>().Complete();
                 var сommandWorkflow = new CommandWorkflowHub();
-                сommandWorkflow.Register(commandDefinition);
                 runner.ConnectHub(сommandWorkflow);
 
                 var dataObject = new MathCommand.MathCommandDataObject()

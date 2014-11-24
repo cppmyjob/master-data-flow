@@ -36,19 +36,21 @@ namespace MasterDataFlow.Handlers
 
         internal protected override void ConnectHub(IHub hub)
         {
-            if (hub is SimpleContainerHub)
+            var simpleContainerHub = hub as SimpleContainerHub;
+            if (simpleContainerHub != null)
             {
-                _simpleContainers.AddItem(hub.Key, (SimpleContainerHub) hub);
+                _simpleContainers.AddItem(hub.Key, simpleContainerHub);
             }
-            if (hub is ClientGate)
+            var clientGate = hub as ClientGate;
+            if (clientGate != null)
             {
-                _clientGateContainers.AddItem(hub.Key, (ClientGate)hub);
+                _clientGateContainers.AddItem(hub.Key, clientGate);
             }
         }
 
         private void ProcessFindContainerAndLaunchCommandAction(FindContainerAndLaunchCommandAction action)
         {
-            List<SimpleContainerHub> allContainers = _simpleContainers.GetItems();
+            var allContainers = _simpleContainers.GetItems();
             if (allContainers.Count == 0)
             {
                 ProcessRemoteExecuteCommandAction(action);
@@ -56,7 +58,7 @@ namespace MasterDataFlow.Handlers
             }
             // TODO Select an one from multi
             var recieverKey = allContainers[0].Key;
-            BaseKey senderKey = Parent.Key;
+            var senderKey = Parent.Key;
             object body = new LocalExecuteCommandAction()
             {
                 CommandInfo = action.CommandInfo
@@ -73,7 +75,7 @@ namespace MasterDataFlow.Handlers
             // TODO Select an one from multi
             var info = new RemoteExecuteCommandAction.Info
             {
-                CommandType = action.CommandInfo.CommandDefinition.Command.AssemblyQualifiedName,
+                CommandType = action.CommandInfo.CommandType.AssemblyQualifiedName,
                 DataObject = action.CommandInfo.CommandDataObject != null ? Serialization.Serializator.Serialize(action.CommandInfo.CommandDataObject) : null,
                 DataObjectType = action.CommandInfo.CommandDataObject != null ? action.CommandInfo.CommandDataObject.GetType().AssemblyQualifiedName : null,
                 WorkflowKey = action.CommandInfo.WorkflowKey.Key,

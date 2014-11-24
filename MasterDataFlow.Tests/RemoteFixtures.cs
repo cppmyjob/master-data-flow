@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
@@ -16,15 +19,9 @@ namespace MasterDataFlow.Tests
     [TestClass]
     public class RemoteFixtures
     {
-        private static ManualResetEvent _event;
+        private EventWaitHandle _eventWaitHandle;
 
-        private static int _executeCommandCall = 0;
-
-        private const string LoopId = "1db907fb-77c7-465f-bd60-031107374727";
-        private const string WorkflowId = "C2B980FF-7C4D-4B43-9935-497218492783";
-
-
-        private class RemoteClientContextMock : IClientContext
+        public class RemoteClientContextMock : IClientContext
         {
             private ServerGate _serverGate;
 
@@ -44,6 +41,11 @@ namespace MasterDataFlow.Tests
                 get { return _serverGate.Key; }
             }
 
+            public bool IsNeedSendKey
+            {
+                get { return false; }
+            }
+
             public void Dispose()
             {
                 
@@ -51,6 +53,7 @@ namespace MasterDataFlow.Tests
 
 
             public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
+
         }
 
         public class ExecuteCommand : Command<CommandDataObjectStub>
@@ -58,8 +61,11 @@ namespace MasterDataFlow.Tests
 
             public override BaseMessage Execute()
             {
-                ++_executeCommandCall;
-                _event.Set();
+                using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
+                        "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
+                {
+                    eventWaitHandle.Set();
+                }
                 return Stop(null);
             }
 
@@ -75,13 +81,13 @@ namespace MasterDataFlow.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _event = new ManualResetEvent(false);
+            _eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, "AE2E34E2-A03D-4B53-930D-A15CA44BCF21");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            _event.Dispose();
+            _eventWaitHandle.Dispose();
         }
 
         [TestMethod]
@@ -100,18 +106,37 @@ namespace MasterDataFlow.Tests
             var clientGate = new ClientGate(remoteClientContext);
             runner.ConnectHub(clientGate);
 
-            var commandDefinition = CommandBuilder.Build<ExecuteCommand>().Complete();
             var сommandWorkflow = new CommandWorkflowHub();
-            сommandWorkflow.Register(commandDefinition);
             runner.ConnectHub(сommandWorkflow);
+
+            SendUploadResponse(serverGate, typeof(ExecuteCommand), сommandWorkflow.Key);
 
             // ACT
             сommandWorkflow.Start<ExecuteCommand>(null);
 
             // ASSERT
-            _event.WaitOne(200);
-            Assert.AreEqual(1, _executeCommandCall);
+            var result = _eventWaitHandle.WaitOne(200);
+            Assert.IsTrue(result);
 
+        }
+
+        private void SendUploadResponse(IHub hub, Type type, BaseKey workflowKey)
+        {
+            string path = type.Assembly.Location;
+            var assemblyFilename = Path.GetFileName(path);
+            using (var stream = File.OpenRead(path))
+            {
+                var buffer = new byte[stream.Length];
+                stream.Read(buffer, 0, buffer.Length);
+                var responseAction = new UploadTypeResponseAction
+                {
+                    TypeName = type.AssemblyQualifiedName,
+                    AssemblyData = buffer,
+                    AssemblyName = assemblyFilename,
+                    WorkflowKey = workflowKey.Key
+                };
+                hub.Send(new Packet(new ServiceKey(), hub.Key, responseAction));
+            }
         }
     }
 }

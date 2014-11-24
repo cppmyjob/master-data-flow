@@ -14,5 +14,10 @@ namespace MasterDataFlow.Tests.TestData
         }
 
         public Guid Id { get; set; }
+
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
     }
 }

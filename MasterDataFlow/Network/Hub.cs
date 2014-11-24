@@ -25,7 +25,7 @@ namespace MasterDataFlow.Network
             // TODO check if exists
             _connectedHubs.AddItem(hub.Key, hub);
             // TODO handle not support cases
-            //hub.AcceptHub(this);
+            hub.AcceptHub(this);
             return true;
         }
 

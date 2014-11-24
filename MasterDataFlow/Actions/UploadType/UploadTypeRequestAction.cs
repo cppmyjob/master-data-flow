@@ -10,5 +10,6 @@
         }
 
         public string TypeName { get; set; }
+        public string WorkflowKey { get; set; }
     }
 }

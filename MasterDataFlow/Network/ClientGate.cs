@@ -22,15 +22,18 @@ namespace MasterDataFlow.Network
         {
             _context = remoteHostContract;
             _context.GateCallbackPacketRecieved += OnGateCallbackPacketRecievedHandler;
-            Accumulator.Lock(ClientGateKeyRecievedAction.ActionName);
-            try
+            if (_context.IsNeedSendKey)
             {
-                SendClientKey();
-                Accumulator.SetBusyStatus(ClientGateKeyRecievedAction.ActionName);
-            }
-            finally
-            {
-                Accumulator.UnLock(ClientGateKeyRecievedAction.ActionName);
+                Accumulator.Lock(ClientGateKeyRecievedAction.ActionName);
+                try
+                {
+                    SendClientKey();
+                    Accumulator.SetBusyStatus(ClientGateKeyRecievedAction.ActionName);
+                }
+                finally
+                {
+                    Accumulator.UnLock(ClientGateKeyRecievedAction.ActionName);
+                }
             }
         }
 
@@ -91,7 +94,8 @@ namespace MasterDataFlow.Network
                 {
                     TypeName = action.TypeName,
                     AssemblyData = buffer,
-                    AssemblyName = assemblyFilename
+                    AssemblyName = assemblyFilename,
+                    WorkflowKey = action.WorkflowKey
                 };
                 Send(new Packet(Key, ServerGateKey, responseAction));
             }
@@ -103,9 +107,12 @@ namespace MasterDataFlow.Network
             try
             {
                 var packets = Accumulator.Extract(ClientGateKeyRecievedAction.ActionName);
-                foreach (var packet in packets)
+                if (packets != null)
                 {
-                    Send(packet);
+                    foreach (var packet in packets)
+                    {
+                        Send(packet);
+                    }
                 }
             }
             finally

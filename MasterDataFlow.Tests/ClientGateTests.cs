@@ -44,6 +44,8 @@ namespace MasterDataFlow.Tests
                 get { return _serverGateKey; }
             }
 
+            public bool IsNeedSendKey { get { return false; } }
+
             public void Dispose()
             {
                 

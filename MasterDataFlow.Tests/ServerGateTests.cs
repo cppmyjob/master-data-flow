@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.Actions;
+using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
@@ -102,6 +104,7 @@ namespace MasterDataFlow.Tests
             var commandRunner = commandRunnerMock.Object;
             serverGate.ConnectHub(commandRunner);
 
+
             var workflowKey = new WorkflowKey();
             var commandKey = new CommandKey();
             var info = new RemoteExecuteCommandAction.Info
@@ -113,6 +116,8 @@ namespace MasterDataFlow.Tests
                 CommandKey = commandKey.Key
             };
             var bodyObject = new RemoteExecuteCommandAction { CommandInfo = info };
+
+            SendUploadResponse(serverGate, typeof (PassingCommand), workflowKey);
 
             // ACT
             var senderKey = new ServiceKey();
@@ -133,9 +138,29 @@ namespace MasterDataFlow.Tests
             var recievedCommand = recievedPacked.Body as FindContainerAndLaunchCommandAction;
             Assert.AreEqual(commandKey, recievedCommand.CommandInfo.CommandKey);
             Assert.AreEqual(workflowKey, recievedCommand.CommandInfo.WorkflowKey);
-            Assert.AreEqual(typeof(PassingCommand), recievedCommand.CommandInfo.CommandDefinition.Command);
-            Assert.AreEqual(DataObjectId, ((PassingCommandDataObject) recievedCommand.CommandInfo.CommandDataObject).Id.ToString());
+
+            Assert.AreEqual(typeof(PassingCommand).FullName, recievedCommand.CommandInfo.CommandType.FullName);
+            Assert.AreEqual(DataObjectId, recievedCommand.CommandInfo.CommandDataObject.ToString());
         }
 
+
+        private void SendUploadResponse(IHub hub, Type type, WorkflowKey workflowKey)
+        {
+            string path = type.Assembly.Location;
+            var assemblyFilename = Path.GetFileName(path);
+            using (var stream = File.OpenRead(path))
+            {
+                var buffer = new byte[stream.Length];
+                stream.Read(buffer, 0, buffer.Length);
+                var responseAction = new UploadTypeResponseAction
+                {
+                    TypeName = type.AssemblyQualifiedName,
+                    AssemblyData = buffer,
+                    AssemblyName = assemblyFilename,
+                    WorkflowKey = workflowKey.Key
+                };
+                hub.Send(new Packet(new ServiceKey(), hub.Key, responseAction));
+            }            
+        }
     }
 }

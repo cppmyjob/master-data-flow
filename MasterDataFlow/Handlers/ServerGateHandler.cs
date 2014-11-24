@@ -18,12 +18,12 @@ using MasterDataFlow.Utils;
 namespace MasterDataFlow.Handlers
 {
     // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
-    public class ServerGateHandler : BaseHandler
+    public class ServerGateHandler : BaseHandler, ICommandFactory
     {
         private readonly AsyncDictionary<BaseKey, CommandRunnerHub> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunnerHub>();
 
         private BaseKey _clientGateKey;
-        private AssemblyLoader _assemblyLoader = new AssemblyLoader();
+        private readonly AssemblyLoader _assemblyLoader = new AssemblyLoader();
 
         public override string[] SupportedActions
         {
@@ -33,9 +33,10 @@ namespace MasterDataFlow.Handlers
 
         internal protected override void ConnectHub(IHub hub)
         {
-            if (hub is CommandRunnerHub)
+            var commandRunnerHub = hub as CommandRunnerHub;
+            if (commandRunnerHub != null)
             {
-                _commandRunnerHubs.AddItem(hub.Key, (CommandRunnerHub)hub);
+                _commandRunnerHubs.AddItem(hub.Key, commandRunnerHub);
             }
         }
 
@@ -64,11 +65,15 @@ namespace MasterDataFlow.Handlers
             Parent.Accumulator.Lock(accumulatorKey);
             try
             {
-                _assemblyLoader.Load(body.AssemblyData);
+                var workflowKey = BaseKey.DeserializeKey(body.WorkflowKey);
+                _assemblyLoader.Load(workflowKey, body.AssemblyName, body.AssemblyData);
                 var packets = Parent.Accumulator.Extract(accumulatorKey);
-                foreach (var packet in packets)
+                if (packets != null)
                 {
-                    Parent.Send(packet);
+                    foreach (var packet in packets)
+                    {
+                        Parent.Send(packet);
+                    }
                 }
             }
             finally
@@ -91,11 +96,13 @@ namespace MasterDataFlow.Handlers
             if (allRunners.Count == 0)
                 // TODO Send error message
                 return;
+
+            var workflowKey = (WorkflowKey) BaseKey.DeserializeKey(action.CommandInfo.WorkflowKey);
+
             ICommandDataObject dataObject = null;
             if (action.CommandInfo.DataObjectType != null)
             {
-                
-                Type dataObjectType = _assemblyLoader.GetLoadedType(action.CommandInfo.DataObjectType);
+                Type dataObjectType = _assemblyLoader.GetLoadedType(workflowKey, action.CommandInfo.DataObjectType);
                 if (dataObjectType == null)
                 {
                     SendUploadTypeCommand(action, packet);
@@ -104,14 +111,14 @@ namespace MasterDataFlow.Handlers
                 dataObject = (ICommandDataObject) Serialization.Serializator.Deserialize(dataObjectType, action.CommandInfo.DataObject);
             }
 
-            Type commandType = _assemblyLoader.GetLoadedType(action.CommandInfo.CommandType);
+            Type commandType = _assemblyLoader.GetLoadedType(workflowKey, action.CommandInfo.CommandType);
             if (commandType == null)
             {
                 SendUploadTypeCommand(action, packet);
                 return;
             }
 
-            var commandDefinition = new CommandDefinition(commandType);
+            //var commandDefinition = new CommandDefinition(commandType);
 
             BaseKey senderKey = Parent.Key;
             BaseKey recieverKey = allRunners[0].Key;
@@ -120,14 +127,14 @@ namespace MasterDataFlow.Handlers
                 CommandInfo = new CommandInfo()
                 {
                     CommandKey = (CommandKey)BaseKey.DeserializeKey(action.CommandInfo.CommandKey),
-                    WorkflowKey = (WorkflowKey)BaseKey.DeserializeKey(action.CommandInfo.WorkflowKey),
-                    CommandDefinition = commandDefinition,
-                    CommandDataObject = dataObject
+                    WorkflowKey = workflowKey,
+                    CommandType = commandType,
+                    CommandDataObject = dataObject,
+                    CommandFactory = this
                 }
             };
 
             allRunners[0].Send(new Packet(senderKey, recieverKey, body));
-
         }
 
         private void SendUploadTypeCommand(RemoteExecuteCommandAction action, IPacket packet)
@@ -140,7 +147,8 @@ namespace MasterDataFlow.Handlers
                 {
                     var uploadAction = new UploadTypeRequestAction
                     {
-                        TypeName = action.CommandInfo.DataObjectType
+                        TypeName = action.CommandInfo.DataObjectType,
+                        WorkflowKey = action.CommandInfo.WorkflowKey,
                     };
                     Parent.Send(new Packet(Parent.Key, _clientGateKey, uploadAction));
                     Parent.Accumulator.SetBusyStatus(accumulatorKey);
@@ -152,6 +160,16 @@ namespace MasterDataFlow.Handlers
             {
                 Parent.Accumulator.UnLock(accumulatorKey);
             }
+        }
+
+        public BaseCommand CreateInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
+        {
+            var instance = (BaseCommand)_assemblyLoader.CreateInstance(workflowKey, type);
+            instance.Key = commandKey;
+            PropertyInfo prop = type.GetProperty("DataObject", BindingFlags.Instance | BindingFlags.Public);
+            // TODO need to add a some checking is DataObject exist and etc
+            prop.SetValue(instance, commandDataObject, null);
+            return instance;
         }
     }
 }

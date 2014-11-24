@@ -36,7 +36,7 @@ namespace MasterDataFlow.Network
                 {
                     var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
                     // TODO need more flexible serialization way
-                    var body = Serialization.Serializator.Serialize(packet.Body);
+                    var body = Serializator.Serialize(packet.Body);
                     var remotePacket = new RemotePacket(packet.SenderKey.Key, packet.RecieverKey.Key, bodyTypeName, body);
                     _callback.Send(remotePacket); 
                 }

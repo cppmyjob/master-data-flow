@@ -84,9 +84,7 @@ namespace MasterDataFlow.Tests
             var container = new SimpleContainerHub();
             _runner.ConnectHub(container);
 
-            var commandDefinition = CommandBuilder.Build<ExecuteCommand>().Complete();
             var сommandWorkflow = new CommandWorkflowHub();
-            сommandWorkflow.Register(commandDefinition);
             _runner.ConnectHub(сommandWorkflow);
 
             // ACT
@@ -117,9 +115,7 @@ namespace MasterDataFlow.Tests
             var container = new SimpleContainerHub();
             _runner.ConnectHub(container);
 
-            var commandDefinition = CommandBuilder.Build<PassingCommand>().Complete();
             var сommandWorkflow = new CommandWorkflowHub();
-            сommandWorkflow.Register(commandDefinition);
             _runner.ConnectHub(сommandWorkflow);
 
             // ACT

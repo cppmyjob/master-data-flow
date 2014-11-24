@@ -74,6 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandDefinitionTests.cs" />
     <Compile Include="CommandWorkflowHubTests.cs" />
+    <Compile Include="AssemblyLoaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
@@ -87,8 +88,16 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Mocks\" />
+    <Content Include="..\MasterDataFlow.Tests.ExternalAssembly.Second\bin\MasterDataFlow.Tests.ExternalAssembly.dll">
+      <Link>External\Second\MasterDataFlow.Tests.ExternalAssembly.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MasterDataFlow.Tests.ExternalAssembly\bin\MasterDataFlow.Tests.ExternalAssembly.dll">
+      <Link>External\First\MasterDataFlow.Tests.ExternalAssembly.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

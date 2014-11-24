@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using MasterDataFlow.Actions;
 using MasterDataFlow.Exceptions;
@@ -13,9 +14,8 @@ namespace MasterDataFlow.Network
 {
     public delegate void OnMessageRecieved(BaseKey senderKey,BaseMessage message);
 
-    public class CommandWorkflowHub : EventLoopHub
+    public class CommandWorkflowHub : EventLoopHub, ICommandFactory
     {
-        private readonly IList<CommandDefinition> _definitions = new List<CommandDefinition>();
         private readonly WorkflowKey _key;
         private CommandRunnerHub _runner;
 
@@ -26,11 +26,6 @@ namespace MasterDataFlow.Network
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public event OnMessageRecieved MessageRecieved;
-
-        internal IList<CommandDefinition> Definitions
-        {
-            get { return _definitions; }
-        }
 
         public override BaseKey Key
         {
@@ -43,27 +38,15 @@ namespace MasterDataFlow.Network
             _runner = (CommandRunnerHub)hub;
         }
 
-        public CommandDefinition Find<TCommand>()
-            where TCommand : ICommand<ICommandDataObject>
-        {
-            Type commandType = typeof(TCommand);
-            return Find(commandType);
-        }
-
-        public void Register(CommandDefinition definition)
-        {
-            _definitions.Add(definition);
-        }
-
         public CommandKey Start<TCommand>(ICommandDataObject commandDataObject)
             where TCommand : ICommand<ICommandDataObject>
         {
             Type commandType = typeof(TCommand);
             var commandKey = new CommandKey();
-            CommandDefinition commandDefinition = Find(commandType);
-            // TODO check if commandDefinition was found
-            if (commandDefinition == null)
-                throw new MasterDataFlowException("Can't find a command definition for " + commandType.AssemblyQualifiedName);
+            //CommandDefinition commandDefinition = Find(commandType);
+            //// TODO check if commandDefinition was found
+            //if (commandDefinition == null)
+            //    throw new MasterDataFlowException("Can't find a command definition for " + commandType.AssemblyQualifiedName);
 
             BaseKey senderKey = _key;
             BaseKey recieverKey = _runner.Key;
@@ -73,8 +56,9 @@ namespace MasterDataFlow.Network
                 {
                     CommandKey = commandKey,
                     WorkflowKey = _key,
-                    CommandDefinition = commandDefinition,
-                    CommandDataObject = commandDataObject
+                    CommandType = commandType,
+                    CommandDataObject = commandDataObject,
+                    CommandFactory = this,
                 }
             };
             _runner.Send(new Packet(senderKey, recieverKey, body));
@@ -91,12 +75,6 @@ namespace MasterDataFlow.Network
             throw new NotImplementedException();
         }
 
-        private CommandDefinition Find(Type commandType)
-        {
-            CommandDefinition result = _definitions.FirstOrDefault(t => t.Command == commandType);
-            return result;
-        }
-
         protected override void ProccessPacket(IPacket packet)
         {
             var message = packet.Body as BaseMessage;
@@ -109,5 +87,14 @@ namespace MasterDataFlow.Network
             }
         }
 
+        public BaseCommand CreateInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
+        {
+            var instance = (BaseCommand)Activator.CreateInstance(type);
+            instance.Key = commandKey;
+            PropertyInfo prop = type.GetProperty("DataObject", BindingFlags.Instance | BindingFlags.Public);
+            // TODO need to add a some checking is DataObject exist and etc
+            prop.SetValue(instance, commandDataObject, null);
+            return instance;
+        }
     }
 }

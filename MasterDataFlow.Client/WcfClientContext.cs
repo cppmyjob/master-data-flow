@@ -31,6 +31,8 @@ namespace MasterDataFlow.Client
             get { return _serverGateKey; }
         }
 
+        public bool IsNeedSendKey { get { return true; } }
+
         public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
 
        // Public implementation of Dispose pattern callable by consumers. 
