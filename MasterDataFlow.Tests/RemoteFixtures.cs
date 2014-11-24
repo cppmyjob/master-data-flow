@@ -91,7 +91,7 @@ namespace MasterDataFlow.Tests
         }
 
         [TestMethod]
-        public void RemoteCommandBasicUsage()
+        public void RemoteCommandIsExecutedTest()
         {
             // ARRANGE
             var remoteCommandRunner = new CommandRunnerHub();
@@ -117,7 +117,49 @@ namespace MasterDataFlow.Tests
             // ASSERT
             var result = _eventWaitHandle.WaitOne(200);
             Assert.IsTrue(result);
+        }
 
+
+        [TestMethod]
+        public void RemoteCommandStopEventReturnedTest()
+        {
+            // ARRANGE
+            var remoteCommandRunner = new CommandRunnerHub();
+            var serverGate = new ServerGate();
+            serverGate.ConnectHub(remoteCommandRunner);
+            var remoteClientContext = new RemoteClientContextMock(serverGate);
+            var remoteContainer = new SimpleContainerHub();
+            remoteCommandRunner.ConnectHub(remoteContainer);
+
+            var runner = new CommandRunnerHub();
+
+            var clientGate = new ClientGate(remoteClientContext);
+            runner.ConnectHub(clientGate);
+
+            var сommandWorkflow = new CommandWorkflowHub();
+            runner.ConnectHub(сommandWorkflow);
+
+            SendUploadResponse(serverGate, typeof(PassingCommand), сommandWorkflow.Key);
+
+            var callStopCommand = 0;
+            сommandWorkflow.MessageRecieved += (key, message) =>
+            {
+                ++callStopCommand;
+                using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
+                        "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
+                {
+                    eventWaitHandle.Set();
+                }
+            };
+
+            // ACT
+            var newId = Guid.NewGuid();
+            var commandKey = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
+
+            // ASSERT
+            _eventWaitHandle.WaitOne(20000);
+
+            Assert.AreEqual(1, callStopCommand);
         }
 
         private void SendUploadResponse(IHub hub, Type type, BaseKey workflowKey)

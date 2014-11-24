@@ -94,7 +94,6 @@ namespace MasterDataFlow.Tests
             // ASSERT
             _event.WaitOne(200);
             Assert.AreEqual(1, _executeCommandCall);
-
         }
 
         [TestMethod]

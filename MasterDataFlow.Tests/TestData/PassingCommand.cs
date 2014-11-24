@@ -11,6 +11,7 @@ namespace MasterDataFlow.Tests.TestData
     {
         public override BaseMessage Execute()
         {
+            Console.WriteLine("PassingCommand::Execute Id={0}",DataObject.Id);
             return Stop(new PassingCommandDataObject(DataObject.Id));
         }
     }
