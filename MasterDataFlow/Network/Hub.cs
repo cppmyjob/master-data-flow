@@ -17,7 +17,7 @@ namespace MasterDataFlow.Network
         private readonly HubAccumulator _accumulator = new HubAccumulator();
 
         private readonly RouteTable _routeTable = new RouteTable();
-        private readonly Dictionary<string, BaseKey> _routeRequests = new Dictionary<string, BaseKey>(); 
+        private readonly AsyncDictionary<string, BaseKey> _routeRequests = new AsyncDictionary<string, BaseKey>(); 
 
         public abstract BaseKey Key { get; }
 
@@ -68,18 +68,18 @@ namespace MasterDataFlow.Network
                 return false;
             var packet = _queue.Dequeue();
 
-            if (packet is RequestPacket && ((RequestPacket) packet).PacketType == PacketType.RouteRequest &&
-                packet.SenderKey != Key)
+            var requestPacket = packet as RequestPacket;
+            if (requestPacket != null && requestPacket.SenderKey != Key)
             {
-                ProcessRouteRequest(packet as RequestPacket);
-                return true;
-            }
-
-            if (packet is RequestPacket && ((RequestPacket) packet).PacketType == PacketType.RouteResponse &&
-                packet.SenderKey != Key)
-            {
-                ProcessRouteResponse(packet as RequestPacket);
-                return true;
+                switch (requestPacket.PacketType)
+                {
+                    case PacketType.RouteRequest:
+                        ProcessRouteRequest(requestPacket);
+                        break;
+                    case PacketType.RouteResponse:
+                        ProcessRouteResponse(requestPacket);
+                        break;
+                }
             }
 
             if (packet.RecieverKey == Key)
@@ -131,7 +131,7 @@ namespace MasterDataFlow.Network
 
         protected virtual void ProcessRouteRequest(RequestPacket routeRequest)
         {
-            if (_routeRequests.ContainsKey(routeRequest.RequestId))
+            if (_routeRequests.GetItem(routeRequest.RequestId) != null)
                 return;
 
             var route = _routeTable.GetRoute(routeRequest.RecieverKey);
@@ -149,15 +149,15 @@ namespace MasterDataFlow.Network
                     CreateRouteResponse(routeRequest);
                     return;
                 }
-                _routeRequests.Add(routeRequest.RequestId, routeRequest.SenderKey);
+                _routeRequests.AddItem(routeRequest.RequestId, routeRequest.SenderKey);
                 RelayRequest(routeRequest.RequestId, destinationPoint);
             }
         }
 
         protected virtual void ProcessRouteResponse(RequestPacket routeResponse)
         {
-            var routeRequest = _routeRequests.FirstOrDefault(s => s.Key == routeResponse.RequestId);
-            if (routeRequest.Value == null)
+            var routeRequest = _routeRequests.GetItem(routeResponse.RequestId);
+            if (routeRequest == null)
                 return;
 
             var routeList = routeResponse.Body as List<Route>;
@@ -166,7 +166,7 @@ namespace MasterDataFlow.Network
 
             _routeTable.AddRoutes(routeList);
 
-            if (routeRequest.Value == Key)
+            if (routeRequest == Key)
             {
                 _accumulator.Lock(routeResponse.RequestId);
                 var packet = _accumulator.Extract(routeResponse.RequestId);
@@ -182,8 +182,8 @@ namespace MasterDataFlow.Network
                 route.IncrementLenght();
 
             routeList.Add(new Route(routeResponse.SenderKey, Key, 1));
-            BaseKey nextHub;
-            if (!_routeRequests.TryGetValue(routeResponse.RequestId, out nextHub))
+            BaseKey nextHub = _routeRequests.GetItem(routeResponse.RequestId);
+            if (nextHub == null)
                 return;
 
             var response = new RequestPacket(Key, nextHub, routeList, routeResponse.RequestId, PacketType.RouteResponse);
@@ -192,7 +192,7 @@ namespace MasterDataFlow.Network
 
         private void CreateRouteRequest(string eventKey, BaseKey destinationPoint)
         {
-            _routeRequests.Add(eventKey, Key);
+            _routeRequests.AddItem(eventKey, Key);
             RelayRequest(eventKey, destinationPoint);
         }
 
