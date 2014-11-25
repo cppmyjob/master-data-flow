@@ -21,29 +21,30 @@ namespace MasterDataFlow.Tests
     {
         private EventWaitHandle _eventWaitHandle;
 
-        public class RemoteClientContextMock : IClientContext
+        public class RemoteClientContextMock : IClientContext, IGateCallback
         {
-            private ServerGate _serverGate;
+            private IGateContract _gateContract;
+            private readonly BaseKey _serverGateKey;
 
-            public RemoteClientContextMock(ServerGate serverGate)
+            public RemoteClientContextMock(BaseKey serverGateKey)
             {
-                _serverGate = serverGate;
+                _serverGateKey = serverGateKey;
             }
 
 
             public IGateContract Contract
             {
-                get { return _serverGate; } 
+                get { return _gateContract; } 
             }
 
             public BaseKey ServerGateKey
             {
-                get { return _serverGate.Key; }
+                get { return _serverGateKey; }
             }
 
             public bool IsNeedSendKey
             {
-                get { return false; }
+                get { return true; }
             }
 
             public void Dispose()
@@ -51,9 +52,20 @@ namespace MasterDataFlow.Tests
                 
             }
 
+            public void SetContract(IGateContract contract)
+            {
+                _gateContract = contract;
+            }
 
             public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
 
+            public void Send(RemotePacket packet)
+            {
+                if (GateCallbackPacketRecieved != null)
+                {
+                    GateCallbackPacketRecieved(packet);
+                }
+            }
         }
 
         public class ExecuteCommand : Command<CommandDataObjectStub>
@@ -94,15 +106,19 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandIsExecutedTest()
         {
             // ARRANGE
+            var serverGateKey = new ServiceKey();
+            var remoteClientContext = new RemoteClientContextMock(serverGateKey);
+
             var remoteCommandRunner = new CommandRunnerHub();
-            var serverGate = new ServerGate();
+            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
             serverGate.ConnectHub(remoteCommandRunner);
-            var remoteClientContext = new RemoteClientContextMock(serverGate);
+            
             var remoteContainer = new SimpleContainerHub();
             remoteCommandRunner.ConnectHub(remoteContainer);
 
             var runner = new CommandRunnerHub();
 
+            remoteClientContext.SetContract(serverGate);
             var clientGate = new ClientGate(remoteClientContext);
             runner.ConnectHub(clientGate);
 
@@ -124,15 +140,19 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandStopEventReturnedTest()
         {
             // ARRANGE
+            var serverGateKey = new ServiceKey();
+            var remoteClientContext = new RemoteClientContextMock(serverGateKey);
+
             var remoteCommandRunner = new CommandRunnerHub();
-            var serverGate = new ServerGate();
+            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
             serverGate.ConnectHub(remoteCommandRunner);
-            var remoteClientContext = new RemoteClientContextMock(serverGate);
+
             var remoteContainer = new SimpleContainerHub();
             remoteCommandRunner.ConnectHub(remoteContainer);
 
             var runner = new CommandRunnerHub();
 
+            remoteClientContext.SetContract(serverGate);
             var clientGate = new ClientGate(remoteClientContext);
             runner.ConnectHub(clientGate);
 

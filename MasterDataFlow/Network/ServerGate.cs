@@ -7,6 +7,7 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network.Routing;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
@@ -15,7 +16,7 @@ namespace MasterDataFlow.Network
     {
         private IGateCallback _callback;
 
-        public ServerGate()
+        internal ServerGate()
         {
             RegisterHandler(new ServerGateHandler());
         }
@@ -43,11 +44,6 @@ namespace MasterDataFlow.Network
             }
         }
 
-        public void UploadAssembly(string typeName, byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Send(RemotePacket remotePacket)
         {
             var bodyType = Type.GetType(remotePacket.TypeName);
@@ -57,5 +53,17 @@ namespace MasterDataFlow.Network
             var packet = new Packet(senderKey, recieverKey, body);
             Send(packet);
         }
+
+        protected override void RelayRequest(string requestId, BaseKey destinationPoint)
+        {
+            base.RelayRequest(requestId, destinationPoint);
+            if (ClientGateKey != null)
+            {
+                var requestPacket = new RequestPacket(Key, ClientGateKey, destinationPoint, requestId,
+                    PacketType.RouteRequest);
+                Send(requestPacket);
+            }
+        }
+
     }
 }

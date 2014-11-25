@@ -60,13 +60,10 @@ namespace MasterDataFlow.Tests
             mock.Setup(h => h.Send(It.Is<IPacket>(s => s.Body is string))).Callback((IPacket pack) => Packet = pack);
            
             firstNode.ConnectHub(secondNode);
-            secondNode.ConnectHub(firstNode);
 
             secondNode.ConnectHub(mock.Object);
-            mock.Object.ConnectHub(secondNode);
 
             mock.Object.ConnectHub(fourthNode);
-            fourthNode.ConnectHub(mock.Object);
 
             var packet = new Packet(firstNode.Key, fourthNode.Key, "Perfect Routing!");
 
@@ -103,16 +100,12 @@ namespace MasterDataFlow.Tests
             thirdNodeMock.Setup(h => h.Send(It.Is<IPacket>(s => s.Body is string))).Callback((IPacket pack) => Packet = pack);
 
             firstNode.ConnectHub(secondNodeMock.Object);
-            secondNodeMock.Object.ConnectHub(firstNode);
 
             firstNode.ConnectHub(thirdNodeMock.Object);
-            thirdNodeMock.Object.ConnectHub(firstNode);
 
             secondNodeMock.Object.ConnectHub(fourthNode);
-            fourthNode.ConnectHub(secondNodeMock.Object);
 
             thirdNodeMock.Object.ConnectHub(fourthNode);
-            fourthNode.ConnectHub(thirdNodeMock.Object);
 
             var packet = new Packet(firstNode.Key, fourthNode.Key, "Perfect Routing!");
 

@@ -14,9 +14,6 @@ namespace MasterDataFlow.Contract
     public interface IWcfGateContract
     {
         [OperationContract]
-        void UploadAssembly(string typeName, byte[] data);
-
-        [OperationContract]
         void Send(RemotePacket packet);
     }
 }

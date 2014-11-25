@@ -44,6 +44,7 @@ namespace MasterDataFlow.Network
 
         public override void AcceptHub(IHub hub)
         {
+            base.AcceptHub(hub);
             // TODO Check CommandRunnerHub
             _runner = (CommandRunnerHub)hub;
         }

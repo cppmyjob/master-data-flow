@@ -47,11 +47,6 @@ namespace MasterDataFlow.Server
             return result;
         }
 
-        public void UploadAssembly(string typeName, byte[] data)
-        {
-            Gate.UploadAssembly(typeName, data);
-        }
-
         public void Send(RemotePacket packet)
         {
             _callback = OperationContext.Current.GetCallbackChannel<IWcfGateCallback>();

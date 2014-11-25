@@ -23,6 +23,7 @@ namespace MasterDataFlow.Interfaces.Network
         void DisconnectHub(IHub hub);
         SendStatus Send(IPacket packet);
         IHubAccumulator Accumulator { get; }
+        IList<IHub> ConnectedHubs { get; }
     }
 
 }

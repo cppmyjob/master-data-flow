@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Interfaces.Network;
@@ -22,7 +23,11 @@ namespace MasterDataFlow.Network
 
         public virtual bool ConnectHub(IHub hub)
         {
-            // TODO check if exists
+            if (hub == null) throw new ArgumentNullException("hub");
+            if (hub.Key == null) throw new ArgumentNullException("hub.Key");
+
+            // TODO What we should do if hub.Key exists? Throw an exception or silent
+
             _connectedHubs.AddItem(hub.Key, hub);
             // TODO handle not support cases
             hub.AcceptHub(this);
@@ -31,7 +36,7 @@ namespace MasterDataFlow.Network
 
         public virtual void AcceptHub(IHub hub)
         {
-            throw new NotSupportedException();
+            _connectedHubs.AddItem(hub.Key, hub);
         }
 
         public virtual void DisconnectHub(IHub hub)
@@ -49,6 +54,10 @@ namespace MasterDataFlow.Network
         public IHubAccumulator Accumulator
         {
             get { return _accumulator; }
+        }
+
+        public IList<IHub> ConnectedHubs {
+            get { return new ReadOnlyCollection<IHub>(_connectedHubs.GetItems()); }
         }
 
         protected abstract void ProccessPacket(IPacket packet);
@@ -199,7 +208,7 @@ namespace MasterDataFlow.Network
             Send(response);
         }
 
-        private void RelayRequest(string requestId, BaseKey destinationPoint)
+        protected virtual void RelayRequest(string requestId, BaseKey destinationPoint)
         {
             foreach (var hub in _connectedHubs.GetItems())
             {

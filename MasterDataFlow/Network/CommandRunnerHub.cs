@@ -17,6 +17,7 @@ namespace MasterDataFlow.Network
 
         public override void AcceptHub(IHub hub)
         {
+            base.AcceptHub(hub);
             // TODO call when hub is ServerGate
             //throw new NotSupportedException();
         }

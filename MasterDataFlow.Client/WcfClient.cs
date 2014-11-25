@@ -22,11 +22,6 @@ namespace MasterDataFlow.Client
             {
             }
 
-            public void UploadAssembly(string typeName, byte[] data)
-            {
-                Channel.UploadAssembly(typeName, data);
-            }
-
             public void Send(RemotePacket packet)
             {
                 Channel.Send(packet);

@@ -59,6 +59,7 @@
     <Compile Include="ClientGateTests.cs" />
     <Compile Include="CommandBuilderTests.cs" />
     <Compile Include="CommandRunnerTests.cs" />
+    <Compile Include="HubTests.cs" />
     <Compile Include="KeyTests.cs" />
     <Compile Include="ServerGateTests.cs" />
     <Compile Include="RemoteFixtures.cs" />
