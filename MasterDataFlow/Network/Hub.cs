@@ -68,20 +68,22 @@ namespace MasterDataFlow.Network
                 return false;
             var packet = _queue.Dequeue();
 
-            var requestPacket = packet as RequestPacket;
-            if (requestPacket != null && requestPacket.SenderKey != Key)
+            if (packet.SenderKey != Key)
             {
-                switch (requestPacket.PacketType)
+                var requestPacket = packet.Body as RouteRequest;
+                if (requestPacket != null)
                 {
-                    case PacketType.RouteRequest:
-                        ProcessRouteRequest(requestPacket);
-                        break;
-                    case PacketType.RouteResponse:
-                        ProcessRouteResponse(requestPacket);
-                        break;
+                    ProcessRouteRequest(packet.SenderKey, packet.RecieverKey, requestPacket);
+                    return true;
+                }
+                var responseRequest = packet.Body as RouteResponse;
+                if (responseRequest != null)
+                {
+                    ProcessRouteResponse(packet.SenderKey, responseRequest);
+                    return true;
                 }
             }
-
+            
             if (packet.RecieverKey == Key)
             {
                 ProccessPacket(packet);
@@ -129,42 +131,34 @@ namespace MasterDataFlow.Network
             }
         }
 
-        protected virtual void ProcessRouteRequest(RequestPacket routeRequest)
+        protected virtual void ProcessRouteRequest(BaseKey senderKey, BaseKey recieverKey, RouteRequest routeRequest)
         {
             if (_routeRequests.GetItem(routeRequest.RequestId) != null)
                 return;
 
-            var route = _routeTable.GetRoute(routeRequest.RecieverKey);
+            var route = _routeTable.GetRoute(recieverKey);
             if (route != null)
             {
-                CreateRouteResponse(routeRequest);
+                CreateRouteResponse(senderKey, routeRequest);
             }
 
-            var destinationPoint = routeRequest.Body as BaseKey;
-            if (destinationPoint != null)
+            var hub = _connectedHubs.GetItems().FirstOrDefault(s => s.Key == routeRequest.DestinationKey);
+            if (hub != null)
             {
-                var hub = _connectedHubs.GetItems().FirstOrDefault(s => s.Key == destinationPoint);
-                if (hub != null)
-                {
-                    CreateRouteResponse(routeRequest);
-                    return;
-                }
-                _routeRequests.AddItem(routeRequest.RequestId, routeRequest.SenderKey);
-                RelayRequest(routeRequest.RequestId, destinationPoint);
+                CreateRouteResponse(senderKey, routeRequest);
+                return;
             }
+            _routeRequests.AddItem(routeRequest.RequestId, senderKey);
+            RelayRequest(routeRequest.RequestId, routeRequest.DestinationKey);
         }
 
-        protected virtual void ProcessRouteResponse(RequestPacket routeResponse)
+        protected virtual void ProcessRouteResponse(BaseKey senderKey, RouteResponse routeResponse)
         {
             var routeRequest = _routeRequests.GetItem(routeResponse.RequestId);
             if (routeRequest == null)
                 return;
 
-            var routeList = routeResponse.Body as List<Route>;
-            if (routeList == null)
-                return;
-
-            _routeTable.AddRoutes(routeList);
+            _routeTable.AddRoutes(routeResponse.Routes);
 
             if (routeRequest == Key)
             {
@@ -178,15 +172,15 @@ namespace MasterDataFlow.Network
                 }
             }
 
-            foreach (var route in routeList)
+            foreach (var route in routeResponse.Routes)
                 route.IncrementLenght();
 
-            routeList.Add(new Route(routeResponse.SenderKey, Key, 1));
-            BaseKey nextHub = _routeRequests.GetItem(routeResponse.RequestId);
-            if (nextHub == null)
+            routeResponse.Routes.Add(new Route(senderKey, Key, 1));
+            var nextHubKey = _routeRequests.GetItem(routeResponse.RequestId);
+            if (nextHubKey == null)
                 return;
 
-            var response = new RequestPacket(Key, nextHub, routeList, routeResponse.RequestId, PacketType.RouteResponse);
+            var response = new Packet(Key, nextHubKey, new RouteResponse(routeResponse.RequestId, routeResponse.Routes));
             Send(response);
         }
 
@@ -196,15 +190,13 @@ namespace MasterDataFlow.Network
             RelayRequest(eventKey, destinationPoint);
         }
 
-        private void CreateRouteResponse(RequestPacket packet)
+        private void CreateRouteResponse(BaseKey senderKey, RouteRequest packet)
         {
-            var destinationPoint = packet.Body as BaseKey;
-            if (destinationPoint == null)
-                return;
-            List<Route> routes = new List<Route>();
-            Route route = new Route(destinationPoint, Key, 1);
+
+            var routes = new List<Route>();
+            var route = new Route(packet.DestinationKey, Key, 1);
             routes.Add(route);
-            var response = new RequestPacket(Key, packet.SenderKey, routes, packet.RequestId, PacketType.RouteResponse);
+            var response = new Packet(Key, senderKey, new RouteResponse(packet.RequestId, routes));
             Send(response);
         }
 
@@ -212,7 +204,7 @@ namespace MasterDataFlow.Network
         {
             foreach (var hub in _connectedHubs.GetItems())
             {
-                var requestPacket = new RequestPacket(Key, hub.Key, destinationPoint, requestId, PacketType.RouteRequest);
+                var requestPacket = new Packet(Key, hub.Key, new RouteRequest(requestId, destinationPoint));
                 Send(requestPacket);
             }
         }

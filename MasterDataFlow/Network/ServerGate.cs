@@ -31,16 +31,14 @@ namespace MasterDataFlow.Network
 
         protected override void ProcessUndeliveredPacket(IPacket packet)
         {
-            if (packet.RecieverKey == ClientGateKey)
+            // TODO need to resend if _callback == null?
+            if (_callback != null)
             {
-                if (_callback != null)
-                {
-                    var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
-                    // TODO need more flexible serialization way
-                    var body = Serializator.Serialize(packet.Body);
-                    var remotePacket = new RemotePacket(packet.SenderKey.Key, packet.RecieverKey.Key, bodyTypeName, body);
-                    _callback.Send(remotePacket); 
-                }
+                var bodyTypeName = packet.Body.GetType().AssemblyQualifiedName;
+                // TODO need more flexible serialization way
+                var body = Serializator.Serialize(packet.Body);
+                var remotePacket = new RemotePacket(packet.SenderKey.Key, packet.RecieverKey.Key, bodyTypeName, body);
+                _callback.Send(remotePacket); 
             }
         }
 
@@ -59,8 +57,7 @@ namespace MasterDataFlow.Network
             base.RelayRequest(requestId, destinationPoint);
             if (ClientGateKey != null)
             {
-                var requestPacket = new RequestPacket(Key, ClientGateKey, destinationPoint, requestId,
-                    PacketType.RouteRequest);
+                var requestPacket = new Packet(Key, ClientGateKey, new RouteRequest(requestId, destinationPoint));
                 Send(requestPacket);
             }
         }

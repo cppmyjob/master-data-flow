@@ -8,38 +8,29 @@ namespace MasterDataFlow.Network.Routing
 {
     public class Route
     {
-        private readonly BaseKey _destination;
-        private readonly BaseKey _gate;
-        private uint _lenght;
+        public Route()
+        {
+            LastUsage = DateTime.Now;
+        }
 
         public Route(BaseKey destination, BaseKey gate, uint lenght)
         {
-            _destination = destination;
-            _gate = gate;
+            Destination = destination;
+            Gate = gate;
+            Lenght = lenght;
             LastUsage = DateTime.Now;
-            _lenght = lenght;
         }
+
+        public BaseKey Destination { get; set; }
+        public BaseKey Gate { get; set; }
+        public uint Lenght { get; set; }
 
         public void IncrementLenght()
         {
-            _lenght++;
-        }
-
-        public BaseKey Destination
-        {
-            get { return _destination;  }
-        }
-
-        public BaseKey Gate
-        {
-            get { return _gate; }
+            Lenght++;
         }
 
         public DateTime LastUsage { get; set; }
 
-        public uint Lenght
-        {
-            get { return _lenght;  }
-        }
     }
 }

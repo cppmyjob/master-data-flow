@@ -72,6 +72,11 @@ namespace MasterDataFlow.Network
             }
         }
 
+        protected override void RelayRequest(string requestId, BaseKey destinationPoint)
+        {
+            base.RelayRequest(requestId, destinationPoint);
+        }
+
         private void OnGateCallbackPacketRecievedHandler(RemotePacket remotePacket)
         {
             var bodyType = Type.GetType(remotePacket.TypeName);

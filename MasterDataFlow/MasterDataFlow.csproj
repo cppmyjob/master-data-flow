@@ -80,8 +80,9 @@
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Network\HubAccumulator.cs" />
     <Compile Include="Network\RemotePacket.cs" />
-    <Compile Include="Network\Routing\RequestPacket.cs" />
     <Compile Include="Network\Routing\Route.cs" />
+    <Compile Include="Network\Routing\RouteRequest.cs" />
+    <Compile Include="Network\Routing\RouteResponse.cs" />
     <Compile Include="Network\Routing\RouteTable.cs" />
     <Compile Include="Network\ServerGate.cs" />
     <Compile Include="Network\SimpleContainerHub.cs" />
@@ -99,7 +100,6 @@
     <Compile Include="Interfaces\ICommandDataObject.cs" />
     <Compile Include="Interfaces\IGateContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\Deserialization.cs" />
     <Compile Include="Serialization\Serializator.cs" />
     <Compile Include="Utils\AsyncDictionary.cs" />
     <Compile Include="Utils\Logger.cs" />
