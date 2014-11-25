@@ -9,6 +9,7 @@ namespace MasterDataFlow.Network.Routing
     public class RouteTable
     {
         private readonly IList<Route> _routes = new List<Route>();
+        private readonly object _lockObject = new object();
 
         public void AddRoute(Route route)
         {
@@ -17,16 +18,22 @@ namespace MasterDataFlow.Network.Routing
 
         public void AddRoutes(IEnumerable<Route> routes)
         {
-            foreach (var route in routes)
+            lock (_lockObject)
             {
-                _routes.Add(route);
+                foreach (var route in routes)
+                {
+                    _routes.Add(route);
+                }
             }
         }
 
         public Route GetRoute(BaseKey destination)
         {
-            var routes = _routes.Where(s => s.Destination == destination);
-            return routes.OrderBy(s => s.Lenght).FirstOrDefault();
+            lock(_lockObject)
+            {
+                var routes = _routes.Where(s => s.Destination == destination);
+                return routes.OrderBy(s => s.Lenght).FirstOrDefault();
+           }
         }
 
         public void DeleteRoute(BaseKey destination)
