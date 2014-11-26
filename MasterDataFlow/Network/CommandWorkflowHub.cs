@@ -14,7 +14,7 @@ namespace MasterDataFlow.Network
 {
     public delegate void OnMessageRecieved(BaseKey senderKey,BaseMessage message);
 
-    public class CommandWorkflowHub : EventLoopHub, ICommandFactory
+    public class CommandWorkflowHub : EventLoopHub, IInstanceFactory
     {
         private readonly WorkflowKey _key;
         private CommandRunnerHub _runner;
@@ -59,7 +59,7 @@ namespace MasterDataFlow.Network
                     WorkflowKey = _key,
                     CommandType = commandType,
                     CommandDataObject = commandDataObject,
-                    CommandFactory = this,
+                    InstanceFactory = this,
                 }
             };
             _runner.Send(new Packet(senderKey, recieverKey, body));
@@ -88,7 +88,7 @@ namespace MasterDataFlow.Network
             }
         }
 
-        public BaseCommand CreateInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
+        public BaseCommand CreateCommandInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
         {
             var instance = (BaseCommand)Activator.CreateInstance(type);
             instance.Key = commandKey;
@@ -96,6 +96,11 @@ namespace MasterDataFlow.Network
             // TODO need to add a some checking is DataObject exist and etc
             prop.SetValue(instance, commandDataObject, null);
             return instance;
+        }
+
+        public Type GetType(WorkflowKey workflowKey, string typeName)
+        {
+            return Type.GetType(typeName);
         }
     }
 }

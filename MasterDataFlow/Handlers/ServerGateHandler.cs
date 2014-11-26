@@ -18,7 +18,7 @@ using MasterDataFlow.Utils;
 namespace MasterDataFlow.Handlers
 {
     // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
-    public class ServerGateHandler : BaseHandler, ICommandFactory
+    public class ServerGateHandler : BaseHandler, IInstanceFactory
     {
         private readonly AsyncDictionary<BaseKey, CommandRunnerHub> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunnerHub>();
 
@@ -102,16 +102,16 @@ namespace MasterDataFlow.Handlers
             ICommandDataObject dataObject = null;
             if (action.CommandInfo.DataObjectType != null)
             {
-                Type dataObjectType = _assemblyLoader.GetLoadedType(workflowKey, action.CommandInfo.DataObjectType);
+                Type dataObjectType = GetType(workflowKey, action.CommandInfo.DataObjectType);
                 if (dataObjectType == null)
                 {
                     SendUploadTypeCommand(action, packet);
                     return;
                 }
-                dataObject = (ICommandDataObject) Serialization.Serializator.Deserialize(dataObjectType, action.CommandInfo.DataObject);
+                dataObject = (ICommandDataObject)Serialization.Serializator.DeserializeDataObject(dataObjectType, action.CommandInfo.DataObject, workflowKey, this);
             }
 
-            Type commandType = _assemblyLoader.GetLoadedType(workflowKey, action.CommandInfo.CommandType);
+            Type commandType = GetType(workflowKey, action.CommandInfo.CommandType);
             if (commandType == null)
             {
                 SendUploadTypeCommand(action, packet);
@@ -130,7 +130,7 @@ namespace MasterDataFlow.Handlers
                     WorkflowKey = workflowKey,
                     CommandType = commandType,
                     CommandDataObject = dataObject,
-                    CommandFactory = this
+                    InstanceFactory = this
                 }
             };
 
@@ -162,7 +162,7 @@ namespace MasterDataFlow.Handlers
             }
         }
 
-        public BaseCommand CreateInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
+        public BaseCommand CreateCommandInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
         {
             var instance = (BaseCommand)_assemblyLoader.CreateInstance(workflowKey, type);
             instance.Key = commandKey;
@@ -170,6 +170,11 @@ namespace MasterDataFlow.Handlers
             // TODO need to add a some checking is DataObject exist and etc
             prop.SetValue(instance, commandDataObject, null);
             return instance;
+        }
+
+        public Type GetType(WorkflowKey workflowKey, string typeName)
+        {
+            return _assemblyLoader.GetLoadedType(workflowKey, typeName);
         }
     }
 }

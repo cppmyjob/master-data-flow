@@ -76,6 +76,7 @@
     <Compile Include="CommandDefinitionTests.cs" />
     <Compile Include="CommandWorkflowHubTests.cs" />
     <Compile Include="AssemblyLoaderTests.cs" />
+    <Compile Include="SerializatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">

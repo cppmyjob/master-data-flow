@@ -162,9 +162,11 @@ namespace MasterDataFlow.Tests
             SendUploadResponse(serverGate, typeof(PassingCommand), сommandWorkflow.Key);
 
             var callStopCommand = 0;
+            BaseMessage callMessage = null;
             сommandWorkflow.MessageRecieved += (key, message) =>
             {
                 ++callStopCommand;
+                callMessage = message;
                 using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
                         "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
                 {
@@ -177,9 +179,18 @@ namespace MasterDataFlow.Tests
             var commandKey = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
 
             // ASSERT
-            _eventWaitHandle.WaitOne(20000);
+            _eventWaitHandle.WaitOne(200);
 
             Assert.AreEqual(1, callStopCommand);
+            Assert.IsNotNull(callMessage);
+            Assert.IsTrue(callMessage is StopCommandMessage);
+            var stopCommand = callMessage as StopCommandMessage;
+            Assert.AreEqual(commandKey, stopCommand.Key);
+
+            Assert.IsNotNull(stopCommand.Data);
+            var passingCommand = stopCommand.Data as PassingCommandDataObject;
+            Assert.IsNotNull(passingCommand);
+            Assert.AreEqual(newId, passingCommand.Id);
         }
 
         private void SendUploadResponse(IHub hub, Type type, BaseKey workflowKey)

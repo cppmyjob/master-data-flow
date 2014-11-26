@@ -104,6 +104,14 @@ namespace MasterDataFlow.Network
 
         protected virtual void ProcessUndeliveredPacket(IPacket packet)
         {
+            if (SendPacketViaRouting(packet)) return;
+            string eventKey = Guid.NewGuid().ToString();
+            CreateRouteRequest(eventKey, packet.RecieverKey);
+            _accumulator.Add(eventKey, packet);
+        }
+
+        protected bool SendPacketViaRouting(IPacket packet)
+        {
             Route route = GetRoute(packet.RecieverKey);
             if (route != null)
             {
@@ -112,12 +120,10 @@ namespace MasterDataFlow.Network
                 {
                     route.LastUsage = DateTime.Now;
                     hub.Send(packet);
-                    return;
+                    return true;
                 }
             }
-            string eventKey = Guid.NewGuid().ToString();
-            CreateRouteRequest(eventKey, packet.RecieverKey);
-            _accumulator.Add(eventKey, packet);
+            return false;
         }
 
         protected virtual Route GetRoute(BaseKey destination)
@@ -173,7 +179,7 @@ namespace MasterDataFlow.Network
             }
 
             foreach (var route in routeResponse.Routes)
-                route.IncrementLenght();
+                route.IncrementLength();
 
             routeResponse.Routes.Add(new Route(senderKey, Key, 1));
             var nextHubKey = _routeRequests.GetItem(routeResponse.RequestId);
@@ -192,7 +198,6 @@ namespace MasterDataFlow.Network
 
         private void CreateRouteResponse(BaseKey senderKey, RouteRequest packet)
         {
-
             var routes = new List<Route>();
             var route = new Route(packet.DestinationKey, Key, 1);
             routes.Add(route);

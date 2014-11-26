@@ -13,6 +13,6 @@ namespace MasterDataFlow
         public ICommandDataObject CommandDataObject { get; internal set; }
         public WorkflowKey WorkflowKey { get; internal set; }
         public CommandKey CommandKey { get; internal set; }
-        public ICommandFactory CommandFactory { get; internal set; }
+        public IInstanceFactory InstanceFactory { get; internal set; }
     }
 }

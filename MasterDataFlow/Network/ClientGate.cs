@@ -9,6 +9,7 @@ using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
@@ -80,11 +81,15 @@ namespace MasterDataFlow.Network
         private void OnGateCallbackPacketRecievedHandler(RemotePacket remotePacket)
         {
             var bodyType = Type.GetType(remotePacket.TypeName);
-            var body = Serializator.Deserialize(bodyType, (string)remotePacket.Body);
+            var body = Serializator.Deserialize(bodyType, remotePacket.Body);
             var senderKey = BaseKey.DeserializeKey(remotePacket.SenderKey);
             var recieverKey = BaseKey.DeserializeKey(remotePacket.RecieverKey);
             var packet = new Packet(senderKey, recieverKey, body);
-            Send(packet);            
+
+            if (body is CommandMessage)
+                SendPacketViaRouting(packet);
+            else
+                Send(packet);
         }
 
         private void ProcessUploadTypeAction(UploadTypeRequestAction action)

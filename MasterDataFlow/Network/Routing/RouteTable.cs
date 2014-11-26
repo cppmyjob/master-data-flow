@@ -32,7 +32,7 @@ namespace MasterDataFlow.Network.Routing
             lock(_lockObject)
             {
                 var routes = _routes.Where(s => s.Destination == destination);
-                return routes.OrderBy(s => s.Lenght).FirstOrDefault();
+                return routes.OrderBy(s => s.Length).FirstOrDefault();
            }
         }
 

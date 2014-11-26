@@ -21,6 +21,11 @@ namespace MasterDataFlow.Wcf.Client
                 var сommandWorkflow = new CommandWorkflowHub();
                 runner.ConnectHub(сommandWorkflow);
 
+                сommandWorkflow.MessageRecieved += (key, message) =>
+                {
+                    Console.WriteLine("Message recieved");
+                };
+
                 var dataObject = new MathCommand.MathCommandDataObject()
                 {
                     Expression = "33 + 44"

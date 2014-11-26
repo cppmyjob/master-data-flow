@@ -13,21 +13,21 @@ namespace MasterDataFlow.Network.Routing
             LastUsage = DateTime.Now;
         }
 
-        public Route(BaseKey destination, BaseKey gate, uint lenght)
+        public Route(BaseKey destination, BaseKey gate, uint length)
         {
             Destination = destination;
             Gate = gate;
-            Lenght = lenght;
+            Length = length;
             LastUsage = DateTime.Now;
         }
 
         public BaseKey Destination { get; set; }
         public BaseKey Gate { get; set; }
-        public uint Lenght { get; set; }
+        public uint Length { get; set; }
 
-        public void IncrementLenght()
+        public void IncrementLength()
         {
-            Lenght++;
+            Length++;
         }
 
         public DateTime LastUsage { get; set; }

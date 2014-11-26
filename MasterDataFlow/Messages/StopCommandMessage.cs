@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
+using Newtonsoft.Json;
 
 namespace MasterDataFlow.Messages
 {
