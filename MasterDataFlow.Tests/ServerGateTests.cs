@@ -30,7 +30,7 @@ namespace MasterDataFlow.Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            _event.Dispose();
+            _event.Close();
         }
 
         private const string DataObjectId = "1db907fb-77c7-465f-bd60-031107374727";

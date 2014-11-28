@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{59B55FDC-FE0A-48B8-8D94-31D32FB4C8D7}</ProjectGuid>
+    <ProjectGuid>{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MasterDataFlow.Tests</RootNamespace>
-    <AssemblyName>MasterDataFlow.Tests</AssemblyName>
+    <RootNamespace>MasterDataFlow.Intelligence.Tests</RootNamespace>
+    <AssemblyName>MasterDataFlow.Intelligence.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -16,12 +16,13 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <TargetFrameworkProfile />
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -34,7 +35,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -57,11 +57,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Moq, Version=4.2.1409.1722, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -72,43 +71,20 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="ClientGateTests.cs" />
-    <Compile Include="CommandBuilderTests.cs" />
-    <Compile Include="CommandRunnerTests.cs" />
-    <Compile Include="HubTests.cs" />
-    <Compile Include="KeyTests.cs" />
-    <Compile Include="ServerGateTests.cs" />
-    <Compile Include="RemoteIntegrationTests.cs" />
-    <Compile Include="SimpleRoutingTest.cs" />
-    <Compile Include="TestData\Command1.cs" />
-    <Compile Include="TestData\Command1DataObject.cs" />
-    <Compile Include="TestData\CommandDataObjectStub.cs" />
-    <Compile Include="TestData\CommandStub.cs" />
-    <Compile Include="TestData\Command2.cs" />
-    <Compile Include="TestData\Command2DataObject.cs" />
-    <Compile Include="TestData\PassingCommand.cs" />
-    <Compile Include="TestData\PassingCommandDataObject.cs" />
+    <Compile Include="GeneticCellCommandTests.cs" />
+    <Compile Include="GeneticIntegrationTests.cs" />
+    <Compile Include="GeneticCellDataObjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CommandDefinitionTests.cs" />
-    <Compile Include="CommandWorkflowHubTests.cs" />
-    <Compile Include="AssemblyLoaderTests.cs" />
-    <Compile Include="SerializatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
+      <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
+      <Name>MasterDataFlow.Intelligence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
       <Project>{28fb7ae9-49ac-476a-af50-5a3b0c94fd72}</Project>
       <Name>MasterDataFlow</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\MasterDataFlow.Tests.ExternalAssembly.Second\bin\MasterDataFlow.Tests.ExternalAssembly.dll">
-      <Link>External\Second\MasterDataFlow.Tests.ExternalAssembly.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\MasterDataFlow.Tests.ExternalAssembly\bin\MasterDataFlow.Tests.ExternalAssembly.dll">
-      <Link>External\First\MasterDataFlow.Tests.ExternalAssembly.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -131,9 +107,6 @@
       <ProductName>Windows Installer 4.5</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

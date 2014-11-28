@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests.Extern
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Tests.ExternalAssembly.Second", "MasterDataFlow.Tests.ExternalAssembly.Second\MasterDataFlow.Tests.ExternalAssembly.Second.csproj", "{CE8E34E9-8067-4321-86A6-6180A9DBF236}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence", "MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj", "{E9683248-7B33-4867-9FF3-32F836B6AF58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence.Tests", "MasterDataFlow.Intelligence.Tests\MasterDataFlow.Intelligence.Tests.csproj", "{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +77,14 @@ Global
 		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE8E34E9-8067-4321-86A6-6180A9DBF236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9683248-7B33-4867-9FF3-32F836B6AF58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9683248-7B33-4867-9FF3-32F836B6AF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9683248-7B33-4867-9FF3-32F836B6AF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9683248-7B33-4867-9FF3-32F836B6AF58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,5 +96,6 @@ Global
 		{8786644A-0C24-44F8-82BC-75BD2BEC1BE9} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
 		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 		{CE8E34E9-8067-4321-86A6-6180A9DBF236} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
+		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 	EndGlobalSection
 EndGlobal

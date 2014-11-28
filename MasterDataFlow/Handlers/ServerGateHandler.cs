@@ -105,7 +105,7 @@ namespace MasterDataFlow.Handlers
                 Type dataObjectType = GetType(workflowKey, action.CommandInfo.DataObjectType);
                 if (dataObjectType == null)
                 {
-                    SendUploadTypeCommand(action, packet);
+                    SendUploadTypeCommand(action.CommandInfo.WorkflowKey, action.CommandInfo.DataObjectType, packet);
                     return;
                 }
                 dataObject = (ICommandDataObject)Serialization.Serializator.DeserializeDataObject(dataObjectType, action.CommandInfo.DataObject, workflowKey, this);
@@ -114,7 +114,7 @@ namespace MasterDataFlow.Handlers
             Type commandType = GetType(workflowKey, action.CommandInfo.CommandType);
             if (commandType == null)
             {
-                SendUploadTypeCommand(action, packet);
+                SendUploadTypeCommand(action.CommandInfo.WorkflowKey, action.CommandInfo.CommandType, packet);
                 return;
             }
 
@@ -137,7 +137,7 @@ namespace MasterDataFlow.Handlers
             allRunners[0].Send(new Packet(senderKey, recieverKey, body));
         }
 
-        private void SendUploadTypeCommand(RemoteExecuteCommandAction action, IPacket packet)
+        private void SendUploadTypeCommand(string workKlowKey, string typeName, IPacket packet)
         {
             var accumulatorKey = UploadTypeResponseAction.ActionName;
             Parent.Accumulator.Lock(accumulatorKey);
@@ -147,8 +147,8 @@ namespace MasterDataFlow.Handlers
                 {
                     var uploadAction = new UploadTypeRequestAction
                     {
-                        TypeName = action.CommandInfo.DataObjectType,
-                        WorkflowKey = action.CommandInfo.WorkflowKey,
+                        TypeName = typeName,
+                        WorkflowKey = workKlowKey,
                     };
                     Parent.Send(new Packet(Parent.Key, _clientGateKey, uploadAction));
                     Parent.Accumulator.SetBusyStatus(accumulatorKey);

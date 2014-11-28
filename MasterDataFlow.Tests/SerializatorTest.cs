@@ -45,6 +45,22 @@ namespace MasterDataFlow.Tests
 
             // ASSERT
             Assert.AreEqual(key.Key, newMessage.Key.Key);
+            Assert.AreEqual(dataObject.Id, ((PassingCommandDataObject)newMessage.Data).Id);
+        }
+
+        [TestMethod]
+        public void SerializeStopCommandDataObjectIsNullMessageTest()
+        {
+            // ARRANGE
+            var key = new CommandKey();
+            var message = new StopCommandMessage(key, null);
+
+            //ACT
+            var messageString = Serializator.Serialize(message);
+            var newMessage = (StopCommandMessage)Serializator.Deserialize(typeof(StopCommandMessage), messageString);
+
+            // ASSERT
+            Assert.AreEqual(key.Key, newMessage.Key.Key);
         }
 
     }

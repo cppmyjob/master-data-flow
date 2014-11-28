@@ -37,6 +37,10 @@ namespace MasterDataFlow.Serialization
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException("Unexpected TokenType :" + reader.TokenType);
             reader.Read();

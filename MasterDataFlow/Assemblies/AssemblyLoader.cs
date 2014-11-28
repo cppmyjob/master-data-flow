@@ -9,35 +9,30 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Assemblies
 {
+    // http://msdn.microsoft.com/en-us/library/dd153782(v=vs.110).aspx
     // http://www.codeproject.com/Articles/453778/Loading-Assemblies-from-Anywhere-into-a-New-AppDom
     public class AssemblyLoader
     {
         private readonly Dictionary<BaseKey, Dictionary<string, Assembly>> _assemblies = new Dictionary<BaseKey, Dictionary<string, Assembly>>();
 
-        public class Loader : MarshalByRefObject
-        {
-            public void LoadAssembly(byte[] bytes)
-            {
-                Assembly.Load(bytes);
-            }
+        //public class Loader : MarshalByRefObject
+        //{
+        //    public void LoadAssembly(byte[] bytes)
+        //    {
+        //        Assembly.Load(bytes);
+        //    }
 
-            public void LoadAssembly(string fileName)
-            {
-                AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-                {
-                    Console.WriteLine("Stage::AssemblyResolve - " + args.Name);
-                    return Assembly.LoadFrom(fileName);
-                };
+        //    public void LoadAssembly(string fileName)
+        //    {
+        //        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+        //        {
+        //            Console.WriteLine("Stage::AssemblyResolve - " + args.Name);
+        //            return Assembly.LoadFrom(fileName);
+        //        };
 
-                Assembly.LoadFrom(fileName);
-            }
-
-            //public object ExecuteCommand()
-            //{
-
-            //}
-
-        }
+        //        Assembly.LoadFrom(fileName);
+        //    }
+        //}
 
         public void Load(BaseKey key, string assemblyName, byte[] bytes)
         {
@@ -48,19 +43,17 @@ namespace MasterDataFlow.Assemblies
                 _assemblies.Add(key, keyAssemblies);
             }
 
-            var appDomain = AppDomain.CurrentDomain;
-            //var appDomain = _appDomain;
+            //var appDomain = AppDomain.CurrentDomain;
 
-            ResolveEventHandler appDomainOnAssemblyResolve = (object sender, ResolveEventArgs args) =>
-            {
-                Console.WriteLine("AssemblyResolve : " + args.Name);
-                return null;
-                //return Assembly.Load(bytes);
-            };
+            //ResolveEventHandler appDomainOnAssemblyResolve = (object sender, ResolveEventArgs args) =>
+            //{
+            //    Console.WriteLine("AssemblyResolve : " + args.Name);
+            //    return null;
+            //};
 
-            appDomain.AssemblyResolve += appDomainOnAssemblyResolve;
+            //appDomain.AssemblyResolve += appDomainOnAssemblyResolve;
             var assembly = Assembly.Load(bytes);
-            appDomain.AssemblyResolve -= appDomainOnAssemblyResolve;
+            //appDomain.AssemblyResolve -= appDomainOnAssemblyResolve;
 
             if (!keyAssemblies.ContainsKey(assemblyName))
             {
@@ -81,10 +74,6 @@ namespace MasterDataFlow.Assemblies
 
         public Type GetLoadedType(BaseKey key, string typeName)
         {
-            //var sss = Type.GetType(typeName);
-            //if (sss != null)
-            //    return sss;
-
             Dictionary<string, Assembly> keyAssemblies;
             if (!_assemblies.TryGetValue(key, out keyAssemblies))
             {
@@ -94,15 +83,31 @@ namespace MasterDataFlow.Assemblies
             var parts = typeName.Split(',');
             var singleTypeName = parts[0];
 
-            foreach (var assembly in keyAssemblies.Values)
-            {
-                var result = assembly.GetType(singleTypeName);
-                if (result != null)
+
+            //var appDomain = AppDomain.CurrentDomain;
+
+            //ResolveEventHandler appDomainOnAssemblyResolve = (object sender, ResolveEventArgs args) =>
+            //{
+            //    Console.WriteLine("AssemblyResolve : " + args.Name);
+            //    return null;
+            //};
+            //appDomain.AssemblyResolve += appDomainOnAssemblyResolve;
+            //try
+            //{
+                foreach (var assembly in keyAssemblies.Values)
                 {
-                    return result;
+                    var result = assembly.GetType(singleTypeName);
+                    if (result != null)
+                    {
+                        return result;
+                    }
                 }
-            }
-            return null;
+                return null;
+            //}
+            //finally
+            //{
+            //    appDomain.AssemblyResolve -= appDomainOnAssemblyResolve;
+            //}
         }
 
         public object CreateInstance(BaseKey key, Type type)
@@ -112,16 +117,32 @@ namespace MasterDataFlow.Assemblies
             {
                 return null;
             }
-            foreach (var assembly in keyAssemblies.Values)
-            {
-                var result = assembly.GetType(type.FullName);
-                if (result != null)
+
+            //var appDomain = AppDomain.CurrentDomain;
+
+            //ResolveEventHandler appDomainOnAssemblyResolve = (object sender, ResolveEventArgs args) =>
+            //{
+            //    Console.WriteLine("AssemblyResolve : " + args.Name);
+            //    return null;
+            //};
+            //appDomain.AssemblyResolve += appDomainOnAssemblyResolve;
+            //try
+            //{
+                foreach (var assembly in keyAssemblies.Values)
                 {
-                    var instance = assembly.CreateInstance(type.FullName);
-                    return instance;
+                    var result = assembly.GetType(type.FullName);
+                    if (result != null)
+                    {
+                        var instance = assembly.CreateInstance(type.FullName);
+                        return instance;
+                    }
                 }
-            }
-            return null;
+                return null;
+            //}
+            //finally
+            //{
+            //    appDomain.AssemblyResolve -= appDomainOnAssemblyResolve;
+            //}
         }
 
         //private AppDomain BuildChildDomain(AppDomain parentDomain)

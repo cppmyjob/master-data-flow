@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MasterDataFlow.Tests
 {
     [TestClass]
-    public class RemoteFixtures
+    public class RemoteIntegrationTests
     {
         private EventWaitHandle _eventWaitHandle;
 
@@ -99,7 +99,7 @@ namespace MasterDataFlow.Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            _eventWaitHandle.Dispose();
+            _eventWaitHandle.Close();
         }
 
         [TestMethod]

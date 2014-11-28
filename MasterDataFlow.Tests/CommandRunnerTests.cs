@@ -17,21 +17,18 @@ namespace MasterDataFlow.Tests
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable"), TestClass]
     public class CommandRunnerTests
     {
-        //private CommandRunner _runner;
         private ManualResetEvent _event;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            //_runner = new CommandRunner();
             _event = new ManualResetEvent(false);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            //_runner.Dispose();
-            _event.Dispose();
+            _event.Close();
         }
 
         // TODO Restore

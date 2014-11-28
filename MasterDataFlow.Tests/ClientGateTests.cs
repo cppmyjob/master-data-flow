@@ -99,7 +99,7 @@ namespace MasterDataFlow.Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            _event.Dispose();
+            _event.Close();
         }
 
         [TestMethod]
