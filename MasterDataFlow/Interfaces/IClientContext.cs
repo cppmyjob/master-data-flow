@@ -5,6 +5,7 @@ using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Interfaces
 {

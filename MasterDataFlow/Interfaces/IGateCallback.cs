@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Interfaces
 {

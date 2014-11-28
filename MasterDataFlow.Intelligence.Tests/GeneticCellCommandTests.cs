@@ -39,11 +39,11 @@ namespace MasterDataFlow.Intelligence.Tests
         public void SimpleCommandExecuteTest()
         {
             // ARRANGE
-            var container = new SimpleContainerHub();
-            var runner = new CommandRunnerHub();
+            var container = new SimpleContainer();
+            var runner = new CommandRunner();
             runner.ConnectHub(container);
 
-            var сommandWorkflow = new CommandWorkflowHub();
+            var сommandWorkflow = new CommandWorkflow();
             runner.ConnectHub(сommandWorkflow);
 
             // ACT

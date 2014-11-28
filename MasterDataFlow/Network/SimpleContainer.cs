@@ -5,13 +5,14 @@ using System.Text;
 using MasterDataFlow.Actions;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Network
 {
-    public class SimpleContainerHub : EventLoopHub
+    public class SimpleContainer : EventLoopHub
     {
         private readonly ServiceKey _key = new ServiceKey();
-        private CommandRunnerHub _runner;
+        private CommandRunner _runner;
 
         public override BaseKey Key
         {
@@ -21,7 +22,7 @@ namespace MasterDataFlow.Network
         public override void AcceptHub(IHub hub)
         {
             // TODO Check CommandRunnerHub
-            _runner = (CommandRunnerHub) hub;
+            _runner = (CommandRunner) hub;
         }
 
         protected override void ProccessPacket(IPacket packet)

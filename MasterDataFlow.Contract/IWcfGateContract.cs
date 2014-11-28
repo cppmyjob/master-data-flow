@@ -7,6 +7,7 @@ using System.Text;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Contract
 {

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using MasterDataFlow.Keys;
 
-namespace MasterDataFlow.Network
+namespace MasterDataFlow.Network.Packets
 {
     [Serializable]
     public class RemotePacket

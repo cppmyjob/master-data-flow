@@ -11,9 +11,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MasterDataFlow.Tests
 {
     [TestClass]
-    public class CommandWorkflowHubTests
+    public class CommandWorkflowTests
     {
-        private CommandRunnerHub _runner;
+        private CommandRunner _runner;
         private static ManualResetEvent _event;
 
         private static int _executeCommandCall = 0;
@@ -65,7 +65,7 @@ namespace MasterDataFlow.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _runner = new CommandRunnerHub();
+            _runner = new CommandRunner();
             _event = new ManualResetEvent(false);
             _subscribeCommandOnSubscribedCall = 0;
             _subscribeCommandOnUnsubscribedCall = 0;
@@ -81,10 +81,10 @@ namespace MasterDataFlow.Tests
         public void SimpleCommandExecuteTest()
         {
             // ARRANGE
-            var container = new SimpleContainerHub();
+            var container = new SimpleContainer();
             _runner.ConnectHub(container);
 
-            var сommandWorkflow = new CommandWorkflowHub();
+            var сommandWorkflow = new CommandWorkflow();
             _runner.ConnectHub(сommandWorkflow);
 
             // ACT
@@ -100,8 +100,8 @@ namespace MasterDataFlow.Tests
         public void DifferentKeysTest()
         {
             // ARRANGE, ACT
-            var workflow1 = new CommandWorkflowHub();
-            var workflow2 = new CommandWorkflowHub();
+            var workflow1 = new CommandWorkflow();
+            var workflow2 = new CommandWorkflow();
 
             // ASSERT
             Assert.AreNotEqual(workflow1.Key, workflow2.Key);
@@ -111,10 +111,10 @@ namespace MasterDataFlow.Tests
         public void StartPassingCommandTest()
         {
             // ARRANGE
-            var container = new SimpleContainerHub();
+            var container = new SimpleContainer();
             _runner.ConnectHub(container);
 
-            var сommandWorkflow = new CommandWorkflowHub();
+            var сommandWorkflow = new CommandWorkflow();
             _runner.ConnectHub(сommandWorkflow);
 
             // ACT

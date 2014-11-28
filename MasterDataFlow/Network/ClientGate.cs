@@ -10,6 +10,7 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
@@ -17,7 +18,7 @@ namespace MasterDataFlow.Network
     public class ClientGate : Gate
     {
         private readonly IClientContext _context;
-        private CommandRunnerHub _runner;
+        private CommandRunner _runner;
 
         public ClientGate(IClientContext remoteHostContract)
         {
@@ -47,7 +48,7 @@ namespace MasterDataFlow.Network
         {
             base.AcceptHub(hub);
             // TODO Check CommandRunnerHub
-            _runner = (CommandRunnerHub)hub;
+            _runner = (CommandRunner)hub;
         }
 
         protected override void ProccessPacket(IPacket packet)

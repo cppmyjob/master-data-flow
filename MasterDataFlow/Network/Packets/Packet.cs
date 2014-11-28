@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MasterDataFlow.Interfaces.Network;
+﻿using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 
-namespace MasterDataFlow.Network
+namespace MasterDataFlow.Network.Packets
 {
     public class Packet : IPacket
     {

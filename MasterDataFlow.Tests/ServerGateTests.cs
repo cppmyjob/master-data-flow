@@ -9,6 +9,7 @@ using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Tests.TestData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -91,7 +92,7 @@ namespace MasterDataFlow.Tests
         public void LaunchingRemoteCommandRunnerHubTest()
         {
             // ARRANGE
-            var commandRunnerMock = new Mock<CommandRunnerHub>() {CallBase = true};
+            var commandRunnerMock = new Mock<CommandRunner>() {CallBase = true};
             int calls = 0;
             IPacket recievedPacked = null;
             commandRunnerMock.Setup(t => t.Send(It.IsAny<IPacket>())).Callback<IPacket>((packet) =>

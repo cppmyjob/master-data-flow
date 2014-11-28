@@ -13,6 +13,7 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Handlers
@@ -20,7 +21,7 @@ namespace MasterDataFlow.Handlers
     // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
     public class ServerGateHandler : BaseHandler, IInstanceFactory
     {
-        private readonly AsyncDictionary<BaseKey, CommandRunnerHub> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunnerHub>();
+        private readonly AsyncDictionary<BaseKey, CommandRunner> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunner>();
 
         private BaseKey _clientGateKey;
         private readonly AssemblyLoader _assemblyLoader = new AssemblyLoader();
@@ -33,7 +34,7 @@ namespace MasterDataFlow.Handlers
 
         internal protected override void ConnectHub(IHub hub)
         {
-            var commandRunnerHub = hub as CommandRunnerHub;
+            var commandRunnerHub = hub as CommandRunner;
             if (commandRunnerHub != null)
             {
                 _commandRunnerHubs.AddItem(hub.Key, commandRunnerHub);

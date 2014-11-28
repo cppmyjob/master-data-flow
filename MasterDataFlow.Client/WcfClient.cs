@@ -6,6 +6,7 @@ using System.Text;
 using MasterDataFlow.Contract;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Client
 {

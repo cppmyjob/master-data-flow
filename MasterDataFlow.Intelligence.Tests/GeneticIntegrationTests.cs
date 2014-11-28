@@ -8,6 +8,7 @@ using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MasterDataFlow.Intelligence.Tests
@@ -105,20 +106,20 @@ namespace MasterDataFlow.Intelligence.Tests
             var serverGateKey = new ServiceKey();
             var remoteClientContext = new RemoteClientContextMock(serverGateKey);
 
-            var remoteCommandRunner = new CommandRunnerHub();
+            var remoteCommandRunner = new CommandRunner();
             var serverGate = new ServerGate(serverGateKey, remoteClientContext);
             serverGate.ConnectHub(remoteCommandRunner);
 
-            var remoteContainer = new SimpleContainerHub();
+            var remoteContainer = new SimpleContainer();
             remoteCommandRunner.ConnectHub(remoteContainer);
 
-            var runner = new CommandRunnerHub();
+            var runner = new CommandRunner();
 
             remoteClientContext.SetContract(serverGate);
             var clientGate = new ClientGate(remoteClientContext);
             runner.ConnectHub(clientGate);
 
-            var сommandWorkflow = new CommandWorkflowHub();
+            var сommandWorkflow = new CommandWorkflow();
             runner.ConnectHub(сommandWorkflow);
 
             // ACT

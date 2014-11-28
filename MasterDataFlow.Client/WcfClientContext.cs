@@ -5,6 +5,7 @@ using System.Text;
 using MasterDataFlow.Contract;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Client
 {
@@ -64,7 +65,7 @@ namespace MasterDataFlow.Client
           Dispose(false);
        }
 
-       void IGateCallback.Send(Network.RemotePacket packet)
+       void IGateCallback.Send(RemotePacket packet)
        {
            if (GateCallbackPacketRecieved != null)
            {

@@ -7,13 +7,14 @@ using MasterDataFlow.Exceptions;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Handlers
 {
     public class CommandRunnerHandler : BaseHandler
     {
-        private readonly AsyncDictionary<BaseKey, SimpleContainerHub> _simpleContainers = new AsyncDictionary<BaseKey, SimpleContainerHub>();
+        private readonly AsyncDictionary<BaseKey, SimpleContainer> _simpleContainers = new AsyncDictionary<BaseKey, SimpleContainer>();
         private readonly AsyncDictionary<BaseKey, ClientGate> _clientGateContainers = new AsyncDictionary<BaseKey, ClientGate>();
 
         public override string[] SupportedActions
@@ -36,7 +37,7 @@ namespace MasterDataFlow.Handlers
 
         internal protected override void ConnectHub(IHub hub)
         {
-            var simpleContainerHub = hub as SimpleContainerHub;
+            var simpleContainerHub = hub as SimpleContainer;
             if (simpleContainerHub != null)
             {
                 _simpleContainers.AddItem(hub.Key, simpleContainerHub);

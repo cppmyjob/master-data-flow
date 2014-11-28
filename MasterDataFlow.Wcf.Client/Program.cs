@@ -15,10 +15,10 @@ namespace MasterDataFlow.Wcf.Client
         {
             using (var clientContext = new WcfClientContext(new ServiceKey(new Guid(ConfigurationManager.AppSettings["ServerGateKey"]))))
             {
-                var runner = new CommandRunnerHub();
+                var runner = new CommandRunner();
                 var clientGate = new ClientGate(clientContext);
                 runner.ConnectHub(clientGate);
-                var сommandWorkflow = new CommandWorkflowHub();
+                var сommandWorkflow = new CommandWorkflow();
                 runner.ConnectHub(сommandWorkflow);
 
                 сommandWorkflow.MessageRecieved += (key, message) =>

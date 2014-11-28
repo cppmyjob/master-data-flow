@@ -8,6 +8,7 @@ using MasterDataFlow.Contract;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Server
 {
@@ -40,9 +41,9 @@ namespace MasterDataFlow.Server
         private static ServerGate CreateDefaultServerGate()
         {
             var result = new ServerGate(new ServiceKey(new Guid(ConfigurationManager.AppSettings["ServerGateKey"])), new GateCallback());
-            var remoteCommandRunner = new CommandRunnerHub();
+            var remoteCommandRunner = new CommandRunner();
             result.ConnectHub(remoteCommandRunner);
-            var remoteContainer = new SimpleContainerHub();
+            var remoteContainer = new SimpleContainer();
             remoteCommandRunner.ConnectHub(remoteContainer);
             return result;
         }

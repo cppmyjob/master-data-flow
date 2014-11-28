@@ -8,9 +8,9 @@ using MasterDataFlow.Interfaces.Network;
 
 namespace MasterDataFlow.Network
 {
-    public class CommandRunnerHub : ActionHub
+    public class CommandRunner : ActionHub
     {
-        public CommandRunnerHub()
+        public CommandRunner()
         {
             RegisterHandler(new CommandRunnerHandler());
         }

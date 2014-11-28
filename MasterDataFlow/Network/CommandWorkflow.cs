@@ -9,17 +9,18 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network.Packets;
 
 namespace MasterDataFlow.Network
 {
     public delegate void OnMessageRecieved(BaseKey senderKey,BaseMessage message);
 
-    public class CommandWorkflowHub : EventLoopHub, IInstanceFactory
+    public class CommandWorkflow : EventLoopHub, IInstanceFactory
     {
         private readonly WorkflowKey _key;
-        private CommandRunnerHub _runner;
+        private CommandRunner _runner;
 
-        public CommandWorkflowHub()
+        public CommandWorkflow()
         {
             _key = new WorkflowKey();
         }
@@ -36,7 +37,7 @@ namespace MasterDataFlow.Network
         {
             base.AcceptHub(hub);
             // TODO Check CommandRunnerHub
-            _runner = (CommandRunnerHub)hub;
+            _runner = (CommandRunner)hub;
         }
 
         public CommandKey Start<TCommand>(ICommandDataObject commandDataObject)

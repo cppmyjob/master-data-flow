@@ -7,6 +7,7 @@ using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
+using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Network.Routing;
 using MasterDataFlow.Serialization;
 
