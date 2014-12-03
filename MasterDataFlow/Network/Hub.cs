@@ -37,6 +37,7 @@ namespace MasterDataFlow.Network
 
         public virtual void AcceptHub(IHub hub)
         {
+            //TODO We add hub in connectHub first and after that we add hub again in AcceptHub. It leads to exception. 
             _connectedHubs.AddItem(hub.Key, hub);
         }
 

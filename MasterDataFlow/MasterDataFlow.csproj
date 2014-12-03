@@ -56,6 +56,7 @@
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Handlers\CommandRunnerHandler.cs" />
     <Compile Include="Handlers\ServerGateHandler.cs" />
+    <Compile Include="Interfaces\IBaseEvent.cs" />
     <Compile Include="Interfaces\IInstanceFactory.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\ILoggerFactory.cs" />
@@ -65,11 +66,13 @@
     <Compile Include="Interfaces\Network\IHubAccumulator.cs" />
     <Compile Include="Interfaces\Network\IPacket.cs" />
     <Compile Include="Keys\CommandKey.cs" />
+    <Compile Include="Keys\EventKey.cs" />
     <Compile Include="Keys\ServiceKey.cs" />
     <Compile Include="Keys\SubscribeKey.cs" />
     <Compile Include="Keys\WorkflowKey.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\CommandMessage.cs" />
+    <Compile Include="Messages\EventMessage.cs" />
     <Compile Include="Messages\StopCommandMessage.cs" />
     <Compile Include="Network\ClientGate.cs" />
     <Compile Include="Network\CommandRunner.cs" />
@@ -80,6 +83,13 @@
     <Compile Include="Network\Packets\Packet.cs" />
     <Compile Include="Network\HubAccumulator.cs" />
     <Compile Include="Network\Packets\RemotePacket.cs" />
+    <Compile Include="Network\Publishing\BaseEvent.cs" />
+    <Compile Include="Network\Publishing\Publisers\BasePublisher.cs" />
+    <Compile Include="Network\Publishing\SubscriptionEndpoint.cs" />
+    <Compile Include="Network\Publishing\Subscribers\BaseSubscriber.cs" />
+    <Compile Include="Network\Publishing\Subscription.cs" />
+    <Compile Include="Network\Publishing\SubscriptionRequestConfirmation.cs" />
+    <Compile Include="Network\Publishing\SubscriptionRequest.cs" />
     <Compile Include="Network\Routing\Route.cs" />
     <Compile Include="Network\Routing\RouteRequest.cs" />
     <Compile Include="Network\Routing\RouteResponse.cs" />

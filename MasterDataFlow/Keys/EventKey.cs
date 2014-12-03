@@ -5,21 +5,21 @@ using System.Text;
 
 namespace MasterDataFlow.Keys
 {
-    public class SubscribeKey : BaseKey
+    public class EventKey : BaseKey
     {
-        static SubscribeKey()
+        static EventKey()
         {
-            AddKeyResolving("subscribe_key", typeof(SubscribeKey));
+            AddKeyResolving("event_key", typeof(EventKey));
         }
 
         private Guid _id;
 
-        public SubscribeKey()
+        public EventKey()
         {
             _id = Guid.NewGuid();
         }
 
-        public SubscribeKey(Guid id)
+        public EventKey(Guid id)
         {
             _id = id;
         }
