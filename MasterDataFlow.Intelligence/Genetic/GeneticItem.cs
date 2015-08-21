@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Xml.Linq;
+using MasterDataFlow.Intelligence.Interfaces;
 
 namespace MasterDataFlow.Intelligence.Genetic
 {
+    [Serializable]
     public abstract class GeneticItem
     {
         protected double[] _values;
@@ -52,7 +54,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         protected internal abstract double CreateValue(double random);
 
-		protected internal virtual void InitOtherValues(Random random) { }
+		protected internal virtual void InitOtherValues(IRandom random) { }
 
         protected internal virtual void SaveValues()
         {

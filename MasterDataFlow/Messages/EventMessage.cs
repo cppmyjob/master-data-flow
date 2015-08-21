@@ -6,6 +6,7 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Messages
 {
+    [Serializable]
     public class EventMessage : BaseMessage
     {
         private readonly Type _occuredEventType;

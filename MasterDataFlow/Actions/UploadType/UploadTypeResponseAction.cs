@@ -1,5 +1,8 @@
-﻿namespace MasterDataFlow.Actions.UploadType
+﻿using System;
+
+namespace MasterDataFlow.Actions.UploadType
 {
+    [Serializable]
     public class UploadTypeResponseAction : BaseAction
     {
         public const string ActionName = "UploadTypeResponseAction";

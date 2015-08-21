@@ -1,5 +1,11 @@
-﻿namespace MasterDataFlow.Intelligence.Genetic
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace MasterDataFlow.Intelligence.Genetic
 {
+    [Serializable]
     public class GeneticInitData
     {
         private int _count;

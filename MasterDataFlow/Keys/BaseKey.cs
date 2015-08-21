@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace MasterDataFlow.Keys
 {
+    [Serializable]
     public abstract class BaseKey : IComparable<BaseKey>
     {
         public class BaseKeyDefaultContractResolver : DefaultContractResolver

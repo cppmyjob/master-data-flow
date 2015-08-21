@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace MasterDataFlow.Actions
 {
+    [Serializable]
     public abstract class BaseAction
     {
         [JsonIgnore]

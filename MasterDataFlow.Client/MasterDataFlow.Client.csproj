@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MsmqClient.cs" />
+    <Compile Include="MsmqContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WcfClient.cs" />
     <Compile Include="WcfClientContext.cs" />

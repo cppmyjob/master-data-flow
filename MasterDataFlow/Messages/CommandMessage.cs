@@ -6,6 +6,7 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Messages
 {
+    [Serializable]
     public class CommandMessage : BaseMessage
     {
         private readonly CommandKey _key;

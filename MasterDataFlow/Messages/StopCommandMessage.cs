@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace MasterDataFlow.Messages
 {
+    [Serializable]
     public class StopCommandMessage : CommandMessage
     {
         private readonly ICommandDataObject _data;

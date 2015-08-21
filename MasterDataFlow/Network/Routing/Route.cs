@@ -6,6 +6,7 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Network.Routing
 {
+    [Serializable]
     public class Route
     {
         public Route()

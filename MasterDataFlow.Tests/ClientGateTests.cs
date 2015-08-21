@@ -139,7 +139,7 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual(1, contract.Calls);
             Assert.AreEqual(runnerKey.Key, contract.Packet.SenderKey);
             Assert.AreEqual(serverGateKey.Key, contract.Packet.RecieverKey);
-            Assert.AreEqual("MasterDataFlow.Actions.RemoteExecuteCommandAction, MasterDataFlow, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", contract.Packet.TypeName);
+            Assert.AreEqual("MasterDataFlow.Actions.RemoteExecuteCommandAction, MasterDataFlow, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null", contract.Packet.TypeName);
 
             var bodyType = Type.GetType(contract.Packet.TypeName);
             var remoteAction = (RemoteExecuteCommandAction)Serialization.Serializator.Deserialize(bodyType, (string)contract.Packet.Body);

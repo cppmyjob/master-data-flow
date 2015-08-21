@@ -39,13 +39,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Genetic\GeneticCellCommand.cs" />
-    <Compile Include="Genetic\Old\DiscreteGeneticItem.cs" />
-    <Compile Include="Genetic\Old\GeneticInitData.cs" />
+    <Compile Include="Genetic\GeneticInitData.cs" />
     <Compile Include="Genetic\GeneticItem.cs" />
-    <Compile Include="Genetic\Old\GeneticManager.cs" />
-    <Compile Include="Genetic\Old\MoveGeneticItem.cs" />
-    <Compile Include="Genetic\Old\MoveGeneticManager.cs" />
+    <Compile Include="Interfaces\IRandom.cs" />
+    <Compile Include="Interfaces\IRandomFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Random.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
@@ -53,6 +52,7 @@
       <Name>MasterDataFlow</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

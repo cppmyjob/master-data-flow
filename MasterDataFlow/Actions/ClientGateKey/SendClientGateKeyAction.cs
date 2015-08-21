@@ -1,5 +1,8 @@
-﻿namespace MasterDataFlow.Actions.ClientGateKey
+﻿using System;
+
+namespace MasterDataFlow.Actions.ClientGateKey
 {
+    [Serializable]
     public class SendClientGateKeyAction : BaseAction
     {
         public const string ActionName = "SendClientGateKeyAction";

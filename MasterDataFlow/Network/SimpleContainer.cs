@@ -43,6 +43,7 @@ namespace MasterDataFlow.Network
             catch (Exception ex)
             {
                 // TODO Send Error Packet
+                Console.Error.WriteLine("SimpleContainer::ProccessPacket Error: "+ex.Message);
             }
             finally
             {

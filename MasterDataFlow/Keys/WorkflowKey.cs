@@ -6,6 +6,7 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Keys
 {
+    [Serializable]
     public class WorkflowKey : ServiceKey
     {
         static WorkflowKey()

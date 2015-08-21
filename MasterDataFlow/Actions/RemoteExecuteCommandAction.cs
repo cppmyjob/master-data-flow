@@ -7,8 +7,10 @@ using MasterDataFlow.Keys;
 
 namespace MasterDataFlow.Actions
 {
+    [Serializable]
     public class RemoteExecuteCommandAction : BaseAction
     {
+        [Serializable]
         public class Info
         {
             public string CommandType { get; set; }

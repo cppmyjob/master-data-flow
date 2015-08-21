@@ -74,7 +74,9 @@
     <Compile Include="GeneticCellCommandTests.cs" />
     <Compile Include="GeneticIntegrationTests.cs" />
     <Compile Include="GeneticCellDataObjectTests.cs" />
+    <Compile Include="GeneticSerializatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteEvironment.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">

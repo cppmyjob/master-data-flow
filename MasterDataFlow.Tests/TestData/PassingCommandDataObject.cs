@@ -6,6 +6,7 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Tests.TestData
 {
+    [Serializable]
     public class PassingCommandDataObject :  ICommandDataObject
     {
         public PassingCommandDataObject(Guid id)

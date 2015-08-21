@@ -17,7 +17,7 @@ namespace MasterDataFlow.Intelligence.Tests
     public class GeneticIntegrationTests
     {
         private EventWaitHandle _eventWaitHandle;
-        private GeneticCellDataObject _dataObject;
+        private static GeneticCellDataObject _dataObject;
 
         public class RemoteClientContextMock : IClientContext, IGateCallback
         {
@@ -80,22 +80,47 @@ namespace MasterDataFlow.Intelligence.Tests
             _dataObject = null;
         }
 
+        [Serializable]
+        public class MockGeneticItem : GeneticItem
+        {
+            public MockGeneticItem(GeneticInitData initData) : base(initData)
+            {
+            }
+
+            protected override double CreateValue(double random)
+            {
+                return random;
+            }
+        }
+
+        [Serializable]
         public class GeneticCellDataObjectMock : GeneticCellDataObject
         {
         }
 
-
         public class GeneticCellCommandMock : GeneticCellCommand
         {
-            protected override BaseMessage BaseExecute()
+            public override BaseMessage Execute()
             {
+                Console.WriteLine("GeneticCellCommandMock::BaseExecute");
+                var result = base.Execute();
                 //_dataObject = DataObject;
-                using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
-                        "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
-                {
-                    eventWaitHandle.Set();
-                }
-                return base.BaseExecute();
+                //using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
+                //        "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
+                //{
+                //    eventWaitHandle.Set();
+                //}
+                return result;
+            }
+
+            protected override GeneticItem CreateItem(GeneticInitData initData)
+            {
+                return new MockGeneticItem(initData);
+            }
+
+            public override double CalculateFitness(GeneticItem item, int processor)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -103,35 +128,19 @@ namespace MasterDataFlow.Intelligence.Tests
         public void GeneticCellInitDataPassingTest()
         {
             // ARRANGE
-            var serverGateKey = new ServiceKey();
-            var remoteClientContext = new RemoteClientContextMock(serverGateKey);
-
-            var remoteCommandRunner = new CommandRunner();
-            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
-            serverGate.ConnectHub(remoteCommandRunner);
-
-            var remoteContainer = new SimpleContainer();
-            remoteCommandRunner.ConnectHub(remoteContainer);
-
-            var runner = new CommandRunner();
-
-            remoteClientContext.SetContract(serverGate);
-            var clientGate = new ClientGate(remoteClientContext);
-            runner.ConnectHub(clientGate);
-
-            var сommandWorkflow = new CommandWorkflow();
-            runner.ConnectHub(сommandWorkflow);
+            var remote = new RemoteEvironment();
+            var сommandWorkflow = remote.PrepeareSingleRemoteContainer();
 
             // ACT
             var initData = new GeneticCellInitData(100, 30, 50);
             var dataObject = new GeneticCellDataObjectMock
             {
-                CellInitData = initData
+                CellInitData = initData,
             };
             сommandWorkflow.Start<GeneticCellCommandMock>(dataObject);
 
             // ASSERT
-            var result = _eventWaitHandle.WaitOne(20000);
+            var result = _eventWaitHandle.WaitOne(2000);
             Assert.IsTrue(result);
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Keys
 {
+    [Serializable]
     public class CommandKey : ServiceKey
     {
         static CommandKey()
