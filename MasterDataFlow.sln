@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow", "MasterDataFlow\MasterDataFlow.csproj", "{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}"
 EndProject
@@ -36,6 +36,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence.Tests", "MasterDataFlow.Intelligence.Tests\MasterDataFlow.Intelligence.Tests.csproj", "{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.NuGet.Packager", "MasterDataFlow.NuGet.Packager\MasterDataFlow.NuGet.Packager.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Assembly", "MasterDataFlow.Assembly\MasterDataFlow.Assembly.csproj", "{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Assembly.Interfaces", "MasterDataFlow.Assembly.Interfaces\MasterDataFlow.Assembly.Interfaces.csproj", "{D651F204-963A-4FE8-B5D6-00527D592E67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,14 @@ Global
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D651F204-963A-4FE8-B5D6-00527D592E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D651F204-963A-4FE8-B5D6-00527D592E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D651F204-963A-4FE8-B5D6-00527D592E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D651F204-963A-4FE8-B5D6-00527D592E67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB6D9F25-95BD-4769-BED6-4C0ABC960EC5}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{9E4F4ED3-3FC3-441D-A46E-728511B3EB65}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MasterDataFlow.Wcf.Server</RootNamespace>
-    <AssemblyName>MasterDataFlow.Wcf.Server</AssemblyName>
+    <RootNamespace>MasterDataFlow.Assembly</RootNamespace>
+    <AssemblyName>MasterDataFlow.Assembly</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,41 +32,24 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Loader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Assembly.Interfaces\MasterDataFlow.Assembly.Interfaces.csproj">
-      <Project>{d651f204-963a-4fe8-b5d6-00527d592e67}</Project>
+      <Project>{D651F204-963A-4FE8-B5D6-00527D592E67}</Project>
       <Name>MasterDataFlow.Assembly.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MasterDataFlow.Assembly\MasterDataFlow.Assembly.csproj">
-      <Project>{9e4f4ed3-3fc3-441d-a46e-728511b3eb65}</Project>
-      <Name>MasterDataFlow.Assembly</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MasterDataFlow.Contract\MasterDataFlow.Contract.csproj">
-      <Project>{E0B47B30-7585-41E4-A0B0-4E4674006FEE}</Project>
-      <Name>MasterDataFlow.Contract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MasterDataFlow.Server\MasterDataFlow.Server.csproj">
-      <Project>{2a322a3b-a6df-4d71-9412-48659438ebb4}</Project>
-      <Name>MasterDataFlow.Server</Name>
     </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
       <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
       <Name>MasterDataFlow</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

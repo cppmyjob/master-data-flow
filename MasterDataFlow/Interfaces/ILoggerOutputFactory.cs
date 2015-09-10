@@ -5,8 +5,8 @@ using System.Text;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface ILoggerFactory
+    public interface ILoggerOutputFactory
     {
-        ILogger Create();
+        ILoggerOutput Create();
     }
 }

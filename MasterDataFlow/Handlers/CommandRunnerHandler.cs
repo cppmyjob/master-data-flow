@@ -62,7 +62,8 @@ namespace MasterDataFlow.Handlers
             var senderKey = Parent.Key;
             object body = new LocalExecuteCommandAction()
             {
-                CommandInfo = action.CommandInfo
+                CommandInfo = action.LocalDomainCommandInfo,
+                ExternalDomainCommandInfo = action.ExternalDomainCommandInfo
             };
             allContainers[0].Send(new Packet(senderKey, recieverKey, body));
         }
@@ -76,11 +77,11 @@ namespace MasterDataFlow.Handlers
             // TODO Select an one from multi
             var info = new RemoteExecuteCommandAction.Info
             {
-                CommandType = action.CommandInfo.CommandType.AssemblyQualifiedName,
-                DataObject = action.CommandInfo.CommandDataObject != null ? Serialization.Serializator.Serialize(action.CommandInfo.CommandDataObject) : null,
-                DataObjectType = action.CommandInfo.CommandDataObject != null ? action.CommandInfo.CommandDataObject.GetType().AssemblyQualifiedName : null,
-                WorkflowKey = action.CommandInfo.WorkflowKey.Key,
-                CommandKey = action.CommandInfo.CommandKey.Key
+                CommandType = action.LocalDomainCommandInfo.CommandType.AssemblyQualifiedName,
+                DataObject = action.LocalDomainCommandInfo.CommandDataObject != null ? Serialization.Serializator.Serialize(action.LocalDomainCommandInfo.CommandDataObject) : null,
+                DataObjectType = action.LocalDomainCommandInfo.CommandDataObject != null ? action.LocalDomainCommandInfo.CommandDataObject.GetType().AssemblyQualifiedName : null,
+                WorkflowKey = action.LocalDomainCommandInfo.WorkflowKey.Key,
+                CommandKey = action.LocalDomainCommandInfo.CommandKey.Key
             };
 
             var recieverKey = allGates[0].ServerGateKey;

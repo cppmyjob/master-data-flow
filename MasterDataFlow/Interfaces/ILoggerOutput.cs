@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MasterDataFlow.Interfaces
 {
-    public interface ILogger
+    public interface ILoggerOutput
     {
         void Error(string message);
         void Error(string message, params object[] args);

@@ -8,6 +8,7 @@ using System.Threading;
 using MasterDataFlow.Assemblies;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Server;
+using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Wcf.Server
 {
@@ -18,6 +19,8 @@ namespace MasterDataFlow.Wcf.Server
             var ck = new CommandKey();
             var sk = new ServiceKey();
             var wk = new WorkflowKey();
+
+            Logger.SetFactory(new ConsoleLoggerOutputFactory());
 
             using (var serviceHost = new ServiceHost(typeof(WcfServer)))
             {

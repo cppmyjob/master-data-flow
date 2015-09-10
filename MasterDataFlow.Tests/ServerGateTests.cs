@@ -137,11 +137,11 @@ namespace MasterDataFlow.Tests
             Assert.IsNotNull(recievedPacked);
             Assert.IsTrue(recievedPacked.Body is FindContainerAndLaunchCommandAction);
             var recievedCommand = recievedPacked.Body as FindContainerAndLaunchCommandAction;
-            Assert.AreEqual(commandKey, recievedCommand.CommandInfo.CommandKey);
-            Assert.AreEqual(workflowKey, recievedCommand.CommandInfo.WorkflowKey);
+            Assert.AreEqual(commandKey, recievedCommand.LocalDomainCommandInfo.CommandKey);
+            Assert.AreEqual(workflowKey, recievedCommand.LocalDomainCommandInfo.WorkflowKey);
 
-            Assert.AreEqual(typeof(PassingCommand).FullName, recievedCommand.CommandInfo.CommandType.FullName);
-            Assert.AreEqual(DataObjectId, recievedCommand.CommandInfo.CommandDataObject.ToString());
+            Assert.AreEqual(typeof(PassingCommand).FullName, recievedCommand.LocalDomainCommandInfo.CommandType.FullName);
+            Assert.AreEqual(DataObjectId, recievedCommand.LocalDomainCommandInfo.CommandDataObject.ToString());
         }
 
 

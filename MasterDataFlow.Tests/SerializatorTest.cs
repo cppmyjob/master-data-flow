@@ -63,5 +63,24 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual(key.Key, newMessage.Key.Key);
         }
 
+        [TestMethod]
+        public void CrossDomainSerializationTest()
+        {
+            // ARRANGE
+            var key = new CommandKey();
+            var dataObject = new PassingCommandDataObject(Guid.NewGuid());
+            var message = new StopCommandMessage(key, dataObject);
+
+            //ACT
+            var messageString = Serializator.Serialize(message);
+
+
+            var newMessage = (StopCommandMessage)Serializator.Deserialize(typeof(StopCommandMessage), messageString);
+
+            // ASSERT
+            Assert.AreEqual(key.Key, newMessage.Key.Key);
+            Assert.AreEqual(dataObject.Id, ((PassingCommandDataObject)newMessage.Data).Id);
+        }
+
     }
 }

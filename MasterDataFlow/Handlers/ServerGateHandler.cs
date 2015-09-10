@@ -19,7 +19,7 @@ using MasterDataFlow.Utils;
 namespace MasterDataFlow.Handlers
 {
     // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
-    public class ServerGateHandler : BaseHandler, IInstanceFactory
+    public class ServerGateHandler : BaseHandler
     {
         private readonly AsyncDictionary<BaseKey, CommandRunner> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunner>();
 
@@ -98,45 +98,41 @@ namespace MasterDataFlow.Handlers
                 // TODO Send error message
                 return;
 
-            var workflowKey = (WorkflowKey) BaseKey.DeserializeKey(action.CommandInfo.WorkflowKey);
+            var workflowKey = (WorkflowKey)BaseKey.DeserializeKey(action.CommandInfo.WorkflowKey);
 
-            ICommandDataObject dataObject = null;
             if (action.CommandInfo.DataObjectType != null)
             {
-                Type dataObjectType = GetType(workflowKey, action.CommandInfo.DataObjectType);
-                if (dataObjectType == null)
+                if (!IsTypeExists(workflowKey, action.CommandInfo.DataObjectType))
                 {
                     SendUploadTypeCommand(action.CommandInfo.WorkflowKey, action.CommandInfo.DataObjectType, packet);
                     return;
                 }
-                dataObject = (ICommandDataObject)Serialization.Serializator.DeserializeDataObject(dataObjectType, action.CommandInfo.DataObject, workflowKey, this);
             }
 
-            Type commandType = GetType(workflowKey, action.CommandInfo.CommandType);
-            if (commandType == null)
+            if (!IsTypeExists(workflowKey, action.CommandInfo.CommandType))
             {
                 SendUploadTypeCommand(action.CommandInfo.WorkflowKey, action.CommandInfo.CommandType, packet);
                 return;
             }
 
-            //var commandDefinition = new CommandDefinition(commandType);
-
             BaseKey senderKey = Parent.Key;
             BaseKey recieverKey = allRunners[0].Key;
             object body = new FindContainerAndLaunchCommandAction()
             {
-                CommandInfo = new CommandInfo()
+                ExternalDomainCommandInfo = new ExternalDomainCommandInfo
                 {
-                    CommandKey = (CommandKey)BaseKey.DeserializeKey(action.CommandInfo.CommandKey),
+                    CommandKey = action.CommandInfo.CommandKey,
+                    CommandType = action.CommandInfo.CommandType,
+                    DataObject = action.CommandInfo.DataObject,
+                    DataObjectType = action.CommandInfo.DataObjectType,
                     WorkflowKey = workflowKey,
-                    CommandType = commandType,
-                    CommandDataObject = dataObject,
-                    InstanceFactory = this
-                }
+                    AssemblyLoader = _assemblyLoader
+                },
             };
 
             allRunners[0].Send(new Packet(senderKey, recieverKey, body));
         }
+
 
         private void SendUploadTypeCommand(string workKlowKey, string typeName, IPacket packet)
         {
@@ -163,19 +159,10 @@ namespace MasterDataFlow.Handlers
             }
         }
 
-        public BaseCommand CreateCommandInstance(WorkflowKey workflowKey, CommandKey commandKey, Type type, ICommandDataObject commandDataObject)
+        public bool IsTypeExists(WorkflowKey workflowKey, string typeName)
         {
-            var instance = (BaseCommand)_assemblyLoader.CreateInstance(workflowKey, type);
-            instance.Key = commandKey;
-            PropertyInfo prop = type.GetProperty("DataObject", BindingFlags.Instance | BindingFlags.Public);
-            // TODO need to add a some checking is DataObject exist and etc
-            prop.SetValue(instance, commandDataObject, null);
-            return instance;
+            return _assemblyLoader.IsTypeExists(workflowKey, typeName);
         }
 
-        public Type GetType(WorkflowKey workflowKey, string typeName)
-        {
-            return _assemblyLoader.GetLoadedType(workflowKey, typeName);
-        }
     }
 }

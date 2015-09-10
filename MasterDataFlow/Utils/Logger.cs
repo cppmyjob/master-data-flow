@@ -6,11 +6,11 @@ using MasterDataFlow.Interfaces;
 
 namespace MasterDataFlow.Utils
 {
-    public class Logger : ILogger
+    public class Logger : ILoggerOutput
     {
         // ReSharper disable InconsistentNaming
-        private static ILoggerFactory _factory = null;
-        private static ILogger _logger = null;
+        private static volatile ILoggerOutputFactory _factory = null;
+        private static volatile ILoggerOutput _logger = null;
         private static readonly Logger _instance = new Logger();
         // ReSharper restore InconsistentNaming
 
@@ -26,9 +26,15 @@ namespace MasterDataFlow.Utils
             }
         }
 
-        public static void SetFactory(ILoggerFactory factory)
+        public static void SetFactory(ILoggerOutputFactory factory)
         {
             _factory = factory;
+        }
+
+        public static void StopLogging()
+        {
+            _factory = null;
+            _logger = null;
         }
 
         public void Error(string message)

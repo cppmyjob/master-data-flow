@@ -30,7 +30,7 @@ namespace MasterDataFlow.Tests
         }
 
         [TestMethod]
-        public void LoadClassTest()
+        public void IsClassExistsTest()
         {
             // ARRANGE
             var bytes = LoadFirstExternalAssembly();
@@ -39,8 +39,8 @@ namespace MasterDataFlow.Tests
             _loader.Load(workflowKey, assemblyName, bytes);
                 
             // ACT
-            var classType = _loader.GetLoadedType(workflowKey, "MasterDataFlow.Tests.ExternalAssembly.MathCommand, MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-            //LogLoadedAssemblies();
+            var classType = _loader.IsTypeExists(workflowKey, "MasterDataFlow.Tests.ExternalAssembly.MathCommand, MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+            Console.WriteLine(_loader.PrintLoadedTypes(workflowKey));
 
             // ASSERT
             Assert.IsNotNull(classType);

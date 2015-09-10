@@ -31,8 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net35\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net35\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,15 +52,16 @@
     <Compile Include="Actions\UploadType\UploadTypeResponseAction.cs" />
     <Compile Include="Actions\UploadType\UploadTypeRequestAction.cs" />
     <Compile Include="Assemblies\AssemblyLoader.cs" />
+    <Compile Include="Assemblies\Creator.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
+    <Compile Include="ExternalDomainCommandInfo.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="EventLoop\EventLoopCommandStatus.cs" />
     <Compile Include="Handlers\CommandRunnerHandler.cs" />
     <Compile Include="Handlers\ServerGateHandler.cs" />
     <Compile Include="Interfaces\IBaseEvent.cs" />
-    <Compile Include="Interfaces\IInstanceFactory.cs" />
-    <Compile Include="Interfaces\ILogger.cs" />
-    <Compile Include="Interfaces\ILoggerFactory.cs" />
+    <Compile Include="Interfaces\ILoggerOutput.cs" />
+    <Compile Include="Interfaces\ILoggerOutputFactory.cs" />
     <Compile Include="Interfaces\IGateCallback.cs" />
     <Compile Include="Interfaces\IClientContext.cs" />
     <Compile Include="Interfaces\Network\IHub.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\CommandMessage.cs" />
     <Compile Include="Messages\EventMessage.cs" />
+    <Compile Include="Messages\SerializedMessage.cs" />
     <Compile Include="Messages\StopCommandMessage.cs" />
     <Compile Include="Network\ClientGate.cs" />
     <Compile Include="Network\CommandRunner.cs" />
@@ -98,14 +101,13 @@
     <Compile Include="Network\SimpleContainer.cs" />
     <Compile Include="Network\ActionHub.cs" />
     <Compile Include="Keys\BaseKey.cs" />
-    <Compile Include="Serialization\CommandDataObjectConverter.cs" />
     <Compile Include="Serialization\KeyConverter.cs" />
     <Compile Include="Utils\AsyncQueue.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="CommandDefinition.cs" />
-    <Compile Include="CommandInfo.cs" />
+    <Compile Include="LocalDomainCommandInfo.cs" />
     <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="Interfaces\IDataObjectHolder.cs" />
     <Compile Include="Exceptions\MasterDataFlowException.cs" />
@@ -114,12 +116,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\Serializator.cs" />
     <Compile Include="Utils\AsyncDictionary.cs" />
+    <Compile Include="Utils\ConsoleLoggerOutput.cs" />
     <Compile Include="Utils\Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Assembly.Interfaces\MasterDataFlow.Assembly.Interfaces.csproj">
+      <Project>{D651F204-963A-4FE8-B5D6-00527D592E67}</Project>
+      <Name>MasterDataFlow.Assembly.Interfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

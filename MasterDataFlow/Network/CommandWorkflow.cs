@@ -15,7 +15,7 @@ namespace MasterDataFlow.Network
 {
     public delegate void OnMessageRecieved(BaseKey senderKey,BaseMessage message);
 
-    public class CommandWorkflow : EventLoopHub, IInstanceFactory
+    public class CommandWorkflow : EventLoopHub//, IInstanceFactory
     {
         private readonly WorkflowKey _key;
         private CommandRunner _runner;
@@ -54,13 +54,12 @@ namespace MasterDataFlow.Network
             BaseKey recieverKey = _runner.Key;
             object body = new FindContainerAndLaunchCommandAction()
             {
-                CommandInfo = new CommandInfo()
+                LocalDomainCommandInfo = new LocalDomainCommandInfo()
                 {
                     CommandKey = commandKey,
                     WorkflowKey = _key,
                     CommandType = commandType,
                     CommandDataObject = commandDataObject,
-                    InstanceFactory = this,
                 }
             };
             _runner.Send(new Packet(senderKey, recieverKey, body));
@@ -84,6 +83,12 @@ namespace MasterDataFlow.Network
             {
                 if (MessageRecieved != null)
                 {
+                    var serializedMessage = packet.Body as SerializedCommandMessage;
+                    if (serializedMessage != null)
+                    {
+                        message = (BaseMessage) Serialization.Serializator.Deserialize(serializedMessage.DataType,
+                                    serializedMessage.Data);
+                    }
                     MessageRecieved(packet.SenderKey, message);
                 }
             }

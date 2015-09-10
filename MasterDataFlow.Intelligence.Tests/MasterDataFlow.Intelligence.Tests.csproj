@@ -72,7 +72,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GeneticCellCommandTests.cs" />
-    <Compile Include="GeneticIntegrationTests.cs" />
     <Compile Include="GeneticCellDataObjectTests.cs" />
     <Compile Include="GeneticSerializatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

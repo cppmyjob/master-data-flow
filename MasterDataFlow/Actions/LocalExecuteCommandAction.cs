@@ -9,7 +9,8 @@ namespace MasterDataFlow.Actions
     {
         public const string ActionName = "LocalExecuteCommandAction";
 
-        public CommandInfo CommandInfo { get; internal set; }
+        public LocalDomainCommandInfo CommandInfo { get; internal set; }
+        public ExternalDomainCommandInfo ExternalDomainCommandInfo { get; internal set; }
 
         public override string Name
         {

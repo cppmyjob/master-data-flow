@@ -13,6 +13,7 @@ using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
 using MasterDataFlow.Network.Packets;
 using MasterDataFlow.Tests.TestData;
+using MasterDataFlow.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MasterDataFlow.Tests
@@ -74,6 +75,7 @@ namespace MasterDataFlow.Tests
 
             public override BaseMessage Execute()
             {
+                Console.WriteLine("Execute");
                 using (var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset,
                         "AE2E34E2-A03D-4B53-930D-A15CA44BCF21"))
                 {
@@ -94,12 +96,14 @@ namespace MasterDataFlow.Tests
         [TestInitialize]
         public void TestInitialize()
         {
+            Logger.SetFactory(new ConsoleLoggerOutputFactory());
             _eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, "AE2E34E2-A03D-4B53-930D-A15CA44BCF21");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
+            Logger.StopLogging();
             _eventWaitHandle.Close();
         }
 
@@ -126,13 +130,11 @@ namespace MasterDataFlow.Tests
             var сommandWorkflow = new CommandWorkflow();
             runner.ConnectHub(сommandWorkflow);
 
-            SendUploadResponse(serverGate, typeof(ExecuteCommand), сommandWorkflow.Key);
-
             // ACT
             сommandWorkflow.Start<ExecuteCommand>(null);
 
             // ASSERT
-            var result = _eventWaitHandle.WaitOne(200);
+            var result = _eventWaitHandle.WaitOne(2000);
             Assert.IsTrue(result);
         }
 
@@ -160,8 +162,6 @@ namespace MasterDataFlow.Tests
             var сommandWorkflow = new CommandWorkflow();
             runner.ConnectHub(сommandWorkflow);
 
-            SendUploadResponse(serverGate, typeof(PassingCommand), сommandWorkflow.Key);
-
             var callStopCommand = 0;
             BaseMessage callMessage = null;
             сommandWorkflow.MessageRecieved += (key, message) =>
@@ -180,7 +180,7 @@ namespace MasterDataFlow.Tests
             var commandKey = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
 
             // ASSERT
-            _eventWaitHandle.WaitOne(200);
+            _eventWaitHandle.WaitOne(2000);
 
             Assert.AreEqual(1, callStopCommand);
             Assert.IsNotNull(callMessage);
@@ -194,23 +194,5 @@ namespace MasterDataFlow.Tests
             Assert.AreEqual(newId, passingCommand.Id);
         }
 
-        private void SendUploadResponse(IHub hub, Type type, BaseKey workflowKey)
-        {
-            string path = type.Assembly.Location;
-            var assemblyFilename = Path.GetFileName(path);
-            using (var stream = File.OpenRead(path))
-            {
-                var buffer = new byte[stream.Length];
-                stream.Read(buffer, 0, buffer.Length);
-                var responseAction = new UploadTypeResponseAction
-                {
-                    TypeName = type.AssemblyQualifiedName,
-                    AssemblyData = buffer,
-                    AssemblyName = assemblyFilename,
-                    WorkflowKey = workflowKey.Key
-                };
-                hub.Send(new Packet(new ServiceKey(), hub.Key, responseAction));
-            }
-        }
     }
 }

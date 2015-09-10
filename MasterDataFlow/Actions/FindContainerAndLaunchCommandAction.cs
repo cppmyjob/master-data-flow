@@ -12,8 +12,9 @@ namespace MasterDataFlow.Actions
         // TODO getting action Name in runtime
         public const string ActionName = "FindContainerAndLaunchCommandAction";
 
-        public CommandInfo CommandInfo { get; internal set; }
-
+        public LocalDomainCommandInfo LocalDomainCommandInfo { get; internal set; }
+        public ExternalDomainCommandInfo ExternalDomainCommandInfo { get; internal set; }
+        
         public override string Name
         {
             get { return ActionName; }
