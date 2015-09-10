@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.Client;
 using MasterDataFlow.Keys;
+using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
 
 namespace MasterDataFlow.Wcf.Client
@@ -24,6 +25,9 @@ namespace MasterDataFlow.Wcf.Client
                 сommandWorkflow.MessageRecieved += (key, message) =>
                 {
                     Console.WriteLine("Message recieved");
+                    var stopMessage = (StopCommandMessage)message;
+                    var result = (MasterDataFlow.Wcf.Client.MathCommand.MathCommandResult)stopMessage.Data;
+                    Console.WriteLine("Result is {0}", result.Result);
                 };
 
                 var dataObject = new MathCommand.MathCommandDataObject()
