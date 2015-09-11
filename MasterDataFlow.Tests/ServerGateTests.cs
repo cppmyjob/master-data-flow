@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.Actions;
+using MasterDataFlow.Actions.ClientGateKey;
 using MasterDataFlow.Actions.UploadType;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
@@ -49,6 +50,7 @@ namespace MasterDataFlow.Tests
             {
                 ++calls;
                 recievedPacked = packet;
+                _event.Set();
             });
 
             var workflowKey = new WorkflowKey();
@@ -99,12 +101,12 @@ namespace MasterDataFlow.Tests
             {
                 ++calls;
                 recievedPacked = packet;
+                _event.Set();
             });
 
             var serverGate = new ServerGate();
             var commandRunner = commandRunnerMock.Object;
             serverGate.ConnectHub(commandRunner);
-
 
             var workflowKey = new WorkflowKey();
             var commandKey = new CommandKey();
@@ -119,6 +121,8 @@ namespace MasterDataFlow.Tests
             var bodyObject = new RemoteExecuteCommandAction { CommandInfo = info };
 
             SendUploadResponse(serverGate, typeof (PassingCommand), workflowKey);
+            // TODO Avoid Sleep. It needs for waiting assembly loading
+            Thread.Sleep(5000);
 
             // ACT
             var senderKey = new ServiceKey();
@@ -130,20 +134,35 @@ namespace MasterDataFlow.Tests
             var remotePacket = new RemotePacket(senderKey.Key, recieverKey.Key, bodyTypeName, body);
             serverGate.Send(remotePacket);
 
-            _event.WaitOne(200);
+            _event.WaitOne(20000);
 
             // ASSERT
             Assert.AreEqual(1, calls);
             Assert.IsNotNull(recievedPacked);
             Assert.IsTrue(recievedPacked.Body is FindContainerAndLaunchCommandAction);
             var recievedCommand = recievedPacked.Body as FindContainerAndLaunchCommandAction;
-            Assert.AreEqual(commandKey, recievedCommand.LocalDomainCommandInfo.CommandKey);
-            Assert.AreEqual(workflowKey, recievedCommand.LocalDomainCommandInfo.WorkflowKey);
+            Assert.IsNull(recievedCommand.LocalDomainCommandInfo);
+            Assert.IsNotNull(recievedCommand.ExternalDomainCommandInfo);
+            Assert.AreEqual(commandKey.ToString(), recievedCommand.ExternalDomainCommandInfo.CommandKey);
+            Assert.AreEqual(workflowKey, recievedCommand.ExternalDomainCommandInfo.WorkflowKey);
 
-            Assert.AreEqual(typeof(PassingCommand).FullName, recievedCommand.LocalDomainCommandInfo.CommandType.FullName);
-            Assert.AreEqual(DataObjectId, recievedCommand.LocalDomainCommandInfo.CommandDataObject.ToString());
+            Assert.AreEqual(typeof(PassingCommand).AssemblyQualifiedName, recievedCommand.ExternalDomainCommandInfo.CommandType);
+            Assert.AreEqual(info.DataObject, recievedCommand.ExternalDomainCommandInfo.DataObject);
         }
 
+
+        //private void SendClientKey()
+        //{
+        //    var sendClientGateKeyAction = new SendClientGateKeyAction()
+        //    {
+        //        ClientGateKey = Key.Key
+        //    };
+        //    var bodyTypeName = sendClientGateKeyAction.GetType().AssemblyQualifiedName;
+        //    // TODO need more flexible serialization way
+        //    var body = Serialization.Serializator.Serialize(sendClientGateKeyAction);
+        //    var remotePacket = new RemotePacket(Key.Key, ServerGateKey.Key, bodyTypeName, body);
+        //    _context.Contract.Send(remotePacket);
+        //}
 
         private void SendUploadResponse(IHub hub, Type type, WorkflowKey workflowKey)
         {
@@ -161,7 +180,7 @@ namespace MasterDataFlow.Tests
                     WorkflowKey = workflowKey.Key
                 };
                 hub.Send(new Packet(new ServiceKey(), hub.Key, responseAction));
-            }            
+            }
         }
     }
 }

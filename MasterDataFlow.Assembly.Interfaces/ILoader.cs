@@ -13,6 +13,8 @@ namespace MasterDataFlow.Assembly.Interfaces
 
         bool IsTypeExists(string typeName);
 
+        string[] GetDomainAssemblies();
+
         string Execute(string commandType, string dataObject, string dataObjectType, string commandKey, out Type resultType);
     }
 }

@@ -39,41 +39,29 @@ namespace MasterDataFlow.Tests
             _loader.Load(workflowKey, assemblyName, bytes);
                 
             // ACT
-            var classType = _loader.IsTypeExists(workflowKey, "MasterDataFlow.Tests.ExternalAssembly.MathCommand, MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-            Console.WriteLine(_loader.PrintLoadedTypes(workflowKey));
+            var isTypeExists = _loader.IsTypeExists(workflowKey, "MasterDataFlow.Tests.ExternalAssembly.MathCommand, MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 
             // ASSERT
-            Assert.IsNotNull(classType);
+            Assert.IsNotNull(isTypeExists);
         }
 
-        //[TestMethod]
-        //public void CreateInstanceTest()
-        //{
-        //    // ARRANGE
-        //    var bytes = LoadFirstExternalAssembly();
-        //    _loader.Load(bytes);
-
-        //    // ACT
-        //    var classType = _loader.GetLoadedType("MasterDataFlow.Tests.ExternalAssembly.MathCommand, MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-        //    LogLoadedAssemblies();
-
-        //    // ASSERT
-        //    Assert.IsNotNull(classType);
-        //}
-
-        private static void LogLoadedAssemblies()
+        [TestMethod]
+        public void AssemlyIsLoadedIntoExternalDomainOnly()
         {
-            LogLoadedAssemblies(AppDomain.CurrentDomain);
-        }
+            // ARRANGE
+            var bytes = LoadFirstExternalAssembly();
+            var workflowKey = new WorkflowKey();
+            var assemblyName = "MasterDataFlow.Tests.ExternalAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+            _loader.Load(workflowKey, assemblyName, bytes);
 
-        private static void LogLoadedAssemblies(AppDomain appDomain)
-        {
-            Console.WriteLine("Loaded assemblies in appdomain: {0}", appDomain.FriendlyName);
-            var names = AppDomain.CurrentDomain.GetAssemblies().Select(t => t.GetName().Name).OrderBy(t => t);
-            foreach (var name in names)
-            {
-                Console.WriteLine("- {0}", name);
-            }
+            // ACT
+            var assemblies = _loader.GetDomainAssemblies(workflowKey);
+
+            // ASSERT
+            Assert.IsTrue(assemblies.Any(t => t == assemblyName));
+            Assert.AreEqual(1, assemblies.Count(t => t == assemblyName));
+            var currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(t => t.GetName().FullName).ToArray();
+            Assert.IsFalse(currentAssemblies.Any(t => t == assemblyName));
         }
 
         private byte[] LoadFirstExternalAssembly()
