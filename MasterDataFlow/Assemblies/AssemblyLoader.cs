@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using MasterDataFlow.Actions;
-using MasterDataFlow.Assembly.Interfaces;
+using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using Newtonsoft.Json;
 
@@ -14,7 +14,7 @@ namespace MasterDataFlow.Assemblies
 {
     // http://msdn.microsoft.com/en-us/library/dd153782(v=vs.110).aspx
     // http://www.codeproject.com/Articles/453778/Loading-Assemblies-from-Anywhere-into-a-New-AppDom
-    public class AssemblyLoader
+    public class AssemblyLoader : IDisposable
     {
         private class InternalDomain
         {
@@ -40,11 +40,12 @@ namespace MasterDataFlow.Assemblies
                 {
                     Domain = AppDomain.CreateDomain(key.Key, evidence, setup),
                 };
-                domain.Loader =(ILoader) domain.Domain.CreateInstanceAndUnwrap("MasterDataFlow.Assembly", "MasterDataFlow.Assembly.Loader");
+                // TODO dynamic assembly and class name
+                domain.Loader =(ILoader) domain.Domain.CreateInstanceAndUnwrap("MasterDataFlow", "MasterDataFlow.Assemblies.Loader");
                 _domains.Add(key, domain);
             }
 
-            var assembly = domain.Loader.LoadAssembly(assemblyName, bytes);
+            domain.Loader.LoadAssembly(assemblyName, bytes);
         }
 
         public bool IsTypeExists(BaseKey key, string typeName)
@@ -83,6 +84,21 @@ namespace MasterDataFlow.Assemblies
             return result;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var domain in _domains)
+                {
+                    AppDomain.Unload(domain.Value.Domain);
+                }
+            }
+        }
     }
 }

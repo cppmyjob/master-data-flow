@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using MasterDataFlow.Assemblies;
-using MasterDataFlow.Assembly.Interfaces;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 
-namespace MasterDataFlow.Assembly
+namespace MasterDataFlow.Assemblies
 {
     public class Loader : MarshalByRefObject, ILoader
     {
@@ -34,11 +30,10 @@ namespace MasterDataFlow.Assembly
             return null;
         }
 
-        public bool LoadAssembly(string assemblyName, byte[] bytes)
+        public void LoadAssembly(string assemblyName, byte[] bytes)
         {
             var assembly = AppDomain.CurrentDomain.Load(bytes);
             _assemblies.Add(assemblyName, assembly);
-            return true;
         }
 
         public Type GetLoadedType(string typeName)

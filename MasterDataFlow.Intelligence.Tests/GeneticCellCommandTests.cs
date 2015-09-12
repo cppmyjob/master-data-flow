@@ -122,7 +122,7 @@ namespace MasterDataFlow.Intelligence.Tests
             сommandWorkflow.Start<GeneticCellCommandMock>(dataObject);
 
             // ASSERT
-            _event.WaitOne(20000);
+            _event.WaitOne(5000);
             Assert.IsNotNull(_dataObject);
             //Assert.AreEqual(100, _dataObject.CellInitData.ItemsCount);
             //Assert.AreEqual(30, _dataObject.CellInitData.SurviveCount);
@@ -160,7 +160,7 @@ namespace MasterDataFlow.Intelligence.Tests
             сommandWorkflow.Start<GeneticCellCommandMock>(dataObject);
 
             // ASSERT
-            _event.WaitOne(20000);
+            _event.WaitOne(5000);
 
             Assert.IsNotNull(_stopMessage);
             Assert.AreEqual(10, ((GeneticItem)(_stopMessage.Data as GeneticStopDataObject).Best).Fitness);

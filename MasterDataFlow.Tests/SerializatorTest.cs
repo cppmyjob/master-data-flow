@@ -21,7 +21,6 @@ namespace MasterDataFlow.Tests
             var route = new Route(destinationKey, gateKey, length);
 
             //ACT
-
             var routeString = Serializator.Serialize(route);
             var newRoute = (Route)Serializator.Deserialize(typeof (Route), routeString);
 

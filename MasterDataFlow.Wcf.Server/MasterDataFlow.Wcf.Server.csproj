@@ -46,14 +46,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MasterDataFlow.Assembly.Interfaces\MasterDataFlow.Assembly.Interfaces.csproj">
-      <Project>{d651f204-963a-4fe8-b5d6-00527d592e67}</Project>
-      <Name>MasterDataFlow.Assembly.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MasterDataFlow.Assembly\MasterDataFlow.Assembly.csproj">
-      <Project>{9e4f4ed3-3fc3-441d-a46e-728511b3eb65}</Project>
-      <Name>MasterDataFlow.Assembly</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow.Contract\MasterDataFlow.Contract.csproj">
       <Project>{E0B47B30-7585-41E4-A0B0-4E4674006FEE}</Project>
       <Name>MasterDataFlow.Contract</Name>

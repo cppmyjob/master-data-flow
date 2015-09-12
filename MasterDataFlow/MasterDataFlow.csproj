@@ -53,6 +53,8 @@
     <Compile Include="Actions\UploadType\UploadTypeRequestAction.cs" />
     <Compile Include="Assemblies\AssemblyLoader.cs" />
     <Compile Include="Assemblies\Creator.cs" />
+    <Compile Include="Interfaces\ILoader.cs" />
+    <Compile Include="Assemblies\Loader.cs" />
     <Compile Include="EventLoop\EventLoop.cs" />
     <Compile Include="ExternalDomainCommandInfo.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
@@ -121,12 +123,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MasterDataFlow.Assembly.Interfaces\MasterDataFlow.Assembly.Interfaces.csproj">
-      <Project>{D651F204-963A-4FE8-B5D6-00527D592E67}</Project>
-      <Name>MasterDataFlow.Assembly.Interfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
