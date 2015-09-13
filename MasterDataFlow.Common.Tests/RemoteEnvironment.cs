@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
 using MasterDataFlow.Network.Packets;
 
-namespace MasterDataFlow.Intelligence.Tests
+namespace MasterDataFlow.Common.Tests
 {
-    public class RemoteEvironment
+    public class RemoteEnvironment : IDisposable
     {
         public class RemoteClientContextMock : IClientContext, IGateCallback
         {
@@ -57,29 +54,54 @@ namespace MasterDataFlow.Intelligence.Tests
             }
         }
 
+        private CommandWorkflow _commandWorkflow;
+        private ServerGate _serverGate;
 
-        public CommandWorkflow PrepeareSingleRemoteContainer()
+        public RemoteEnvironment()
+        {
+            PrepeareSingleRemoteContainer();
+        }
+
+        public CommandWorkflow CommandWorkflow
+        {
+            get { return _commandWorkflow; }
+        }
+
+        private void PrepeareSingleRemoteContainer()
         {
             var serverGateKey = new ServiceKey();
             var remoteClientContext = new RemoteClientContextMock(serverGateKey);
 
             var remoteCommandRunner = new CommandRunner();
-            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
-            serverGate.ConnectHub(remoteCommandRunner);
+            _serverGate = new ServerGate(serverGateKey, remoteClientContext);
+            _serverGate.ConnectHub(remoteCommandRunner);
 
             var remoteContainer = new SimpleContainer();
             remoteCommandRunner.ConnectHub(remoteContainer);
 
             var runner = new CommandRunner();
 
-            remoteClientContext.SetContract(serverGate);
+            remoteClientContext.SetContract(_serverGate);
             var clientGate = new ClientGate(remoteClientContext);
             runner.ConnectHub(clientGate);
 
-            var сommandWorkflow = new CommandWorkflow();
-            runner.ConnectHub(сommandWorkflow);
+            _commandWorkflow = new CommandWorkflow();
+            runner.ConnectHub(_commandWorkflow);
 
-            return сommandWorkflow;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _serverGate.Dispose();
+            }
         }
     }
 }
