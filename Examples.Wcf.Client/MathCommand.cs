@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
+using MasterDataFlow;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Messages;
 
-namespace MasterDataFlow.Wcf.Client
+namespace Examples.Wcf.Client
 {
     public class MathCommand : Command<MathCommand.MathCommandDataObject>
     {

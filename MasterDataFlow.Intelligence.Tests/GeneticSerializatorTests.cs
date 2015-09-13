@@ -21,7 +21,7 @@ namespace MasterDataFlow.Intelligence.Tests
             {
             }
 
-            protected override double CreateValue(double random)
+            public override double CreateValue(double random)
             {
                 return Math.Floor(random * 5);
             }

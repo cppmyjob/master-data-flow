@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MasterDataFlow.Common.Tests;
 
 namespace Examples.Intelligence.MultiGenetic
 {
@@ -9,6 +10,16 @@ namespace Examples.Intelligence.MultiGenetic
     {
         static void Main(string[] args)
         {
+            Console.SetWindowSize(200, 64);
+
+            using (var remote = new RemoteEnvironment())
+            {
+                var command = new MultiGeneticCommand();
+                command.Execute(remote.CommandWorkflow);
+            }
+            Console.WriteLine("Finished");
+            Console.ReadLine();
+
         }
     }
 }

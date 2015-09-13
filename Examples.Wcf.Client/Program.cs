@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
 using MasterDataFlow.Client;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
 
-namespace MasterDataFlow.Wcf.Client
+namespace Examples.Wcf.Client
 {
     class Program
     {
@@ -26,7 +23,7 @@ namespace MasterDataFlow.Wcf.Client
                 {
                     Console.WriteLine("Message recieved");
                     var stopMessage = (StopCommandMessage)message;
-                    var result = (MasterDataFlow.Wcf.Client.MathCommand.MathCommandResult)stopMessage.Data;
+                    var result = (MathCommand.MathCommandResult)stopMessage.Data;
                     Console.WriteLine("Result is {0}", result.Result);
                 };
 

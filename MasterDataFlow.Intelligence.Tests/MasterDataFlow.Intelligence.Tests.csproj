@@ -77,7 +77,6 @@
     <Compile Include="GeneticCellDataObjectTests.cs" />
     <Compile Include="GeneticSerializatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj">

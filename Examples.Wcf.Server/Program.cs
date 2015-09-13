@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading;
-using MasterDataFlow.Assemblies;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Server;
 using MasterDataFlow.Utils;
 
-namespace MasterDataFlow.Wcf.Server
+namespace Examples.Wcf.Server
 {
     class Program
     {

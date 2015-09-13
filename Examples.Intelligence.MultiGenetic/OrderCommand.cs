@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Messages;
 
-namespace MasterDataFlow.Common.Tests.Genetic
+namespace Examples.Intelligence.MultiGenetic
 {
     [Serializable]
     public class OrderGeneticItem : GeneticItem
@@ -28,13 +25,13 @@ namespace MasterDataFlow.Common.Tests.Genetic
 
     public class OrderCommand : GeneticCellCommand
     {
-        public static GeneticCellDataObject StaticDataObject;
 
         protected override BaseMessage BaseExecute()
         {
-            StaticDataObject = DataObject;
-            //Console.WriteLine("OrderCommand::BaseExecute");
-            return base.BaseExecute();
+            Console.WriteLine("Started Command Key={0}", Key);
+            var result = base.BaseExecute();
+            Console.WriteLine("Finished Command Key={0}", Key);
+            return result;
         }
 
         protected override GeneticItem CreateItem(GeneticInitData initData)
@@ -57,19 +54,38 @@ namespace MasterDataFlow.Common.Tests.Genetic
                     break;
             }
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < item.Values.Length; i++)
             {
-                for (int j = 0; j < item.Values.Length; j++)
+                if (i == item.Values[i])
                 {
-                    if (i == item.Values[j])
-                    {
-                        result += 1;
-                        break;
-                    }
+                    result += 1;
                 }
-
             }
             return result;
         }
+
+        //protected override GeneticItem CreateChild(GeneticItem firstParent, GeneticItem secondParent)
+        //{
+        //    GeneticItem child = InternalCreateItem();
+        //    double[] firstValues = firstParent.Values;
+        //    double[] secondValues = secondParent.Values;
+        //    double[] childValues = child.Values;
+
+        //    for (int i = 0; i < firstValues.Length; i++)
+        //    {
+        //        if (Random.NextDouble() > 0.8)
+        //        {
+        //            childValues[i] = child.CreateValue(Random.NextDouble());
+        //        }
+        //        else
+        //        {
+        //            if (i % 2 == 0)
+        //                childValues[i] = firstValues[i];
+        //            else
+        //                childValues[i] = secondValues[i];
+        //        }
+        //    }
+        //    return child;
+        //}
     }
 }

@@ -40,8 +40,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MultiGeneticCommand.cs" />
+    <Compile Include="OrderCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj">
+      <Project>{ad12d97e-6339-4d9e-9c44-c62055f952d5}</Project>
+      <Name>MasterDataFlow.Common.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
+      <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
+      <Name>MasterDataFlow.Intelligence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
+      <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
+      <Name>MasterDataFlow</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

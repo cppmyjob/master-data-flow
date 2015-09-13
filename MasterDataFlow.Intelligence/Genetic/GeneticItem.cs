@@ -13,7 +13,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         private readonly Guid _guid = Guid.NewGuid();
         private double[] _oldValues;
 
-        public GeneticItem(GeneticInitData initData)
+        protected GeneticItem(GeneticInitData initData)
         {
             _initData = initData;
             _values = new double[initData.Count];
@@ -52,7 +52,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             get { return _values; }
         }
 
-        protected internal abstract double CreateValue(double random);
+        public abstract double CreateValue(double random);
 
 		protected internal virtual void InitOtherValues(IRandom random) { }
 

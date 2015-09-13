@@ -39,6 +39,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     {
         public GeneticCellInitData CellInitData { get; set; }
         public int RepeatCount { get; set; }
+        public double[,] InitPopulation { get; set; }
     }
 
     [Serializable]
