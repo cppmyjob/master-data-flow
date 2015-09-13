@@ -41,6 +41,7 @@
     <Compile Include="Genetic\GeneticCellCommand.cs" />
     <Compile Include="Genetic\GeneticInitData.cs" />
     <Compile Include="Genetic\GeneticItem.cs" />
+    <Compile Include="Genetic\ManagerCommand.cs" />
     <Compile Include="Interfaces\IRandom.cs" />
     <Compile Include="Interfaces\IRandomFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

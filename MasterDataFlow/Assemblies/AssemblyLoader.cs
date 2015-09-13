@@ -14,6 +14,7 @@ namespace MasterDataFlow.Assemblies
 {
     // http://msdn.microsoft.com/en-us/library/dd153782(v=vs.110).aspx
     // http://www.codeproject.com/Articles/453778/Loading-Assemblies-from-Anywhere-into-a-New-AppDom
+    // TODO Thread Safe
     public class AssemblyLoader : IDisposable
     {
         private class InternalDomain

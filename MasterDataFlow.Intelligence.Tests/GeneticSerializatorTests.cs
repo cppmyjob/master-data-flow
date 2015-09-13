@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MasterDataFlow.Intelligence.Tests
 {
     [TestClass]
-    public class GeneticSerializatorTest
+    public class GeneticSerializatorTests
     {
         [Serializable]
         public class MockGeneticItem : GeneticItem

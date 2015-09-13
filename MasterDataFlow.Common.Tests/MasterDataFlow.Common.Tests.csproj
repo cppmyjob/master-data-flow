@@ -38,10 +38,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Genetic\OrderCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteEnvironment.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
+      <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
+      <Name>MasterDataFlow.Intelligence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
       <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
       <Name>MasterDataFlow</Name>
