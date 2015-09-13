@@ -26,7 +26,7 @@ namespace MasterDataFlow.Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            //_loader.Dispose();
+            _loader.Dispose();
         }
 
         [TestMethod]

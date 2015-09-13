@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using MasterDataFlow.Actions.UploadType;
+using MasterDataFlow.Common.Tests;
 using MasterDataFlow.EventLoop;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
@@ -22,53 +23,7 @@ namespace MasterDataFlow.Tests
     public class RemoteIntegrationTests
     {
         private EventWaitHandle _eventWaitHandle;
-
-        public class RemoteClientContextMock : IClientContext, IGateCallback
-        {
-            private IGateContract _gateContract;
-            private readonly BaseKey _serverGateKey;
-
-            public RemoteClientContextMock(BaseKey serverGateKey)
-            {
-                _serverGateKey = serverGateKey;
-            }
-
-
-            public IGateContract Contract
-            {
-                get { return _gateContract; } 
-            }
-
-            public BaseKey ServerGateKey
-            {
-                get { return _serverGateKey; }
-            }
-
-            public bool IsNeedSendKey
-            {
-                get { return true; }
-            }
-
-            public void Dispose()
-            {
-                
-            }
-
-            public void SetContract(IGateContract contract)
-            {
-                _gateContract = contract;
-            }
-
-            public event GateCallbackPacketRecievedHandler GateCallbackPacketRecieved;
-
-            public void Send(RemotePacket packet)
-            {
-                if (GateCallbackPacketRecieved != null)
-                {
-                    GateCallbackPacketRecieved(packet);
-                }
-            }
-        }
+        private RemoteEnvironment _remote; 
 
         public class ExecuteCommand : Command<CommandDataObjectStub>
         {
@@ -96,6 +51,7 @@ namespace MasterDataFlow.Tests
         [TestInitialize]
         public void TestInitialize()
         {
+            _remote = new RemoteEnvironment(); 
             Logger.SetFactory(new ConsoleLoggerOutputFactory());
             _eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, "AE2E34E2-A03D-4B53-930D-A15CA44BCF21");
         }
@@ -103,6 +59,7 @@ namespace MasterDataFlow.Tests
         [TestCleanup]
         public void TestCleanup()
         {
+            _remote.Dispose();
             Logger.StopLogging();
             _eventWaitHandle.Close();
         }
@@ -111,27 +68,9 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandIsExecutedTest()
         {
             // ARRANGE
-            var serverGateKey = new ServiceKey();
-            var remoteClientContext = new RemoteClientContextMock(serverGateKey);
-
-            var remoteCommandRunner = new CommandRunner();
-            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
-            serverGate.ConnectHub(remoteCommandRunner);
-            
-            var remoteContainer = new SimpleContainer();
-            remoteCommandRunner.ConnectHub(remoteContainer);
-
-            var runner = new CommandRunner();
-
-            remoteClientContext.SetContract(serverGate);
-            var clientGate = new ClientGate(remoteClientContext);
-            runner.ConnectHub(clientGate);
-
-            var сommandWorkflow = new CommandWorkflow();
-            runner.ConnectHub(сommandWorkflow);
 
             // ACT
-            сommandWorkflow.Start<ExecuteCommand>(null);
+            _remote.CommandWorkflow.Start<ExecuteCommand>(null);
 
             // ASSERT
             var result = _eventWaitHandle.WaitOne(2000);
@@ -143,28 +82,9 @@ namespace MasterDataFlow.Tests
         public void RemoteCommandStopEventReturnedTest()
         {
             // ARRANGE
-            var serverGateKey = new ServiceKey();
-            var remoteClientContext = new RemoteClientContextMock(serverGateKey);
-
-            var remoteCommandRunner = new CommandRunner();
-            var serverGate = new ServerGate(serverGateKey, remoteClientContext);
-            serverGate.ConnectHub(remoteCommandRunner);
-
-            var remoteContainer = new SimpleContainer();
-            remoteCommandRunner.ConnectHub(remoteContainer);
-
-            var runner = new CommandRunner();
-
-            remoteClientContext.SetContract(serverGate);
-            var clientGate = new ClientGate(remoteClientContext);
-            runner.ConnectHub(clientGate);
-
-            var сommandWorkflow = new CommandWorkflow();
-            runner.ConnectHub(сommandWorkflow);
-
             var callStopCommand = 0;
             BaseMessage callMessage = null;
-            сommandWorkflow.MessageRecieved += (key, message) =>
+            _remote.CommandWorkflow.MessageRecieved += (key, message) =>
             {
                 ++callStopCommand;
                 callMessage = message;
@@ -177,7 +97,7 @@ namespace MasterDataFlow.Tests
 
             // ACT
             var newId = Guid.NewGuid();
-            var commandKey = сommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
+            var commandKey = _remote.CommandWorkflow.Start<PassingCommand>(new PassingCommandDataObject(newId));
 
             // ASSERT
             _eventWaitHandle.WaitOne(2000);

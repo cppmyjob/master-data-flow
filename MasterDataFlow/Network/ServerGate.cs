@@ -13,19 +13,22 @@ using MasterDataFlow.Serialization;
 
 namespace MasterDataFlow.Network
 {
-    public class ServerGate : Gate, IGateContract
+    public class ServerGate : Gate, IGateContract, IDisposable
     {
-        private IGateCallback _callback;
+        private readonly IGateCallback _callback;
+        private readonly ServerGateHandler _serverGateHandler;
 
         internal ServerGate()
         {
-            RegisterHandler(new ServerGateHandler());
+            _serverGateHandler = new ServerGateHandler();
+            RegisterHandler(_serverGateHandler);
         }
 
         public ServerGate(ServiceKey key, IGateCallback callback) : base(key)
         {
             _callback = callback;
-            RegisterHandler(new ServerGateHandler());
+            _serverGateHandler = new ServerGateHandler();
+            RegisterHandler(_serverGateHandler);
         }
 
         public BaseKey ClientGateKey { get; internal set; }
@@ -63,5 +66,18 @@ namespace MasterDataFlow.Network
             }
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _serverGateHandler.Dispose();
+            }
+        }
     }
 }

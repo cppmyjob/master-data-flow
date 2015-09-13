@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MasterDataFlow.Common.Tests;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
@@ -14,9 +15,10 @@ namespace MasterDataFlow.Intelligence.Tests
     [TestClass]
     public class GeneticCellCommandTests
     {
-        private static ManualResetEvent _event;
+        private ManualResetEvent _event;
         private static GeneticCellDataObject _dataObject;
-        private static StopCommandMessage _stopMessage;
+        private StopCommandMessage _stopMessage;
+        private RemoteEnvironment _remote; 
 
         [Serializable]
         public class MockGeneticItem : GeneticItem
@@ -80,15 +82,18 @@ namespace MasterDataFlow.Intelligence.Tests
                 return result;
             }
         }
+
         [TestInitialize]
         public void TestInitialize()
         {
+            _remote = new RemoteEnvironment(); 
             _event = new ManualResetEvent(false);
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
+            _remote.Dispose();
             _dataObject = null;
             _event.Close();
         }
@@ -124,25 +129,22 @@ namespace MasterDataFlow.Intelligence.Tests
             // ASSERT
             _event.WaitOne(5000);
             Assert.IsNotNull(_dataObject);
-            //Assert.AreEqual(100, _dataObject.CellInitData.ItemsCount);
-            //Assert.AreEqual(30, _dataObject.CellInitData.SurviveCount);
-            //Assert.AreEqual(10, _dataObject.CellInitData.ValuesCount);
+            Assert.AreEqual(1000, _dataObject.CellInitData.ItemsCount);
+            Assert.AreEqual(300, _dataObject.CellInitData.SurviveCount);
+            Assert.AreEqual(5, _dataObject.CellInitData.ValuesCount);
 
             Assert.IsNotNull(_stopMessage);
             Assert.AreEqual(10, ((GeneticItem)(_stopMessage.Data as GeneticStopDataObject).Best).Fitness);
 
         }
 
-
         [TestMethod]
         public void GeneticCellInitDataPassingTest()
         {
             // ARRANGE
-            var remote = new RemoteEvironment();
-            var сommandWorkflow = remote.PrepeareSingleRemoteContainer();
 
             // ACT
-            сommandWorkflow.MessageRecieved += (key, message) =>
+            _remote.CommandWorkflow.MessageRecieved += (key, message) =>
             {
                 _stopMessage = message as StopCommandMessage;
                 if (_stopMessage != null)
@@ -157,7 +159,7 @@ namespace MasterDataFlow.Intelligence.Tests
             };
 
             // ASSERT
-            сommandWorkflow.Start<GeneticCellCommandMock>(dataObject);
+            _remote.CommandWorkflow.Start<GeneticCellCommandMock>(dataObject);
 
             // ASSERT
             _event.WaitOne(5000);

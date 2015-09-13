@@ -75,9 +75,12 @@
     <Compile Include="GeneticCellDataObjectTests.cs" />
     <Compile Include="GeneticSerializatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RemoteEvironment.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj">
+      <Project>{AD12D97E-6339-4D9E-9C44-C62055F952D5}</Project>
+      <Name>MasterDataFlow.Common.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
       <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
       <Name>MasterDataFlow.Intelligence</Name>

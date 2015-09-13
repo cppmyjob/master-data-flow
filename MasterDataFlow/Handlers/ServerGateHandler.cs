@@ -19,7 +19,7 @@ using MasterDataFlow.Utils;
 namespace MasterDataFlow.Handlers
 {
     // http://stackoverflow.com/questions/658498/how-to-load-assembly-to-appdomain-with-all-references-recursively
-    public class ServerGateHandler : BaseHandler
+    public class ServerGateHandler : BaseHandler, IDisposable
     {
         private readonly AsyncDictionary<BaseKey, CommandRunner> _commandRunnerHubs = new AsyncDictionary<BaseKey, CommandRunner>();
 
@@ -164,5 +164,19 @@ namespace MasterDataFlow.Handlers
             return _assemblyLoader.IsTypeExists(workflowKey, typeName);
         }
 
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _assemblyLoader.Dispose();
+            }
+        }
     }
 }

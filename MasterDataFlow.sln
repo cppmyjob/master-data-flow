@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow", "MasterDataFlow\MasterDataFlow.csproj", "{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence.Tests", "MasterDataFlow.Intelligence.Tests\MasterDataFlow.Intelligence.Tests.csproj", "{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.NuGet.Packager", "MasterDataFlow.NuGet.Packager\MasterDataFlow.NuGet.Packager.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Common.Tests", "MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj", "{AD12D97E-6339-4D9E-9C44-C62055F952D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,5 +109,6 @@ Global
 		{811FE8BE-F8BD-435D-8CEF-C97FEAA44B50} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 		{CE8E34E9-8067-4321-86A6-6180A9DBF236} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
+		{AD12D97E-6339-4D9E-9C44-C62055F952D5} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 	EndGlobalSection
 EndGlobal
