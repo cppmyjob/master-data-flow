@@ -23,7 +23,7 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
 
-    public class OrderCommand : GeneticCellCommand
+    public class OrderCommand : GeneticCellCommand<GeneticCellDataObject>
     {
 
         protected override BaseMessage BaseExecute()

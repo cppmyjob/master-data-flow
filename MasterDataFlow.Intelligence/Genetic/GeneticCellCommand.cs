@@ -58,7 +58,8 @@ namespace MasterDataFlow.Intelligence.Genetic
         }
     }
 
-    public abstract class GeneticCellCommand : Command<GeneticCellDataObject>
+    public abstract class GeneticCellCommand<TGeneticCellDataObject> : Command<TGeneticCellDataObject> 
+        where TGeneticCellDataObject : GeneticCellDataObject
     {
         protected GeneticItem[] _itemsArray;
         private int _currentYear = 1;
@@ -108,7 +109,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         public abstract double CalculateFitness(GeneticItem item, int processor);
 
-        protected void FillValues(GeneticItem item)
+        protected virtual void FillValues(GeneticItem item)
         {
             double[] values = item.Values;
             for (int j = 0; j < DataObject.CellInitData.ValuesCount; j++)

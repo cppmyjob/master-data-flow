@@ -12,16 +12,71 @@ namespace Examples.Intelligence.MultiGenetic
 {
     public class MultiGeneticCommand
     {
+        //public void Execute(CommandWorkflow commandWorkflow)
+        //{
+        //    using (var @event = new ManualResetEvent(false))
+        //    {
+        //        var initData = new GeneticCellInitData(1000, 300, 50);
+        //        var dataObject = new OrderDataObject
+        //                         {
+        //                             CellInitData = initData,
+        //                             RepeatCount = 500
+        //                         };
+        //        var instancesCount = 4;
+
+        //        List<GeneticItem> theBests = new List<GeneticItem>();
+        //        var completedInstances = 0;
+        //        commandWorkflow.MessageRecieved += (key, message) =>
+        //                                           {
+        //                                               Console.WriteLine("Response from {0}", key);
+        //                                               var stopMessage = message as StopCommandMessage;
+        //                                               if (stopMessage != null)
+        //                                               {
+        //                                                   var best = (GeneticItem) (stopMessage.Data as GeneticStopDataObject).Best;
+        //                                                   lock (this)
+        //                                                   {
+        //                                                       theBests.Add(best);
+        //                                                       ++completedInstances;
+        //                                                       if (completedInstances == instancesCount)
+        //                                                       {
+        //                                                           @event.Set();
+        //                                                       }
+        //                                                   }
+        //                                               }
+        //                                           };
+
+        //        for (int i = 0; i < instancesCount; i++)
+        //        {
+        //            commandWorkflow.Start<OrderCommand>(dataObject);
+        //        }
+        //        @event.WaitOne(1000000);
+        //        Console.WriteLine("The bests");
+        //        foreach (var theBestItem in theBests)
+        //        {
+        //            PrintTheBest(theBestItem);
+        //        }
+
+        //    }
+
+        //}
+
+
         public void Execute(CommandWorkflow commandWorkflow)
         {
             using (var @event = new ManualResetEvent(false))
             {
-                var initData = new GeneticCellInitData(1000, 300, 50);
-                var dataObject = new OrderDataObject
-                                 {
-                                     CellInitData = initData,
-                                     RepeatCount = 500
-                                 };
+                var initData = new GeneticCellInitData(1000, 300, 10);
+                var dataObject = new TravelingSalesmanProblemInitData
+                {
+                    CellInitData = initData,
+                    RepeatCount = 100000,
+                    Points = new [] { new TravalingPoint(1, 1), new TravalingPoint(10, 1),
+                                      new TravalingPoint(44, 11), new TravalingPoint(4, 4),
+                                      new TravalingPoint(8, 8), new TravalingPoint(6, 6),
+                                      new TravalingPoint(98, 1), new TravalingPoint(32, 33),
+                                      new TravalingPoint(39, 39), new TravalingPoint(45, 02),
+                                    }
+                };
                 var instancesCount = 4;
 
                 List<GeneticItem> theBests = new List<GeneticItem>();
@@ -32,7 +87,7 @@ namespace Examples.Intelligence.MultiGenetic
                                                        var stopMessage = message as StopCommandMessage;
                                                        if (stopMessage != null)
                                                        {
-                                                           var best = (GeneticItem) (stopMessage.Data as GeneticStopDataObject).Best;
+                                                           var best = (GeneticItem)(stopMessage.Data as GeneticStopDataObject).Best;
                                                            lock (this)
                                                            {
                                                                theBests.Add(best);
@@ -47,7 +102,7 @@ namespace Examples.Intelligence.MultiGenetic
 
                 for (int i = 0; i < instancesCount; i++)
                 {
-                    commandWorkflow.Start<OrderCommand>(dataObject);
+                    commandWorkflow.Start<TravelingSalesmanProblemCommand>(dataObject);
                 }
                 @event.WaitOne(1000000);
                 Console.WriteLine("The bests");

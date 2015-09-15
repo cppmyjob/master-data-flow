@@ -26,7 +26,7 @@ namespace MasterDataFlow.Common.Tests.Genetic
     }
 
 
-    public class OrderCommand : GeneticCellCommand
+    public class OrderCommand : GeneticCellCommand<GeneticCellDataObject>
     {
         public static GeneticCellDataObject StaticDataObject;
 

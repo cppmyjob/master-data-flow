@@ -97,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj">
-      <Project>{AD12D97E-6339-4D9E-9C44-C62055F952D5}</Project>
+      <Project>{ad12d97e-6339-4d9e-9c44-c62055f952d5}</Project>
       <Name>MasterDataFlow.Common.Tests</Name>
     </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
