@@ -6,7 +6,7 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticInitData
+    public class GeneticItemInitData
     {
         private int _count;
         private int _yearOfBorn;

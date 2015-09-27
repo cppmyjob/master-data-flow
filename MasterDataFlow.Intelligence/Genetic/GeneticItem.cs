@@ -5,18 +5,18 @@ using MasterDataFlow.Intelligence.Interfaces;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public abstract class GeneticItem
+    public abstract class GeneticItem<TValue>
     {
-        protected double[] _values;
+        protected TValue[] _values;
         private double _fitness;
-        private GeneticInitData _initData;
+        private GeneticItemInitData _initData;
         private readonly Guid _guid = Guid.NewGuid();
-        private double[] _oldValues;
+        private TValue[] _oldValues;
 
-        protected GeneticItem(GeneticInitData initData)
+        protected GeneticItem(GeneticItemInitData initData)
         {
             _initData = initData;
-            _values = new double[initData.Count];
+            _values = new TValue[initData.Count];
         }
 
         public Guid Guid
@@ -24,7 +24,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             get { return _guid; }
         } 
 
-        public GeneticInitData InitData
+        public GeneticItemInitData InitData
         {
             get { return _initData; }
         }
@@ -47,19 +47,19 @@ namespace MasterDataFlow.Intelligence.Genetic
         }
 
 
-        public double[] Values
+        public TValue[] Values
         {
             get { return _values; }
         }
 
-        public abstract double CreateValue(double random);
+        public abstract TValue CreateValue(double random);
 
 		protected internal virtual void InitOtherValues(IRandom random) { }
 
         protected internal virtual void SaveValues()
         {
             if (_oldValues == null)
-                _oldValues = new double[_values.Length];
+                _oldValues = new TValue[_values.Length];
             Array.Copy(_values, _oldValues, _oldValues.Length);
         }
 
@@ -69,37 +69,37 @@ namespace MasterDataFlow.Intelligence.Genetic
             _oldValues = null;
         }
 
-        public virtual void Write(XElement root)
-        {
-            XElement best = new XElement("Item");
-            root.Add(best);
+        //public virtual void Write(XElement root)
+        //{
+        //    XElement best = new XElement("Item");
+        //    root.Add(best);
 
-            best.Add(new XElement("Fitness", Fitness.ToString()));
+        //    best.Add(new XElement("Fitness", Fitness.ToString()));
 
-            XElement values = new XElement("Values");
-            best.Add(values);
-            foreach (double value in Values)
-            {
-                values.Add(new XElement("Value", value.ToString()));
-            }
-        }
+        //    XElement values = new XElement("Values");
+        //    best.Add(values);
+        //    foreach (TValue value in Values)
+        //    {
+        //        values.Add(new XElement("Value", value.ToString()));
+        //    }
+        //}
 
 
-        public virtual void Read(XElement root)
-        {
-            XElement eBest = root.Element("Item");
+        //public virtual void Read(XElement root)
+        //{
+        //    XElement eBest = root.Element("Item");
 
-            XElement eFitness = eBest.Element("Fitness");
-            Fitness = Double.Parse(eFitness.Value);
+        //    XElement eFitness = eBest.Element("Fitness");
+        //    Fitness = Double.Parse(eFitness.Value);
 
-            XElement eValues = eBest.Element("Values");
-            int i = 0;
-            foreach (XElement eValue in eValues.Elements("Value"))
-            {
-                Values[i] = Double.Parse(eValue.Value);
-                ++i;
-            }
-        }
+        //    XElement eValues = eBest.Element("Values");
+        //    int i = 0;
+        //    foreach (XElement eValue in eValues.Elements("Value"))
+        //    {
+        //        Values[i] = Double.Parse(eValue.Value);
+        //        ++i;
+        //    }
+        //}
 
     }
 

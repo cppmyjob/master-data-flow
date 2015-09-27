@@ -54,7 +54,7 @@ namespace MasterDataFlow.Intelligence.Tests
                     _event.Set();
             };
 
-            var initData = new GeneticCellInitData(1000, 300, 5);
+            var initData = new GeneticInitData(1000, 300, 5);
             var dataObject = new OrderDataObject
             {
                 CellInitData = initData,
@@ -70,7 +70,7 @@ namespace MasterDataFlow.Intelligence.Tests
             Assert.AreEqual(5, OrderCommand.StaticDataObject.CellInitData.ValuesCount);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
 
         }
 
@@ -88,7 +88,7 @@ namespace MasterDataFlow.Intelligence.Tests
                     _event.Set();
             };
 
-            var initData = new GeneticCellInitData(1000, 300, 5);
+            var initData = new GeneticInitData(1000, 300, 5);
             var dataObject = new OrderDataObject
             {
                 CellInitData = initData,
@@ -102,7 +102,7 @@ namespace MasterDataFlow.Intelligence.Tests
             _event.WaitOne(5000);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
 
 
         }

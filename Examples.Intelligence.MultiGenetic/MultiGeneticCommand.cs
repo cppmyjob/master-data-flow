@@ -68,7 +68,7 @@ namespace Examples.Intelligence.MultiGenetic
                 var dataObject = CreateTravelingSalesmanProblemInitData();
                 var instancesCount = 20;
 
-                List<GeneticItem> theBests = new List<GeneticItem>();
+                var theBests = new List<GeneticItem<int>>();
                 var completedInstances = 0;
                 commandWorkflow.MessageRecieved += (key, message) =>
                                                    {
@@ -76,7 +76,7 @@ namespace Examples.Intelligence.MultiGenetic
                                                        var stopMessage = message as StopCommandMessage;
                                                        if (stopMessage != null)
                                                        {
-                                                           var best = (GeneticItem)(stopMessage.Data as GeneticStopDataObject).Best;
+                                                           var best = (GeneticIntItem)(stopMessage.Data as GeneticStopDataObject).Best;
                                                            lock (this)
                                                            {
                                                                theBests.Add(best);
@@ -103,7 +103,7 @@ namespace Examples.Intelligence.MultiGenetic
 
                 dataObject = CreateTravelingSalesmanProblemInitData();
                 //dataObject.RepeatCount = 200;
-                dataObject.InitPopulation = new List<double[]>();
+                dataObject.InitPopulation = new List<int[]>();
                 for (int i = 0; i < theBests.Count; i++)
                 {
                     dataObject.InitPopulation.Add(theBests[i].Values);
@@ -125,7 +125,7 @@ namespace Examples.Intelligence.MultiGenetic
 
         private static TravelingSalesmanProblemInitData CreateTravelingSalesmanProblemInitData()
         {
-            var initData = new GeneticCellInitData(1000, 380, 10);
+            var initData = new GeneticInitData(1000, 380, 10);
             var dataObject = new TravelingSalesmanProblemInitData
                              {
                                  CellInitData = initData,
@@ -142,7 +142,7 @@ namespace Examples.Intelligence.MultiGenetic
             return dataObject;
         }
 
-        private void PrintTheBest(GeneticItem theBestItem)
+        private void PrintTheBest(GeneticItem<int> theBestItem)
         {
             var values = theBestItem.Values.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray();
             var result = string.Join(",", values);

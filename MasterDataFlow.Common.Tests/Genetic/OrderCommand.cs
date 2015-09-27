@@ -8,9 +8,9 @@ using MasterDataFlow.Messages;
 namespace MasterDataFlow.Common.Tests.Genetic
 {
     [Serializable]
-    public class OrderGeneticItem : GeneticItem
+    public class OrderGeneticItem : GeneticDoubleItem
     {
-        public OrderGeneticItem(GeneticInitData initData) : base(initData)
+        public OrderGeneticItem(GeneticItemInitData initData) : base(initData)
         {
         }
 
@@ -21,14 +21,13 @@ namespace MasterDataFlow.Common.Tests.Genetic
     }
 
     [Serializable]
-    public class OrderDataObject : GeneticCellDataObject
+    public class OrderDataObject : GeneticDoubleDataObject
     {
     }
 
-
-    public class OrderCommand : GeneticCellCommand<GeneticCellDataObject>
+    public class OrderCommand : GeneticDoubleCommand<OrderDataObject>
     {
-        public static GeneticCellDataObject StaticDataObject;
+        public static GeneticDataObject<double> StaticDataObject;
 
         protected override BaseMessage BaseExecute()
         {
@@ -37,12 +36,12 @@ namespace MasterDataFlow.Common.Tests.Genetic
             return base.BaseExecute();
         }
 
-        protected override GeneticItem CreateItem(GeneticInitData initData)
+        protected override GeneticDoubleItem CreateItem(GeneticItemInitData initData)
         {
             return new OrderGeneticItem(initData);
         }
 
-        public override double CalculateFitness(GeneticItem item, int processor)
+        public override double CalculateFitness(GeneticDoubleItem item, int processor)
         {
             var result = 1;
             var lastValue = item.Values[0];

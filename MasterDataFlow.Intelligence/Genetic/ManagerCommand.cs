@@ -6,7 +6,7 @@ using MasterDataFlow.Messages;
 
 namespace MasterDataFlow.Intelligence.Genetic
 {
-    public class ManagerCommand : Command<GeneticCellDataObject>
+    public class ManagerCommand : Command<GeneticDataObject<double>>
     {
         public override BaseMessage Execute()
         {

@@ -15,9 +15,9 @@ namespace MasterDataFlow.Intelligence.Tests
     public class GeneticSerializatorTests
     {
         [Serializable]
-        public class MockGeneticItem : GeneticItem
+        public class MockGeneticItem : GeneticItem<double>
         {
-            public MockGeneticItem(GeneticInitData initData) : base(initData)
+            public MockGeneticItem(GeneticItemInitData initData) : base(initData)
             {
             }
 
@@ -33,7 +33,7 @@ namespace MasterDataFlow.Intelligence.Tests
             // ARRANGE
             var key = new CommandKey();
 
-            var initData = new GeneticInitData
+            var initData = new GeneticItemInitData
             {
                 Count = 10,
                 YearOfBorn = 3

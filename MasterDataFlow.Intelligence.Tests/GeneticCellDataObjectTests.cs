@@ -14,8 +14,8 @@ namespace MasterDataFlow.Intelligence.Tests
         public void SerializationTest()
         {
             // ASSERT
-            var initData = new GeneticCellInitData(100, 30, 50);
-            var value = new GeneticCellDataObject
+            var initData = new GeneticInitData(100, 30, 50);
+            var value = new GeneticDataObject<double>
             {
                 CellInitData = initData
             };
@@ -23,7 +23,7 @@ namespace MasterDataFlow.Intelligence.Tests
 
             // ACT
             var serializatedValue = Serialization.Serializator.Serialize(value);
-            var newValue = (GeneticCellDataObject)Serialization.Serializator.Deserialize(typeof (GeneticCellDataObject), serializatedValue);
+            var newValue = (GeneticDataObject<double>)Serialization.Serializator.Deserialize(typeof(GeneticDataObject<double>), serializatedValue);
 
             // ARRANGE
             Assert.IsNotNull(newValue.CellInitData);

@@ -38,8 +38,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Genetic\GeneticCellCommand.cs" />
-    <Compile Include="Genetic\GeneticInitData.cs" />
+    <Compile Include="Genetic\GeneticCommand.cs" />
+    <Compile Include="Genetic\GeneticDoubleCommand.cs" />
+    <Compile Include="Genetic\GeneticIntCommand.cs" />
+    <Compile Include="Genetic\GeneticItemInitData.cs" />
     <Compile Include="Genetic\GeneticItem.cs" />
     <Compile Include="Genetic\ManagerCommand.cs" />
     <Compile Include="Interfaces\IRandom.cs" />
@@ -53,7 +55,9 @@
       <Name>MasterDataFlow</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Neuron\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

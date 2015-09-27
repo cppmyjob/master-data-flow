@@ -9,15 +9,15 @@ namespace Examples.Intelligence.MultiGenetic
 {
 
     [Serializable]
-    public class TravelingSalesmanProblemGeneticItem : GeneticItem
+    public class TravelingSalesmanProblemGeneticItem : GeneticIntItem
     {
-        public TravelingSalesmanProblemGeneticItem(GeneticInitData initData) : base(initData)
+        public TravelingSalesmanProblemGeneticItem(GeneticItemInitData initData) : base(initData)
         {
         }
 
-        public override double CreateValue(double random)
+        public override int CreateValue(double random)
         {
-            return Math.Floor(random * InitData.Count);
+            return (int)(random * InitData.Count);
         }
     }
 
@@ -34,12 +34,12 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class TravelingSalesmanProblemInitData : GeneticCellDataObject
+    public class TravelingSalesmanProblemInitData : GeneticIntDataObject
     {
         public TravalingPoint[] Points { get; set; }
     }
 
-    public class TravelingSalesmanProblemCommand : GeneticCellCommand<TravelingSalesmanProblemInitData>
+    public class TravelingSalesmanProblemCommand : GeneticIntCommand<TravelingSalesmanProblemInitData>
     {
 
         protected override BaseMessage BaseExecute()
@@ -50,12 +50,12 @@ namespace Examples.Intelligence.MultiGenetic
             return result;
         }
 
-        protected override GeneticItem CreateItem(GeneticInitData initData)
+        protected override GeneticIntItem CreateItem(GeneticItemInitData initData)
         {
             return new TravelingSalesmanProblemGeneticItem(initData);
         }
 
-        public override double CalculateFitness(GeneticItem item, int processor)
+        public override double CalculateFitness(GeneticIntItem item, int processor)
         {
             var fitness = 0.0;
             bool[] oldValues = new bool[item.Values.Length];
@@ -80,13 +80,13 @@ namespace Examples.Intelligence.MultiGenetic
                 return 1 / fitness;
         }
 
-        protected override void Mutation(GeneticItem item)
+        protected override void Mutation(GeneticIntItem item)
         {
             for (int i = 0; i < item.Values.Length; i++)
             {
                 if (Random.NextDouble() > 0.9)
                 {
-                    double newValue = item.CreateValue(Random.NextDouble());
+                    var newValue = item.CreateValue(Random.NextDouble());
                     var oldValue = item.Values[i];
                     item.Values[i] = newValue;
                     for (int j = 0; j < item.Values.Length; j++)
@@ -102,9 +102,9 @@ namespace Examples.Intelligence.MultiGenetic
         }
 
 
-        protected override GeneticItem CreateChild(GeneticItem firstParent, GeneticItem secondParent)
+        protected override GeneticIntItem CreateChild(GeneticIntItem firstParent, GeneticIntItem secondParent)
         {
-            GeneticItem child = InternalCreateItem();
+            var child = InternalCreateItem();
             for (int i = 0; i < secondParent.Values.Length; i++)
             {
                 child.Values[i] = secondParent.Values[i];
@@ -137,9 +137,9 @@ namespace Examples.Intelligence.MultiGenetic
         //    return child;
         //}
 
-        protected override void FillValues(GeneticItem item)
+        protected override void FillValues(GeneticIntItem item)
         {
-            double[] values = item.Values;
+            var values = item.Values;
             for (int i = 0; i < item.Values.Length; i++)
             {
                 values[i] = i;
