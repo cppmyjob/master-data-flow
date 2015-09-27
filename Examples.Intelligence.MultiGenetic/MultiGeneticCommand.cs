@@ -65,19 +65,8 @@ namespace Examples.Intelligence.MultiGenetic
         {
             using (var @event = new ManualResetEvent(false))
             {
-                var initData = new GeneticCellInitData(1000, 300, 10);
-                var dataObject = new TravelingSalesmanProblemInitData
-                {
-                    CellInitData = initData,
-                    RepeatCount = 100000,
-                    Points = new [] { new TravalingPoint(1, 1), new TravalingPoint(10, 1),
-                                      new TravalingPoint(44, 11), new TravalingPoint(4, 4),
-                                      new TravalingPoint(8, 8), new TravalingPoint(6, 6),
-                                      new TravalingPoint(98, 1), new TravalingPoint(32, 33),
-                                      new TravalingPoint(39, 39), new TravalingPoint(45, 02),
-                                    }
-                };
-                var instancesCount = 4;
+                var dataObject = CreateTravelingSalesmanProblemInitData();
+                var instancesCount = 20;
 
                 List<GeneticItem> theBests = new List<GeneticItem>();
                 var completedInstances = 0;
@@ -110,9 +99,47 @@ namespace Examples.Intelligence.MultiGenetic
                 {
                     PrintTheBest(theBestItem);
                 }
+                Console.WriteLine("The best fitness is {0}", theBests.Max(t => t.Fitness));
 
+                dataObject = CreateTravelingSalesmanProblemInitData();
+                //dataObject.RepeatCount = 200;
+                dataObject.InitPopulation = new List<double[]>();
+                for (int i = 0; i < theBests.Count; i++)
+                {
+                    dataObject.InitPopulation.Add(theBests[i].Values);
+                }
+                @event.Reset();
+                theBests.Clear();
+                instancesCount = 1;
+                completedInstances = 0;
+                commandWorkflow.Start<TravelingSalesmanProblemCommand>(dataObject);
+                @event.WaitOne(1000000);
+                Console.WriteLine("The bests");
+                foreach (var theBestItem in theBests)
+                {
+                    PrintTheBest(theBestItem);
+                }
             }
 
+        }
+
+        private static TravelingSalesmanProblemInitData CreateTravelingSalesmanProblemInitData()
+        {
+            var initData = new GeneticCellInitData(1000, 380, 10);
+            var dataObject = new TravelingSalesmanProblemInitData
+                             {
+                                 CellInitData = initData,
+                                 RepeatCount = 100,
+                                 Points = new[]
+                                          {
+                                              new TravalingPoint(1, 1), new TravalingPoint(10, 1),
+                                              new TravalingPoint(44, 11), new TravalingPoint(4, 4),
+                                              new TravalingPoint(8, 8), new TravalingPoint(6, 6),
+                                              new TravalingPoint(98, 1), new TravalingPoint(32, 33),
+                                              new TravalingPoint(39, 39), new TravalingPoint(45, 02),
+                                          }
+                             };
+            return dataObject;
         }
 
         private void PrintTheBest(GeneticItem theBestItem)

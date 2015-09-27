@@ -80,6 +80,39 @@ namespace Examples.Intelligence.MultiGenetic
                 return 1 / fitness;
         }
 
+        protected override void Mutation(GeneticItem item)
+        {
+            for (int i = 0; i < item.Values.Length; i++)
+            {
+                if (Random.NextDouble() > 0.9)
+                {
+                    double newValue = item.CreateValue(Random.NextDouble());
+                    var oldValue = item.Values[i];
+                    item.Values[i] = newValue;
+                    for (int j = 0; j < item.Values.Length; j++)
+                    {
+                        if (j != i && item.Values[j] == newValue)
+                        {
+                            item.Values[j] = oldValue;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        protected override GeneticItem CreateChild(GeneticItem firstParent, GeneticItem secondParent)
+        {
+            GeneticItem child = InternalCreateItem();
+            for (int i = 0; i < secondParent.Values.Length; i++)
+            {
+                child.Values[i] = secondParent.Values[i];
+            }
+            return child;
+        }
+
+
         //protected override GeneticItem CreateChild(GeneticItem firstParent, GeneticItem secondParent)
         //{
         //    GeneticItem child = InternalCreateItem();

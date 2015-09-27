@@ -39,7 +39,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     {
         public GeneticCellInitData CellInitData { get; set; }
         public int RepeatCount { get; set; }
-        public double[,] InitPopulation { get; set; }
+        public IList<double[]> InitPopulation { get; set; }
     }
 
     [Serializable]
@@ -69,7 +69,15 @@ namespace MasterDataFlow.Intelligence.Genetic
         public override BaseMessage Execute()
         {
             Init();
-            CreatingPopulation(0);
+            if (DataObject.InitPopulation == null)
+            {
+                CreatingPopulation(0);
+            }
+            else
+            {
+                InitPopulation();
+                CreatingPopulation(DataObject.InitPopulation.Count);
+            }
             for (int i = 0; i < DataObject.RepeatCount; i++)
             {
                 Process();
@@ -79,6 +87,16 @@ namespace MasterDataFlow.Intelligence.Genetic
                 Best = _itemsArray[0]
             };
             return Stop(result);
+        }
+
+        private void InitPopulation()
+        {
+            for (int i = 0; i < DataObject.InitPopulation.Count; i++)
+            {
+                var item = InternalCreateItem();
+                Array.Copy(DataObject.InitPopulation[i], item.Values, DataObject.InitPopulation[i].Length);
+                _itemsArray[i] = item;
+            }
         }
 
         private void Init()
@@ -182,6 +200,19 @@ namespace MasterDataFlow.Intelligence.Genetic
                     continue;
                 GeneticItem child = CreateChild(firstParent, secondParent);
                 _itemsArray[i + DataObject.CellInitData.SurviveCount] = child;
+                Mutation(child);
+            }
+        }
+
+        protected virtual void Mutation(GeneticItem item)
+        {
+            for (int i = 0; i < item.Values.Length; i++)
+            {
+                if (Random.NextDouble() > 0.999)
+                {
+                    double valueValue = item.CreateValue(Random.NextDouble());
+                    item.Values[i] = valueValue;
+                }
             }
         }
 

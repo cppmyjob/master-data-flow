@@ -16,7 +16,7 @@ namespace MasterDataFlow.Intelligence
         {
             byte[] b = new byte[4];
             _random.GetBytes(b);
-            return (double) BitConverter.ToUInt32(b, 0)/UInt32.MaxValue;
+            return (double)BitConverter.ToUInt32(b, 0) / UInt32.MaxValue;
         }
 
         public int Next(int maxValue)
@@ -24,4 +24,19 @@ namespace MasterDataFlow.Intelligence
             return (int)(Math.Round(NextDouble() * (maxValue - 1)));
         }
     }
+
+    //public class Random : IRandom
+    //{
+    //    private System.Random _random = new System.Random();
+
+    //    public double NextDouble()
+    //    {
+    //        return _random.NextDouble();
+    //    }
+
+    //    public int Next(int maxValue)
+    //    {
+    //        return _random.Next(maxValue);
+    //    }
+    //}
 }
