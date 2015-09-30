@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using MasterDataFlow.Intelligence.Interfaces;
 
-namespace MasterDataFlow.Intelligence
+namespace MasterDataFlow.Intelligence.Random
 {
-
     public class Random : IRandom
     {
-        private RNGCryptoServiceProvider _random = new RNGCryptoServiceProvider();
+        private readonly RNGCryptoServiceProvider _random = new RNGCryptoServiceProvider();
 
         public double NextDouble()
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Intelligence.Interfaces;
+using MasterDataFlow.Intelligence.Random;
 using MasterDataFlow.Interfaces;
 using MasterDataFlow.Messages;
 
@@ -48,24 +49,14 @@ namespace MasterDataFlow.Intelligence.Genetic
         public object Best { get; set; }
     }
 
-    public class GeneticRandomFactory : IRandomFactory
-    {
-        public static IRandomFactory Instance = new GeneticRandomFactory();
-
-        public IRandom Create()
-        {
-            return new Random();
-        }
-    }
-
     public abstract class GeneticCommand<TGeneticCellDataObject, TGeneticItem, TValue> : Command<TGeneticCellDataObject> 
         where TGeneticCellDataObject : GeneticDataObject<TValue>
         where TGeneticItem : GeneticItem<TValue>
     {
-        protected TGeneticItem[] _itemsArray;
+        private TGeneticItem[] _itemsArray;
         private int _currentYear = 1;
         //protected Random _random = new Random((int)DateTime.Now.Ticks);
-        protected IRandom Random = GeneticRandomFactory.Instance.Create();
+        protected IRandom Random = RandomFactory.Instance.Create();
 
         public override BaseMessage Execute()
         {
@@ -141,7 +132,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private double Process()
         {
-            Random = GeneticRandomFactory.Instance.Create();
+            Random = RandomFactory.Instance.Create();
             Reproduction();
             Selection();
             ++_currentYear;
