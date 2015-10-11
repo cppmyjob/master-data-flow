@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MasterDataFlow.Intelligence.Genetic;
+﻿using MasterDataFlow.Intelligence.Genetic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MasterDataFlow.Intelligence.Tests
+namespace MasterDataFlow.Intelligence.Tests.Genetic
 {
     [TestClass]
     public class GeneticCellDataObjectTests

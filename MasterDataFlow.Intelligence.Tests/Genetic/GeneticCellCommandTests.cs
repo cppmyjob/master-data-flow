@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using MasterDataFlow.Common.Tests;
 using MasterDataFlow.Common.Tests.Genetic;
 using MasterDataFlow.Intelligence.Genetic;
-using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MasterDataFlow.Intelligence.Tests
+namespace MasterDataFlow.Intelligence.Tests.Genetic
 {
     [TestClass]
     public class GeneticCellCommandTests
