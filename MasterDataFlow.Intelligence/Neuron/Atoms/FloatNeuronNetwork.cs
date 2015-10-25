@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MasterDataFlow.Intelligence.Neuron
+﻿namespace MasterDataFlow.Intelligence.Neuron.Atoms
 {
     public class FloatNeuronNetwork : NeuronNetwork<float>
     {

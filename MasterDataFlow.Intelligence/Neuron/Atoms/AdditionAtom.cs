@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MasterDataFlow.Intelligence.Interfaces;
+﻿using MasterDataFlow.Intelligence.Interfaces;
 
-namespace MasterDataFlow.Intelligence.Atoms
+namespace MasterDataFlow.Intelligence.Neuron.Atoms
 {
-    public class FloatAddAtom : INeuronAtom<float>
+    public class FloatAdditionAtom : INeuronAtom<float>
     {
         public float[] NetworkCompute(float[] inputs)
         {

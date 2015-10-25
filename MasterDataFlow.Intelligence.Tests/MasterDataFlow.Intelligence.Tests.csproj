@@ -73,10 +73,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Atoms\AddAtomTests.cs" />
+    <Compile Include="Atoms\AdditonAtomTests.cs" />
+    <Compile Include="Atoms\MultiplicationAtomTests.cs" />
     <Compile Include="Genetic\GeneticCellCommandTests.cs" />
     <Compile Include="Genetic\GeneticCellDataObjectTests.cs" />
     <Compile Include="Genetic\GeneticSerializatorTests.cs" />
+    <Compile Include="Neuron\NeuronNetworkTests.cs" />
     <Compile Include="Neuron\NetworkTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

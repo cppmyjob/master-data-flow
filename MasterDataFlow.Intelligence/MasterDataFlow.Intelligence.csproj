@@ -38,7 +38,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Atoms\AddAtom.cs" />
+    <Compile Include="Neuron\Atoms\AdditionAtom.cs" />
+    <Compile Include="Neuron\Atoms\Dna\AdditionAtomDnaDefinitions.cs" />
+    <Compile Include="Neuron\Atoms\Dna\NeuronNetworkDnaDefinition.cs" />
+    <Compile Include="Neuron\Atoms\MultiplicationAtom.cs" />
+    <Compile Include="Neuron\Dna\DnaAxon.cs" />
+    <Compile Include="Neuron\Dna\DnaDefinition.cs" />
+    <Compile Include="Neuron\Dna\DnaSection.cs" />
+    <Compile Include="Neuron\Dna\MasterDna.cs" />
     <Compile Include="Genetic\GeneticCommand.cs" />
     <Compile Include="Genetic\GeneticDoubleCommand.cs" />
     <Compile Include="Genetic\GeneticIntCommand.cs" />
@@ -48,8 +55,9 @@
     <Compile Include="Interfaces\INeuronAtom.cs" />
     <Compile Include="Interfaces\IRandom.cs" />
     <Compile Include="Interfaces\IRandomFactory.cs" />
-    <Compile Include="Neuron\FloatNeuronNetwork.cs" />
-    <Compile Include="Neuron\NeuronNetwork.cs" />
+    <Compile Include="Neuron\NetworkInstance.cs" />
+    <Compile Include="Neuron\Atoms\FloatNeuronNetwork.cs" />
+    <Compile Include="Neuron\Atoms\NeuronNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Random\Random.cs" />
     <Compile Include="Random\RandomFactory.cs" />

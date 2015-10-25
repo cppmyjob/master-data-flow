@@ -1,17 +1,17 @@
 ﻿using System;
-using MasterDataFlow.Intelligence.Atoms;
+using MasterDataFlow.Intelligence.Neuron.Atoms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MasterDataFlow.Intelligence.Tests.Atoms
 {
     [TestClass]
-    public class AddAtomTests
+    public class AdditonAtomTests
     {
         [TestMethod]
         public void SimpleUsage()
         {
             // ARRANGE
-            var atom = new FloatAddAtom();
+            var atom = new FloatAdditionAtom();
 
             // ACT
             var value = atom.NetworkCompute(new[] {10.5F, 9.5F, 12F});
