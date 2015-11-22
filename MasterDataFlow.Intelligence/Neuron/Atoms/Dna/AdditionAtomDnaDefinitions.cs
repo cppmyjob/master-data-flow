@@ -1,8 +1,8 @@
 ﻿using MasterDataFlow.Intelligence.Neuron.Dna;
 
-namespace MasterDataFlow.Intelligence.Neuron.Atoms.Definitions
+namespace MasterDataFlow.Intelligence.Neuron.Atoms.Dna
 {
-    public class AdditionAtomDefinitions : DnaDefinition
+    public class AdditionAtomDefinitions : DnaAtomDefinition
     {
     }
 }

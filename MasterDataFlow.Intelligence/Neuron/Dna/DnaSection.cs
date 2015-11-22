@@ -2,10 +2,8 @@
 
 namespace MasterDataFlow.Intelligence.Neuron.Dna
 {
-    public class DnaSection
+    public class DnaSection : DnaInOut
     {
-        public DnaDefinition[] Definitions { get; set; }
-        public DnaAxon[] Input { get; set; }
-        public int OutputCount { get; set; }
+        public DnaAtomDefinition[] Definitions { get; set; }
     }
 }
