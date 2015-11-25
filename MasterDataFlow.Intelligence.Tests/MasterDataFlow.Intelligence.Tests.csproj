@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Atoms\AdditonAtomTests.cs" />
     <Compile Include="Atoms\MultiplicationAtomTests.cs" />
+    <Compile Include="Builder\DnaBuilderTests.cs" />
     <Compile Include="Genetic\GeneticCellCommandTests.cs" />
     <Compile Include="Genetic\GeneticCellDataObjectTests.cs" />
     <Compile Include="Genetic\GeneticSerializatorTests.cs" />

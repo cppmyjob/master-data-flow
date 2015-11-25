@@ -10,7 +10,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         protected TValue[] _values;
         private double _fitness;
         private GeneticItemInitData _initData;
-        private readonly Guid _guid = Guid.NewGuid();
+        //private readonly Guid _guid = Guid.NewGuid();
         private TValue[] _oldValues;
 
         protected GeneticItem(GeneticItemInitData initData)
@@ -19,10 +19,10 @@ namespace MasterDataFlow.Intelligence.Genetic
             _values = new TValue[initData.Count];
         }
 
-        public Guid Guid
-        {
-            get { return _guid; }
-        } 
+        //public Guid Guid
+        //{
+        //    get { return _guid; }
+        //} 
 
         public GeneticItemInitData InitData
         {

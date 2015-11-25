@@ -1,5 +1,6 @@
 ﻿using System;
 using MasterDataFlow.Intelligence.Neuron;
+using MasterDataFlow.Intelligence.Neuron.Atoms;
 using MasterDataFlow.Intelligence.Neuron.Atoms.Dna;
 using MasterDataFlow.Intelligence.Neuron.Dna;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,12 +17,13 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
             var dna = CreateSimpleDna();
 
             var network = new NetworkInstance(dna);
+            network.Build();
 
             // ACT
-            network.Compute(new float[] {12, 13, 14});
+            network.Compute(new float[] {12, 13});
 
             // ASSERT
-
+            Assert.AreEqual(25, network.Outputs[0].Value);
         }
 
         [TestMethod]
@@ -31,6 +33,7 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
             var dna = CreateSimpleDna();
 
             var network = new NetworkInstance(dna);
+            network.Build();
 
             // ACT
             network.Compute(new float[] { 12, 13 });
@@ -38,11 +41,14 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
             // ASSERT
             Assert.AreEqual(12, network.Sections[0].Inputs[0].Value);
             Assert.AreEqual(13, network.Sections[0].Inputs[1].Value);
+
+            Assert.AreEqual(12, network.Sections[0].Atoms[0].Inputs[0].Value);
+            Assert.AreEqual(13, network.Sections[0].Atoms[0].Inputs[1].Value);
         }
 
-        private static MasterDna CreateSimpleDna()
+        private static Dna CreateSimpleDna()
         {
-            var dna = new MasterDna();
+            var dna = new Dna();
             dna.Inputs = new[]
             {
                 new DnaAxon(0, new[] {0}),
@@ -70,7 +76,8 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
                     {
                         new AdditionAtomDefinitions
                         {
-                            Inputs = new[] {0, 1},
+                            AtomType = typeof(FloatAdditionAtom),
+                            Inputs = new[] { new DnaAxon(0, null), new DnaAxon(1, null)},
                             Outputs = new DnaAxon[]
                             {
                                 new DnaAxon(2, new int[] {2}),

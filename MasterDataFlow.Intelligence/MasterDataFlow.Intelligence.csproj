@@ -38,15 +38,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Genetic\GeneticFloatCommand.cs" />
+    <Compile Include="Interfaces\IDnaSerializator.cs" />
+    <Compile Include="Interfaces\IDnaInstruction.cs" />
+    <Compile Include="NeuronGeneticCommand.cs" />
     <Compile Include="Neuron\Atoms\AdditionAtom.cs" />
     <Compile Include="Neuron\Atoms\Dna\AdditionAtomDnaDefinitions.cs" />
     <Compile Include="Neuron\Atoms\Dna\NeuronNetworkDnaDefinition.cs" />
     <Compile Include="Neuron\Atoms\MultiplicationAtom.cs" />
+    <Compile Include="Neuron\Builder\DnaBuilder.cs" />
+    <Compile Include="Neuron\Builder\Instructions\AddInputsToDnaInstruction.cs" />
+    <Compile Include="Neuron\Builder\Instructions\AddOutputsToDnaInstruction.cs" />
+    <Compile Include="Neuron\Builder\Instructions\StopInstruction.cs" />
+    <Compile Include="Neuron\Builder\WriteBuffer.cs" />
     <Compile Include="Neuron\Dna\DnaAxon.cs" />
-    <Compile Include="Neuron\Dna\DnaAtomDefinition.cs" />
+    <Compile Include="Neuron\Dna\DnaAtom.cs" />
     <Compile Include="Neuron\Dna\DnaInOut.cs" />
     <Compile Include="Neuron\Dna\DnaSection.cs" />
-    <Compile Include="Neuron\Dna\MasterDna.cs" />
+    <Compile Include="Neuron\Dna\Dna.cs" />
     <Compile Include="Genetic\GeneticCommand.cs" />
     <Compile Include="Genetic\GeneticDoubleCommand.cs" />
     <Compile Include="Genetic\GeneticIntCommand.cs" />
@@ -56,6 +65,10 @@
     <Compile Include="Interfaces\INeuronAtom.cs" />
     <Compile Include="Interfaces\IRandom.cs" />
     <Compile Include="Interfaces\IRandomFactory.cs" />
+    <Compile Include="Neuron\Builder\Instructions\AddInputsToSectionInstruction.cs" />
+    <Compile Include="Neuron\Builder\Instructions\AddSectionsInstruction.cs" />
+    <Compile Include="Neuron\Builder\ReadBuffer.cs" />
+    <Compile Include="Neuron\Builder\Context.cs" />
     <Compile Include="Neuron\NetworkInstance.cs" />
     <Compile Include="Neuron\Atoms\FloatNeuronNetwork.cs" />
     <Compile Include="Neuron\Atoms\NeuronNetwork.cs" />

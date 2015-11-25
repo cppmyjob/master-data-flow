@@ -6,7 +6,7 @@ using MasterDataFlow.Intelligence.Neuron.Dna;
 
 namespace MasterDataFlow.Intelligence.Neuron.Atoms.Dna
 {
-    public class NeuronNetworkDnaDefinition : DnaAtomDefinition
+    public class NeuronNetworkDnaDefinition : DnaAtom
     {
     }
 }

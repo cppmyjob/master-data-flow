@@ -2,7 +2,7 @@
 
 namespace MasterDataFlow.Intelligence.Neuron.Atoms.Dna
 {
-    public class AdditionAtomDefinitions : DnaAtomDefinition
+    public class AdditionAtomDefinitions : DnaAtom
     {
     }
 }
