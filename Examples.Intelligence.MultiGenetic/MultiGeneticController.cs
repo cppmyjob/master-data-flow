@@ -10,7 +10,7 @@ using MasterDataFlow.Network;
 
 namespace Examples.Intelligence.MultiGenetic
 {
-    public class MultiGeneticCommand
+    public class MultiGeneticController
     {
         //public void Execute(CommandWorkflow commandWorkflow)
         //{

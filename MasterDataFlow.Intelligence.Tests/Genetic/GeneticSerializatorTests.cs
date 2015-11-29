@@ -1,5 +1,6 @@
 ﻿using System;
 using MasterDataFlow.Intelligence.Genetic;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Serialization;
@@ -17,9 +18,9 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             {
             }
 
-            public override double CreateValue(double random)
+            public override double CreateValue(IRandom random)
             {
-                return Math.Floor(random * 5);
+                return Math.Floor(random.NextDouble() * 5);
             }
         }
 

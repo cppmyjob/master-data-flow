@@ -1,5 +1,6 @@
 ﻿using System;
 using MasterDataFlow.Intelligence.Genetic;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Messages;
 
 namespace Examples.Intelligence.MultiGenetic
@@ -11,9 +12,9 @@ namespace Examples.Intelligence.MultiGenetic
         {
         }
 
-        public override double CreateValue(double random)
+        public override double CreateValue(IRandom random)
         {
-            return Math.Floor(random * InitData.Count);
+            return Math.Floor(random.NextDouble() * InitData.Count);
         }
     }
 

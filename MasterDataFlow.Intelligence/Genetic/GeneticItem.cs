@@ -52,7 +52,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             get { return _values; }
         }
 
-        public abstract TValue CreateValue(double random);
+        public abstract TValue CreateValue(IRandom random);
 
 		protected internal virtual void InitOtherValues(IRandom random) { }
 

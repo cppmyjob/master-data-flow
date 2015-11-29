@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Intelligence.Genetic;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Messages;
 
 namespace Examples.Intelligence.MultiGenetic
@@ -15,9 +16,9 @@ namespace Examples.Intelligence.MultiGenetic
         {
         }
 
-        public override int CreateValue(double random)
+        public override int CreateValue(IRandom random)
         {
-            return (int)(random * InitData.Count);
+            return (int)(random.NextDouble() * InitData.Count);
         }
     }
 
@@ -86,7 +87,7 @@ namespace Examples.Intelligence.MultiGenetic
             {
                 if (Random.NextDouble() > 0.9)
                 {
-                    var newValue = item.CreateValue(Random.NextDouble());
+                    var newValue = item.CreateValue(Random);
                     var oldValue = item.Values[i];
                     item.Values[i] = newValue;
                     for (int j = 0; j < item.Values.Length; j++)

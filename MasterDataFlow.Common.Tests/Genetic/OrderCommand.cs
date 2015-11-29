@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Intelligence.Genetic;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Messages;
 
 namespace MasterDataFlow.Common.Tests.Genetic
@@ -14,9 +15,9 @@ namespace MasterDataFlow.Common.Tests.Genetic
         {
         }
 
-        public override double CreateValue(double random)
+        public override double CreateValue(IRandom random)
         {
-            return Math.Floor(random * InitData.Count);
+            return Math.Floor(random.NextDouble() * InitData.Count);
         }
     }
 

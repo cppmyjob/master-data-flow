@@ -124,7 +124,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             TValue[] values = item.Values;
             for (int j = 0; j < DataObject.CellInitData.ValuesCount; j++)
             {
-                var valueValue = item.CreateValue(Random.NextDouble());
+                var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
             }
             item.InitOtherValues(Random);
@@ -202,7 +202,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             {
                 if (Random.NextDouble() > 0.999)
                 {
-                    var valueValue = item.CreateValue(Random.NextDouble());
+                    var valueValue = item.CreateValue(Random);
                     item.Values[i] = valueValue;
                 }
             }
@@ -244,7 +244,7 @@ namespace MasterDataFlow.Intelligence.Genetic
                             value = secondValues[secondOffset + i];
                         else
                         {
-                            value = child.CreateValue(Random.NextDouble());
+                            value = child.CreateValue(Random);
                         }
                     }
                 }
@@ -253,7 +253,7 @@ namespace MasterDataFlow.Intelligence.Genetic
                 if (Random.NextDouble() > 0.999)
                 //                if (_random.NextDouble() > 0.9)
                 {
-                    var valueValue = child.CreateValue(Random.NextDouble());
+                    var valueValue = child.CreateValue(Random);
                     value = valueValue;
                 }
                 childValues[i] = value;

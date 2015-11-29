@@ -10,11 +10,11 @@ namespace Examples.Intelligence.MultiGenetic
     {
         static void Main(string[] args)
         {
-            Console.SetWindowSize(200, 64);
+            //Console.SetWindowSize(200, 64);
 
             using (var remote = new RemoteEnvironment())
             {
-                var command = new MultiGeneticCommand();
+                var command = new TravelingSalesmanProblemMendelController();
                 command.Execute(remote.CommandWorkflow);
             }
             Console.WriteLine("Finished");
