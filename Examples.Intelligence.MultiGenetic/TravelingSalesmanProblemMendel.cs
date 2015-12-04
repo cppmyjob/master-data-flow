@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MasterDataFlow.Intelligence.Genetic;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Messages;
 
 namespace Examples.Intelligence.MultiGenetic
@@ -10,7 +11,7 @@ namespace Examples.Intelligence.MultiGenetic
     [Serializable]
     public class TravelingSalesmanProblemMendelGeneticItem : MendelGeneticItem
     {
-        public TravelingSalesmanProblemMendelGeneticItem(GeneticItemInitData initData) : base(initData)
+        public TravelingSalesmanProblemMendelGeneticItem(GeneticItemInitData initData, IRandom random) : base(initData, random)
         {
         }
     }
@@ -35,7 +36,7 @@ namespace Examples.Intelligence.MultiGenetic
 
         protected override MendelGeneticItem CreateItem(GeneticItemInitData initData)
         {
-            return new TravelingSalesmanProblemMendelGeneticItem(initData);
+            return new TravelingSalesmanProblemMendelGeneticItem(initData, Random);
         }
 
         public override double CalculateFitness(MendelGeneticItem item, int processor)

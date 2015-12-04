@@ -53,9 +53,8 @@ namespace MasterDataFlow.Intelligence.Genetic
         where TGeneticCellDataObject : GeneticDataObject<TValue>
         where TGeneticItem : GeneticItem<TValue>
     {
-        private TGeneticItem[] _itemsArray;
+        protected TGeneticItem[] _itemsArray;
         private int _currentYear = 1;
-        //protected Random _random = new Random((int)DateTime.Now.Ticks);
         protected IRandom Random = RandomFactory.Instance.Create();
 
         public override BaseMessage Execute()
@@ -162,11 +161,12 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void CalculateWithOneProcessor()
         {
-            for (int i = 0; i < DataObject.CellInitData.ItemsCount; i++)
+            for (var i = 0; i < DataObject.CellInitData.ItemsCount; i++)
             {
                 var item = _itemsArray[i];
-                if (item.Fitness == 0.0)
-                    item.Fitness = InternalCalculateFitness(item, 0);
+                if (item.Fitness > 0.0)
+                    continue;
+                item.Fitness = InternalCalculateFitness(item, 0);
             }
         }
 
@@ -180,16 +180,14 @@ namespace MasterDataFlow.Intelligence.Genetic
             for (int i = 0; i < DataObject.CellInitData.ItemsCount - DataObject.CellInitData.SurviveCount; i++)
             {
                 var firstParent = _itemsArray[i + DataObject.CellInitData.SurviveCount];
-                if (firstParent.Fitness == 0)
-                    continue;
+                if (!(firstParent.Fitness > 0)) continue;
                 int secondParentIndex;
                 //                do
                 //                {
                 secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
                 //               ` } while (secondParentIndex == i);
                 var secondParent = _itemsArray[secondParentIndex];
-                if (secondParent.Fitness == 0)
-                    continue;
+                if (!(secondParent.Fitness > 0)) continue;
                 var child = CreateChild(firstParent, secondParent);
                 _itemsArray[i + DataObject.CellInitData.SurviveCount] = child;
                 Mutation(child);

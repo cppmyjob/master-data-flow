@@ -80,7 +80,7 @@ namespace Examples.Intelligence.MultiGenetic
             var dataObject = new TravelingSalesmanProblemMendelInitData
             {
                 CellInitData = initData,
-                RepeatCount = 100,
+                RepeatCount = 1000,
                 Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),

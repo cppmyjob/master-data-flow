@@ -66,9 +66,12 @@ namespace Examples.Intelligence.MultiGenetic
     [Serializable]
     public abstract class MendelGeneticItem : GeneticItem<GenePair>
     {
-        protected MendelGeneticItem(GeneticItemInitData initData)
+        public int Age { get; set; }
+
+        protected MendelGeneticItem(GeneticItemInitData initData, IRandom random)
             : base(initData)
         {
+            Age = random.Next(100);
         }
 
         public override GenePair CreateValue(IRandom random)
@@ -96,6 +99,22 @@ namespace Examples.Intelligence.MultiGenetic
         where TGeneticCellDataObject : MendelGeneticDataObject
     {
 
+        protected override void SortFitness()
+        {
+            List<MendelGeneticItem> list = (from item in _itemsArray
+                                            where item.Age > 0
+                                            orderby item.Fitness descending
+                                            select item).ToList();
+            while (list.Count < DataObject.CellInitData.ItemsCount)
+            {
+                var item = InternalCreateItem();
+                FillValues(item);
+                list.Add(item);
+            }
+
+            _itemsArray = list.ToArray();
+        }
+
         protected override void Mutation(MendelGeneticItem item)
         {
             for (int i = 0; i < item.Values.Length; i++)
@@ -105,43 +124,45 @@ namespace Examples.Intelligence.MultiGenetic
                     var newValue = item.CreateValue(Random);
                     var oldValue = item.Values[i];
                     item.Values[i] = newValue;
-                    for (int j = 0; j < item.Values.Length; j++)
-                    {
-                        if (j != i && item.Values[j].Value == newValue.Value)
-                        {
-                            item.Values[j] = oldValue;
-                            break;
-                        }
-                    }
+                    //for (int j = 0; j < item.Values.Length; j++)
+                    //{
+                    //    if (j != i && item.Values[j].Value == newValue.Value)
+                    //    {
+                    //        item.Values[j] = oldValue;
+                    //        break;
+                    //    }
+                    //}
                 }
             }
         }
 
         protected override MendelGeneticItem CreateChild(MendelGeneticItem firstParent, MendelGeneticItem secondParent)
         {
-            //var result = InternalCreateItem();
-            //for (int i = 0; i < firstParent.Values.Length; i++)
-            //{
-            //    var firstValue = firstParent.Values[i];
-            //    var secondValue = secondParent.Values[i];
-            //    var allele1 = GetGeneAllele(firstValue);
-            //    var allele2 = GetGeneAllele(secondValue);
-            //    var newPair = new GenePair {Alleles = new [] {allele1, allele2}};
-            //    newPair.SelectDominancValue(Random);
-            //    result.Values[i] = newPair;
-            //}
-            //return result;
-
             var result = InternalCreateItem();
-            var zeroValue = firstParent.Values[0];
-            for (int i = 1; i < firstParent.Values.Length; i++)
+            --firstParent.Age;
+            --secondParent.Age;
+            for (int i = 0; i < firstParent.Values.Length; i++)
             {
                 var firstValue = firstParent.Values[i];
-                var secondValue = secondParent.Values[i-1];
-                CreateNewPair(firstValue, secondValue, result, i);
+                var secondValue = secondParent.Values[i];
+                var allele1 = GetGeneAllele(firstValue);
+                var allele2 = GetGeneAllele(secondValue);
+                var newPair = new GenePair { Alleles = new[] { allele1, allele2 } };
+                newPair.SelectDominancValue(Random);
+                result.Values[i] = newPair;
             }
-            CreateNewPair(zeroValue, secondParent.Values[secondParent.Values.Length-1], result, 0);
             return result;
+
+            //var result = InternalCreateItem();
+            //var zeroValue = firstParent.Values[0];
+            //for (int i = 1; i < firstParent.Values.Length; i++)
+            //{
+            //    var firstValue = firstParent.Values[i];
+            //    var secondValue = secondParent.Values[i-1];
+            //    CreateNewPair(firstValue, secondValue, result, i);
+            //}
+            //CreateNewPair(zeroValue, secondParent.Values[secondParent.Values.Length-1], result, 0);
+            //return result;
         }
 
         private void CreateNewPair(GenePair firstValue, GenePair secondValue, MendelGeneticItem result, int i)
