@@ -39,8 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Genetic\GeneticFloatCommand.cs" />
+    <Compile Include="Genetic\GeneticHistory.cs" />
     <Compile Include="Interfaces\IDnaSerializator.cs" />
     <Compile Include="Interfaces\IDnaInstruction.cs" />
+    <Compile Include="Interfaces\IValueClone.cs" />
     <Compile Include="NeuronGeneticCommand.cs" />
     <Compile Include="Neuron\Atoms\AdditionAtom.cs" />
     <Compile Include="Neuron\Atoms\Dna\AdditionAtomDnaDefinitions.cs" />

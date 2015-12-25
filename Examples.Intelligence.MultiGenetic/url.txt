@@ -1,0 +1,9 @@
+﻿Примеры применения
+Библиотека для реализации генетических алгоритмов в .NET Framework 2.0 
+http://jenyay.net/Programming/Genetic
+
+Выживает самый приспособленный: естественный отбор алгоритмов
+https://msdn.microsoft.com/ru-ru/library/dd335954.aspx
+
+ПРОСТОЙ ГЕНЕТИЧЕСКИЙ АЛГОРИТМ НА C#
+http://www.cyberguru.ru/algorithms/algorithms-theory/algorithms-simple-genetic-algorithm.html

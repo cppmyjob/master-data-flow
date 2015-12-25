@@ -47,7 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TravelingSalesmanProblem.cs" />
     <Compile Include="TravelingSalesmanProblemMendel.cs" />
+    <Compile Include="TravelingSalesmanProblemVectorController.cs" />
     <Compile Include="TravelingSalesmanProblemMendelController.cs" />
+    <Compile Include="VectorGenetic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj">
@@ -62,6 +64,9 @@
       <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
       <Name>MasterDataFlow</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="url.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

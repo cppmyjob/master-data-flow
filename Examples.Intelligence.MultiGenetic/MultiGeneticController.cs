@@ -125,11 +125,11 @@ namespace Examples.Intelligence.MultiGenetic
 
         private static TravelingSalesmanProblemInitData CreateTravelingSalesmanProblemInitData()
         {
-            var initData = new GeneticInitData(1000, 380, 10);
+            var initData = new GeneticInitData(1000, 330, 20);
             var dataObject = new TravelingSalesmanProblemInitData
                              {
                                  CellInitData = initData,
-                                 RepeatCount = 100,
+                                 RepeatCount = 1000,
                                  Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),
@@ -137,8 +137,15 @@ namespace Examples.Intelligence.MultiGenetic
                                               new TravalingPoint(8, 8), new TravalingPoint(6, 6),
                                               new TravalingPoint(98, 1), new TravalingPoint(32, 33),
                                               new TravalingPoint(39, 39), new TravalingPoint(45, 02),
+
+                                              new TravalingPoint(4, 1), new TravalingPoint(10, 1),
+                                              new TravalingPoint(74, 11), new TravalingPoint(9, 4),
+                                              new TravalingPoint(89, 8), new TravalingPoint(2, 6),
+                                              new TravalingPoint(98, 51), new TravalingPoint(72, 33),
+                                              new TravalingPoint(39, 339), new TravalingPoint(55, 2),
+
                                           }
-                             };
+            };
             return dataObject;
         }
 

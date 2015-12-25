@@ -15,6 +15,7 @@ namespace Examples.Intelligence.MultiGenetic
             using (var remote = new RemoteEnvironment())
             {
                 var command = new TravelingSalesmanProblemMendelController();
+                //var command = new MultiGeneticController();
                 command.Execute(remote.CommandWorkflow);
             }
             Console.WriteLine("Finished");

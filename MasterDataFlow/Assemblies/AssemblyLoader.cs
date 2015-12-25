@@ -39,10 +39,12 @@ namespace MasterDataFlow.Assemblies
                 AppDomainSetup setup = AppDomain.CurrentDomain.SetupInformation;
                 domain = new InternalDomain
                 {
-                    Domain = AppDomain.CreateDomain(key.Key, evidence, setup),
+                    //Domain = AppDomain.CreateDomain(key.Key, evidence, setup),
+                    Domain = AppDomain.CurrentDomain
                 };
                 // TODO dynamic assembly and class name
-                domain.Loader =(ILoader) domain.Domain.CreateInstanceAndUnwrap("MasterDataFlow", "MasterDataFlow.Assemblies.Loader");
+                //domain.Loader =(ILoader) domain.Domain.CreateInstanceAndUnwrap("MasterDataFlow", "MasterDataFlow.Assemblies.Loader");
+                domain.Loader = new Loader();
                 _domains.Add(key, domain);
             }
 
@@ -97,7 +99,7 @@ namespace MasterDataFlow.Assemblies
             {
                 foreach (var domain in _domains)
                 {
-                    AppDomain.Unload(domain.Value.Domain);
+                    //AppDomain.Unload(domain.Value.Domain);
                 }
             }
         }

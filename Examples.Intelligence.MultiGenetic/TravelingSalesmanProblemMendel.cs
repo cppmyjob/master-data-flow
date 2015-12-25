@@ -11,6 +11,11 @@ namespace Examples.Intelligence.MultiGenetic
     [Serializable]
     public class TravelingSalesmanProblemMendelGeneticItem : MendelGeneticItem
     {
+        public TravelingSalesmanProblemMendelGeneticItem() : base()
+        {
+
+        }
+
         public TravelingSalesmanProblemMendelGeneticItem(GeneticItemInitData initData, IRandom random) : base(initData, random)
         {
         }
@@ -63,6 +68,27 @@ namespace Examples.Intelligence.MultiGenetic
             else
                 return 0.0;
         }
+
+        //protected override void FillValues(MendelGeneticItem item)
+        //{
+        //    var values = item.Values;
+        //    for (int i = 0; i < item.Values.Length; i++)
+        //    {
+        //        var v = item.CreateValue(Random);
+        //        values[i] = v;
+        //        //values[i].Value = i;
+        //        values[i].Alleles[0].Value = i;
+        //        values[i].Alleles[1].Value = i;
+        //    }
+
+        //    for (int i = values.Length; i > 0; i--)
+        //    {
+        //        int j = Random.Next(i);
+        //        var k = values[j];
+        //        values[j] = values[i - 1];
+        //        values[i - 1] = k;
+        //    }
+        //}
 
         //protected override MendelGeneticItem CreateChild(MendelGeneticItem firstParent, MendelGeneticItem secondParent)
         //{

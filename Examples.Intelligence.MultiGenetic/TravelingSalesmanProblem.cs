@@ -83,32 +83,47 @@ namespace Examples.Intelligence.MultiGenetic
 
         protected override void Mutation(GeneticIntItem item)
         {
-            for (int i = 0; i < item.Values.Length; i++)
+            var changeIndex = Random.Next(item.Values.Length);
+
+            var newValue = item.CreateValue(Random);
+            var oldValue = item.Values[changeIndex];
+            item.Values[changeIndex] = newValue;
+            for (int j = 0; j < item.Values.Length; j++)
             {
-                if (Random.NextDouble() > 0.9)
+                if (j != changeIndex && item.Values[j] == newValue)
                 {
-                    var newValue = item.CreateValue(Random);
-                    var oldValue = item.Values[i];
-                    item.Values[i] = newValue;
-                    for (int j = 0; j < item.Values.Length; j++)
-                    {
-                        if (j != i && item.Values[j] == newValue)
-                        {
-                            item.Values[j] = oldValue;
-                            break;
-                        }
-                    }
+                    item.Values[j] = oldValue;
+                    break;
                 }
             }
+
+
+            //for (int i = 0; i < item.Values.Length; i++)
+            //{
+            //    if (Random.NextDouble() > 0.9)
+            //    {
+            //        var newValue = item.CreateValue(Random);
+            //        var oldValue = item.Values[i];
+            //        item.Values[i] = newValue;
+            //        for (int j = 0; j < item.Values.Length; j++)
+            //        {
+            //            if (j != i && item.Values[j] == newValue)
+            //            {
+            //                item.Values[j] = oldValue;
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
 
         protected override GeneticIntItem CreateChild(GeneticIntItem firstParent, GeneticIntItem secondParent)
         {
             var child = InternalCreateItem();
-            for (int i = 0; i < secondParent.Values.Length; i++)
+            for (int i = 0; i < firstParent.Values.Length; i++)
             {
-                child.Values[i] = secondParent.Values[i];
+                child.Values[i] = firstParent.Values[i];
             }
             return child;
         }

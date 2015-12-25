@@ -15,12 +15,14 @@ namespace MasterDataFlow.Intelligence.Genetic
         private readonly int _itemsCount;
         private readonly int _surviveCount;
         private readonly int _valuesCount;
+        private readonly bool _isAddFistory;
 
-        public GeneticInitData(int itemsCount, int surviveCount, int valuesCount)
+        public GeneticInitData(int itemsCount, int surviveCount, int valuesCount, bool isAddFistory = false)
         {
             _itemsCount = itemsCount;
             _surviveCount = surviveCount;
             _valuesCount = valuesCount;
+            _isAddFistory = isAddFistory;
 
             if (_surviveCount > _itemsCount)
                 throw new Exception("Число выживших > число особей");
@@ -33,6 +35,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         public int ItemsCount { get { return _itemsCount; } }
         public int SurviveCount { get { return _surviveCount; } }
         public int ValuesCount { get { return _valuesCount; } }
+        public bool IsAddFistory { get { return _isAddFistory; } }
     }
     
     [Serializable]
@@ -56,6 +59,12 @@ namespace MasterDataFlow.Intelligence.Genetic
         protected TGeneticItem[] _itemsArray;
         private int _currentYear = 1;
         protected IRandom Random = RandomFactory.Instance.Create();
+        private TGeneticItem _theBest;
+
+        public TGeneticItem TheBest
+        {
+            get { return _theBest; }
+        }
 
         public override BaseMessage Execute()
         {
@@ -75,7 +84,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             }
             var result = new GeneticStopDataObject
             {
-                Best = _itemsArray[0]
+                Best = _theBest ?? _itemsArray[0]
             };
             return Stop(result);
         }
@@ -107,9 +116,12 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         protected TGeneticItem InternalCreateItem()
         {
-            GeneticItemInitData initData = new GeneticItemInitData();
-            initData.Count = DataObject.CellInitData.ValuesCount;
-            initData.YearOfBorn = _currentYear;
+            GeneticItemInitData initData = new GeneticItemInitData
+            {
+                Count = DataObject.CellInitData.ValuesCount,
+                IsAddHistory = DataObject.CellInitData.IsAddFistory,
+                YearOfBorn = _currentYear
+            };
             var child = CreateItem(initData);
             return child;
         }
@@ -142,11 +154,25 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
             CalculateWithOneProcessor();
             SortFitness();
+            GetTheBestFitness();
+        }
+
+        protected virtual void GetTheBestFitness()
+        {
+            if (_theBest == null)
+                _theBest = _itemsArray[0];
+            else
+            {
+                if (_itemsArray[0].Fitness > _theBest.Fitness)
+                {
+                    _theBest = _itemsArray[0];
+                }
+            }
         }
 
         protected virtual void SortFitness()
         {
-            List<TGeneticItem> list = (from item in _itemsArray
+            var list = (from item in _itemsArray
                                       orderby item.Fitness descending
                                       select item).ToList();
             while (list.Count < DataObject.CellInitData.ItemsCount)
@@ -155,7 +181,6 @@ namespace MasterDataFlow.Intelligence.Genetic
                 FillValues(item);
                 list.Add(item);
             }
-
             _itemsArray = list.ToArray();
         }
 
@@ -177,20 +202,28 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void Reproduction()
         {
+            int surveyI = 0;
             for (int i = 0; i < DataObject.CellInitData.ItemsCount - DataObject.CellInitData.SurviveCount; i++)
             {
-                var firstParent = _itemsArray[i + DataObject.CellInitData.SurviveCount];
-                if (!(firstParent.Fitness > 0)) continue;
-                int secondParentIndex;
-                //                do
-                //                {
-                secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
-                //               ` } while (secondParentIndex == i);
+                var firstParent = _itemsArray[surveyI];
+                //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
+                var secondParentIndex = Random.Next(DataObject.CellInitData.ItemsCount);
                 var secondParent = _itemsArray[secondParentIndex];
-                if (!(secondParent.Fitness > 0)) continue;
                 var child = CreateChild(firstParent, secondParent);
+                if (child != null)
+                {
+                    Mutation(child);
+                }
+                else
+                {
+                    child = InternalCreateItem();
+                    FillValues(child);
+                }
                 _itemsArray[i + DataObject.CellInitData.SurviveCount] = child;
-                Mutation(child);
+
+                ++surveyI;
+                if (surveyI >= DataObject.CellInitData.SurviveCount)
+                    surveyI = 0;
             }
         }
 

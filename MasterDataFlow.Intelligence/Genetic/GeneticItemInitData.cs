@@ -9,6 +9,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     public class GeneticItemInitData
     {
         private int _count;
+        private bool _isAddHistory;
         private int _yearOfBorn;
 
         public int Count
@@ -21,6 +22,12 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
             get { return _yearOfBorn; }
             set { _yearOfBorn = value; }
+        }
+
+        public bool IsAddHistory
+        {
+            get { return _isAddHistory; }
+            set { _isAddHistory = value; }
         }
     }
 }

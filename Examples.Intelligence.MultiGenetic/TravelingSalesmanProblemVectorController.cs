@@ -10,7 +10,7 @@ using MasterDataFlow.Network;
 
 namespace Examples.Intelligence.MultiGenetic
 {
-    public class TravelingSalesmanProblemMendelController
+    public class TravelingSalesmanProblemVectorController
     {
         public void Execute(CommandWorkflow commandWorkflow)
         {
@@ -53,7 +53,7 @@ namespace Examples.Intelligence.MultiGenetic
                 Console.WriteLine("The best fitness is {0}", theBests.Max(t => t.Fitness));
 
                 dataObject = CreateTravelingSalesmanProblemInitData();
-                dataObject.RepeatCount = 20;
+                dataObject.RepeatCount = 50;
                 dataObject.InitPopulation = new List<GenePair[]>();
                 for (int i = 0; i < theBests.Count; i++)
                 {
@@ -80,7 +80,7 @@ namespace Examples.Intelligence.MultiGenetic
             var dataObject = new TravelingSalesmanProblemMendelInitData
             {
                 CellInitData = initData,
-                RepeatCount = 100,
+                RepeatCount = 1000,
                 Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Interfaces;
 
@@ -10,19 +11,21 @@ namespace MasterDataFlow.Intelligence.Genetic
         protected TValue[] _values;
         private double _fitness;
         private GeneticItemInitData _initData;
-        //private readonly Guid _guid = Guid.NewGuid();
         private TValue[] _oldValues;
+        private GeneticHistory<GeneticItem<TValue>, TValue> _history;
+
+        protected GeneticItem()
+        {
+            
+        }
 
         protected GeneticItem(GeneticItemInitData initData)
         {
             _initData = initData;
             _values = new TValue[initData.Count];
+            if (initData.IsAddHistory)
+                _history = new GeneticHistory<GeneticItem<TValue>, TValue>();
         }
-
-        //public Guid Guid
-        //{
-        //    get { return _guid; }
-        //} 
 
         public GeneticItemInitData InitData
         {
@@ -46,10 +49,35 @@ namespace MasterDataFlow.Intelligence.Genetic
             }
         }
 
+        public virtual GeneticItem<TValue> Clone()
+        {
+            var result = (GeneticItem<TValue>)Activator.CreateInstance(this.GetType());
+            var isCloneInterface = typeof(TValue).IsAssignableFrom(typeof(IValueClone<TValue>));
+            result._values = new TValue[_initData.Count];
+            for (int i = 0; i < result._values.Length; i++)
+            {
+                if (!isCloneInterface)
+                {
+                    result._values[i] = _values[i];
+                }
+                else
+                {
+                    result._values[i] = ((IValueClone<TValue>)_values[i]).Clone();
+                }
+            }
+            result._fitness = _fitness;
+            result._initData = _initData;
+            return result;
+        }
 
         public TValue[] Values
         {
             get { return _values; }
+        }
+
+        public GeneticHistory<GeneticItem<TValue>, TValue> History
+        {
+            get { return _history; }
         }
 
         public abstract TValue CreateValue(IRandom random);
