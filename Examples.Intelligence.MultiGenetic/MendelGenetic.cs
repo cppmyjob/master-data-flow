@@ -88,7 +88,9 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class MendelGeneticDataObject : GeneticDataObject<GenePair>
+    public class MendelGeneticDataObject<TGeneticItem, TValue> : GeneticDataObject<GeneticItem<TValue>, TValue>
+        where TGeneticItem : GeneticItem<TValue>
+        where TValue : GenePair
     {
 
     }
@@ -142,7 +144,7 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     public abstract class MendelGeneticCommand<TGeneticCellDataObject> : GeneticCommand<TGeneticCellDataObject, MendelGeneticItem, GenePair>
-        where TGeneticCellDataObject : MendelGeneticDataObject
+        where TGeneticCellDataObject : GeneticDataObject<MendelGeneticItem, GenePair>
     {
 
         protected override void SortFitness()

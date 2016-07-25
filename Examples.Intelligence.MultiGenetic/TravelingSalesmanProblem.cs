@@ -121,37 +121,9 @@ namespace Examples.Intelligence.MultiGenetic
         protected override GeneticIntItem CreateChild(GeneticIntItem firstParent, GeneticIntItem secondParent)
         {
             var child = InternalCreateItem();
-            for (int i = 0; i < firstParent.Values.Length; i++)
-            {
-                child.Values[i] = firstParent.Values[i];
-            }
+            Array.Copy(firstParent.Values, child.Values, firstParent.Values.Length);
             return child;
         }
-
-
-        //protected override GeneticItem CreateChild(GeneticItem firstParent, GeneticItem secondParent)
-        //{
-        //    GeneticItem child = InternalCreateItem();
-        //    double[] firstValues = firstParent.Values;
-        //    double[] secondValues = secondParent.Values;
-        //    double[] childValues = child.Values;
-
-        //    for (int i = 0; i < firstValues.Length; i++)
-        //    {
-        //        if (Random.NextDouble() > 0.8)
-        //        {
-        //            childValues[i] = child.CreateValue(Random.NextDouble());
-        //        }
-        //        else
-        //        {
-        //            if (i % 2 == 0)
-        //                childValues[i] = firstValues[i];
-        //            else
-        //                childValues[i] = secondValues[i];
-        //        }
-        //    }
-        //    return child;
-        //}
 
         protected override void FillValues(GeneticIntItem item)
         {

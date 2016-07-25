@@ -23,7 +23,7 @@ namespace Examples.Intelligence.MultiGenetic
 
 
     [Serializable]
-    public class TravelingSalesmanProblemMendelInitData : MendelGeneticDataObject
+    public class TravelingSalesmanProblemMendelInitData : GeneticDataObject<MendelGeneticItem, GenePair>
     {
         public TravalingPoint[] Points { get; set; }
     }
@@ -69,36 +69,36 @@ namespace Examples.Intelligence.MultiGenetic
                 return 0.0;
         }
 
-        //protected override void FillValues(MendelGeneticItem item)
-        //{
-        //    var values = item.Values;
-        //    for (int i = 0; i < item.Values.Length; i++)
-        //    {
-        //        var v = item.CreateValue(Random);
-        //        values[i] = v;
-        //        //values[i].Value = i;
-        //        values[i].Alleles[0].Value = i;
-        //        values[i].Alleles[1].Value = i;
-        //    }
+        protected override void FillValues(MendelGeneticItem item)
+        {
+            var values = item.Values;
+            for (int i = 0; i < item.Values.Length; i++)
+            {
+                var v = item.CreateValue(Random);
+                values[i] = v;
+                //values[i].Value = i;
+                values[i].Alleles[0].Value = i;
+                values[i].Alleles[1].Value = i;
+            }
 
-        //    for (int i = values.Length; i > 0; i--)
-        //    {
-        //        int j = Random.Next(i);
-        //        var k = values[j];
-        //        values[j] = values[i - 1];
-        //        values[i - 1] = k;
-        //    }
-        //}
+            for (int i = values.Length; i > 0; i--)
+            {
+                int j = Random.Next(i);
+                var k = values[j];
+                values[j] = values[i - 1];
+                values[i - 1] = k;
+            }
+        }
 
-        //protected override MendelGeneticItem CreateChild(MendelGeneticItem firstParent, MendelGeneticItem secondParent)
-        //{
-        //    var child = InternalCreateItem();
-        //    for (int i = 0; i < secondParent.Values.Length; i++)
-        //    {
-        //        child.Values[i] = secondParent.Values[i];
-        //    }
-        //    return child;
-        //}
+        protected override MendelGeneticItem CreateChild(MendelGeneticItem firstParent, MendelGeneticItem secondParent)
+        {
+            var child = InternalCreateItem();
+            for (int i = 0; i < secondParent.Values.Length; i++)
+            {
+                child.Values[i] = secondParent.Values[i];
+            }
+            return child;
+        }
 
         //protected override void FillValues(MendelGeneticItem item)
         //{

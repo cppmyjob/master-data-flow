@@ -66,7 +66,7 @@ namespace Examples.Intelligence.MultiGenetic
             using (var @event = new ManualResetEvent(false))
             {
                 var dataObject = CreateTravelingSalesmanProblemInitData();
-                var instancesCount = 20;
+                var instancesCount = 7;
 
                 var theBests = new List<GeneticItem<int>>();
                 var completedInstances = 0;
@@ -129,7 +129,7 @@ namespace Examples.Intelligence.MultiGenetic
             var dataObject = new TravelingSalesmanProblemInitData
                              {
                                  CellInitData = initData,
-                                 RepeatCount = 1000,
+                                 RepeatCount = 10000,
                                  Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),

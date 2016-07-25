@@ -6,7 +6,7 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticIntDataObject : GeneticDataObject<int>
+    public class GeneticIntDataObject : GeneticDataObject<GeneticIntItem, int>
     {
 
     }

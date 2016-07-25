@@ -28,7 +28,7 @@ namespace MasterDataFlow.Common.Tests.Genetic
 
     public class OrderCommand : GeneticDoubleCommand<OrderDataObject>
     {
-        public static GeneticDataObject<double> StaticDataObject;
+        public static GeneticDataObject<GeneticDoubleItem, double> StaticDataObject;
 
         protected override BaseMessage BaseExecute()
         {

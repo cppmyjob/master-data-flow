@@ -11,7 +11,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
         {
             // ASSERT
             var initData = new GeneticInitData(100, 30, 50);
-            var value = new GeneticDataObject<double>
+            var value = new GeneticDataObject<GeneticDoubleItem, double>
             {
                 CellInitData = initData
             };
@@ -19,7 +19,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
 
             // ACT
             var serializatedValue = Serialization.Serializator.Serialize(value);
-            var newValue = (GeneticDataObject<double>)Serialization.Serializator.Deserialize(typeof(GeneticDataObject<double>), serializatedValue);
+            var newValue = (GeneticDataObject<GeneticDoubleItem, double>)Serialization.Serializator.Deserialize(typeof(GeneticDataObject<GeneticDoubleItem, double>), serializatedValue);
 
             // ARRANGE
             Assert.IsNotNull(newValue.CellInitData);

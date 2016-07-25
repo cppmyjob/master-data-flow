@@ -39,11 +39,17 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
     
     [Serializable]
-    public class GeneticDataObject<TValue> : ICommandDataObject
+    public class GeneticDataObject<TGeneticItem, TValue> : ICommandDataObject
+        where TGeneticItem : GeneticItem<TValue>
     {
         public GeneticInitData CellInitData { get; set; }
         public int RepeatCount { get; set; }
         public IList<TValue[]> InitPopulation { get; set; }
+
+        public virtual void Init(TGeneticItem item, int index)
+        {
+            Array.Copy(InitPopulation[index], item.Values, InitPopulation[index].Length);
+        }
     }
 
     [Serializable]
@@ -53,7 +59,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     public abstract class GeneticCommand<TGeneticCellDataObject, TGeneticItem, TValue> : Command<TGeneticCellDataObject> 
-        where TGeneticCellDataObject : GeneticDataObject<TValue>
+        where TGeneticCellDataObject : GeneticDataObject<TGeneticItem, TValue>
         where TGeneticItem : GeneticItem<TValue>
     {
         protected TGeneticItem[] _itemsArray;
@@ -94,7 +100,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             for (int i = 0; i < DataObject.InitPopulation.Count; i++)
             {
                 var item = InternalCreateItem();
-                Array.Copy(DataObject.InitPopulation[i], item.Values, DataObject.InitPopulation[i].Length);
+                DataObject.Init(item, i);
                 _itemsArray[i] = item;
             }
         }
