@@ -10,8 +10,6 @@ using MasterDataFlow.Trading.Tester;
 namespace MasterDataFlow.Trading.Genetic
 {
 
-
-
     public class FNDirectionTester : FxDirectionTester
     {
         private const double START_DEPOSIT = 1000;
@@ -21,7 +19,6 @@ namespace MasterDataFlow.Trading.Genetic
         private double[] _avg2;
         private double[] _avg3;
 
-        private FxDirection[] _directions;
         private FNGeneticItem _item;
         private Bar[] _bars;
 
@@ -36,12 +33,6 @@ namespace MasterDataFlow.Trading.Genetic
             _avg3 = avg3;
         }
 
-        public FNDirectionTester(FxDirection[] directions, Bar[] bars, int fromBar, int length) :
-            base(START_DEPOSIT, bars, fromBar, length)
-        {
-            _directions = directions;
-        }
-
         protected override FxDirectionGetDirection GetDirectionDelegate()
         {
             return DirectionGetDirection;
@@ -51,36 +42,28 @@ namespace MasterDataFlow.Trading.Genetic
 
         private FxDirection DirectionGetDirection(int index)
         {
-            if (_directions != null)
-            {
-                return _directions[index];
-            }
-            else
-            {
-                Array.Copy(_avg1, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 0, FNGeneticManager.BAR_COUNT);
-                Array.Copy(_avg2, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 1, FNGeneticManager.BAR_COUNT);
-                Array.Copy(_avg3, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 2, FNGeneticManager.BAR_COUNT);
+            Array.Copy(_avg1, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 0, FNGeneticManager.BAR_COUNT);
+            Array.Copy(_avg2, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 1, FNGeneticManager.BAR_COUNT);
+            Array.Copy(_avg3, index - FNGeneticManager.BAR_COUNT, _inputs, FNGeneticManager.BAR_COUNT * 2, FNGeneticManager.BAR_COUNT);
 
-                int addValueOffset = FNGeneticManager.BAR_COUNT * FNGeneticManager.AVG_COUNT;
-                _inputs[addValueOffset] = GetAddValueOrder();
-                _inputs[addValueOffset + 1] = GetAddValueEquity();
-                _inputs[addValueOffset + 2] = GetAddValueLastOrderResult();
-                _inputs[addValueOffset + 3] = GetAddValueLastOrderPeriod();
-                _inputs[addValueOffset + 4] = GetAddValueOrderOpenPeriod();
-                _inputs[addValueOffset + 5] = GetAddValueHistoryOrder();
+            int addValueOffset = FNGeneticManager.BAR_COUNT * FNGeneticManager.AVG_COUNT;
+            _inputs[addValueOffset] = GetAddValueOrder();
+            _inputs[addValueOffset + 1] = GetAddValueEquity();
+            _inputs[addValueOffset + 2] = GetAddValueLastOrderResult();
+            _inputs[addValueOffset + 3] = GetAddValueLastOrderPeriod();
+            _inputs[addValueOffset + 4] = GetAddValueOrderOpenPeriod();
+            _inputs[addValueOffset + 5] = GetAddValueHistoryOrder();
 
-                double[] outputs = _dll.NetworkCompute(_inputs);
-                bool isBuy = outputs[0] > 0.5;
-                bool isSell = outputs[1] > 0.5;
-                if (isBuy && isSell)
-                    return FxDirection.None;
-                if (isBuy)
-                    return FxDirection.Up;
-                if (isSell)
-                    return FxDirection.Down;
+            double[] outputs = _dll.NetworkCompute(_inputs);
+            bool isBuy = outputs[0] > 0.5;
+            bool isSell = outputs[1] > 0.5;
+            if (isBuy && isSell)
                 return FxDirection.None;
-
-            }
+            if (isBuy)
+                return FxDirection.Up;
+            if (isSell)
+                return FxDirection.Down;
+            return FxDirection.None;
         }
 
 
@@ -184,7 +167,7 @@ namespace MasterDataFlow.Trading.Genetic
 
         protected override int GetStopLoss()
         {
-            return _item == null ? 0 : _item.StopLoss;
+            return _item.StopLoss;
         }
 
     }

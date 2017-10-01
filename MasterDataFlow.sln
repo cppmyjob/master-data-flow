@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterDataFlow.Trading", "M
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trading", "Trading", "{AD09241B-7FC4-4370-8228-1F436ED74993}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Trading.Tests", "MasterDataFlow.Trading.Tests\MasterDataFlow.Trading.Tests.csproj", "{9783CB75-43DA-4533-A69C-54044117ABA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,10 @@ Global
 		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9783CB75-43DA-4533-A69C-54044117ABA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9783CB75-43DA-4533-A69C-54044117ABA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9783CB75-43DA-4533-A69C-54044117ABA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9783CB75-43DA-4533-A69C-54044117ABA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -129,6 +135,7 @@ Global
 		{F91B8A1E-F5A3-45CF-9B8F-314B553FD0CB} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
 		{4398F41D-E070-4C10-A12B-FAE2BCB601D3} = {F91B8A1E-F5A3-45CF-9B8F-314B553FD0CB}
 		{AD09241B-7FC4-4370-8228-1F436ED74993} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
+		{9783CB75-43DA-4533-A69C-54044117ABA7} = {9B682F02-8450-48AA-AACD-555F7603F9D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9240955-D193-4AE5-9A34-7F540A8066EF}
