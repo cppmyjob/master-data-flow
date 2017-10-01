@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow", "MasterDataFlow\MasterDataFlow.csproj", "{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}"
 EndProject
@@ -42,6 +42,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Intelligence", "Intelligence", "{F91B8A1E-F5A3-45CF-9B8F-314B553FD0CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.Intelligence.MultiGenetic", "Examples.Intelligence.MultiGenetic\Examples.Intelligence.MultiGenetic.csproj", "{4398F41D-E070-4C10-A12B-FAE2BCB601D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterDataFlow.Trading", "MasterDataFlow.Trading\MasterDataFlow.Trading.csproj", "{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trading", "Trading", "{AD09241B-7FC4-4370-8228-1F436ED74993}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +109,10 @@ Global
 		{4398F41D-E070-4C10-A12B-FAE2BCB601D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4398F41D-E070-4C10-A12B-FAE2BCB601D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4398F41D-E070-4C10-A12B-FAE2BCB601D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57074C9D-F3E6-4CC0-BF7A-1D960B396A43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,5 +128,9 @@ Global
 		{CB6D9F25-95BD-4769-BED6-4C0ABC960EC5} = {8786644A-0C24-44F8-82BC-75BD2BEC1BE9}
 		{F91B8A1E-F5A3-45CF-9B8F-314B553FD0CB} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
 		{4398F41D-E070-4C10-A12B-FAE2BCB601D3} = {F91B8A1E-F5A3-45CF-9B8F-314B553FD0CB}
+		{AD09241B-7FC4-4370-8228-1F436ED74993} = {F7F35156-4A3E-4AEE-8A12-9C9D2466ED2C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A9240955-D193-4AE5-9A34-7F540A8066EF}
 	EndGlobalSection
 EndGlobal
