@@ -6,7 +6,8 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticIntDataObject : GeneticDataObject<GeneticIntItem, int>
+    public class GeneticIntDataObject<TGeneticIntItem> : GeneticDataObject<TGeneticIntItem, int>
+        where TGeneticIntItem : GeneticIntItem
     {
 
     }
@@ -20,8 +21,10 @@ namespace MasterDataFlow.Intelligence.Genetic
         }
     }
 
-    public abstract class GeneticIntCommand<TGeneticCellDataObject> : GeneticCommand<TGeneticCellDataObject, GeneticIntItem, int>
-        where TGeneticCellDataObject : GeneticIntDataObject
+    public abstract class GeneticIntCommand<TGeneticIntDataObject, TGeneticIntItem> 
+        : GeneticCommand<TGeneticIntDataObject, TGeneticIntItem, int>
+        where TGeneticIntDataObject : GeneticIntDataObject<TGeneticIntItem>
+        where TGeneticIntItem : GeneticIntItem
     {
 
     }

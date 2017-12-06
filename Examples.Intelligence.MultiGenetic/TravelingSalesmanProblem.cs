@@ -35,12 +35,12 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class TravelingSalesmanProblemInitData : GeneticIntDataObject
+    public class TravelingSalesmanProblemInitData : GeneticIntDataObject<TravelingSalesmanProblemGeneticItem>
     {
         public TravalingPoint[] Points { get; set; }
     }
 
-    public class TravelingSalesmanProblemCommand : GeneticIntCommand<TravelingSalesmanProblemInitData>
+    public class TravelingSalesmanProblemCommand : GeneticIntCommand<TravelingSalesmanProblemInitData, TravelingSalesmanProblemGeneticItem>
     {
 
         protected override BaseMessage BaseExecute()
@@ -51,12 +51,12 @@ namespace Examples.Intelligence.MultiGenetic
             return result;
         }
 
-        protected override GeneticIntItem CreateItem(GeneticItemInitData initData)
+        protected override TravelingSalesmanProblemGeneticItem CreateItem(GeneticItemInitData initData)
         {
             return new TravelingSalesmanProblemGeneticItem(initData);
         }
 
-        public override double CalculateFitness(GeneticIntItem item, int processor)
+        public override double CalculateFitness(TravelingSalesmanProblemGeneticItem item, int processor)
         {
             var fitness = 0.0;
             bool[] oldValues = new bool[item.Values.Length];
@@ -81,7 +81,7 @@ namespace Examples.Intelligence.MultiGenetic
                 return 1 / fitness;
         }
 
-        protected override void Mutation(GeneticIntItem item)
+        protected override void Mutation(TravelingSalesmanProblemGeneticItem item)
         {
             var changeIndex = Random.Next(item.Values.Length);
 
@@ -117,15 +117,14 @@ namespace Examples.Intelligence.MultiGenetic
             //}
         }
 
-
-        protected override GeneticIntItem CreateChild(GeneticIntItem firstParent, GeneticIntItem secondParent)
+        protected override TravelingSalesmanProblemGeneticItem CreateChild(TravelingSalesmanProblemGeneticItem firstParent, TravelingSalesmanProblemGeneticItem secondParent)
         {
             var child = InternalCreateItem();
             Array.Copy(firstParent.Values, child.Values, firstParent.Values.Length);
             return child;
         }
 
-        protected override void FillValues(GeneticIntItem item)
+        protected override void FillValues(TravelingSalesmanProblemGeneticItem item)
         {
             var values = item.Values;
             for (int i = 0; i < item.Values.Length; i++)

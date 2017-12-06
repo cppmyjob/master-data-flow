@@ -134,7 +134,7 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class VariableCrossoverGeneticInitData : GeneticDataObject<VariableCrossoverGeneticItem, int>
+    public class VariableCrossoverGeneticInitData : GeneticIntDataObject<VariableCrossoverGeneticItem>
     {
         public TravalingPoint[] Points { get; set; }
         public IList<int[]> InitLengths { get; set; }
@@ -146,7 +146,7 @@ namespace Examples.Intelligence.MultiGenetic
         }
     }
 
-    public class VariableCrossoverGeneticCommand : GeneticCommand<VariableCrossoverGeneticInitData, VariableCrossoverGeneticItem, int>
+    public class VariableCrossoverGeneticCommand : GeneticIntCommand<VariableCrossoverGeneticInitData, VariableCrossoverGeneticItem>
     {
 
         protected override BaseMessage BaseExecute()

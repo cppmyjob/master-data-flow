@@ -20,7 +20,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
 
             public override double CreateValue(IRandom random)
             {
-                return Math.Floor(random.NextDouble() * 5);
+                return System.Math.Floor(random.NextDouble() * 5);
             }
         }
 

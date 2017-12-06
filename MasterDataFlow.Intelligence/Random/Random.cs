@@ -17,7 +17,7 @@ namespace MasterDataFlow.Intelligence.Random
 
         public int Next(int maxValue)
         {
-            return (int)(Math.Round(NextDouble() * (maxValue - 1)));
+            return (int)(System.Math.Round(NextDouble() * (maxValue - 1)));
         }
     }
 

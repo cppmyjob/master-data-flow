@@ -28,7 +28,7 @@ namespace MasterDataFlow.Intelligence.Neuron.Builder.Instructions
             }
             else
             {
-                var newSectionsNumber = Math.Min(dna.Sections.Length + sectionNumber, context.MaxSectionsNumber);
+                var newSectionsNumber = System.Math.Min(dna.Sections.Length + sectionNumber, context.MaxSectionsNumber);
                 var newSections = new DnaSection[newSectionsNumber];
                 Array.Copy(dna.Sections, 0, newSections, 0, dna.Sections.Length);
                 for (var i = dna.Sections.Length; i < newSectionsNumber - dna.Sections.Length; i++)

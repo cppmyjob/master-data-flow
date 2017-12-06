@@ -58,8 +58,8 @@ namespace MasterDataFlow.Intelligence.Genetic
         public object Best { get; set; }
     }
 
-    public abstract class GeneticCommand<TGeneticCellDataObject, TGeneticItem, TValue> : Command<TGeneticCellDataObject> 
-        where TGeneticCellDataObject : GeneticDataObject<TGeneticItem, TValue>
+    public abstract class GeneticCommand<TGeneticDataObject, TGeneticItem, TValue> : Command<TGeneticDataObject> 
+        where TGeneticDataObject : GeneticDataObject<TGeneticItem, TValue>
         where TGeneticItem : GeneticItem<TValue>
     {
         protected TGeneticItem[] _itemsArray;

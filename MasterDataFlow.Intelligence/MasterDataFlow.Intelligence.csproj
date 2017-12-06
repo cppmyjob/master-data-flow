@@ -43,6 +43,11 @@
     <Compile Include="Interfaces\IDnaSerializator.cs" />
     <Compile Include="Interfaces\IDnaInstruction.cs" />
     <Compile Include="Interfaces\IValueClone.cs" />
+    <Compile Include="Math\FloatOperationProvider.cs" />
+    <Compile Include="Math\Int32OperationProvider.cs" />
+    <Compile Include="Math\IOperate.cs" />
+    <Compile Include="Math\OperationHelper.cs" />
+    <Compile Include="Math\OperationProvider.cs" />
     <Compile Include="NeuronGeneticCommand.cs" />
     <Compile Include="Neuron\Atoms\AdditionAtom.cs" />
     <Compile Include="Neuron\Atoms\Dna\AdditionAtomDnaDefinitions.cs" />
@@ -71,6 +76,7 @@
     <Compile Include="Neuron\Builder\Instructions\AddSectionsInstruction.cs" />
     <Compile Include="Neuron\Builder\ReadBuffer.cs" />
     <Compile Include="Neuron\Builder\Context.cs" />
+    <Compile Include="Neuron\GeneticNeuronDLL1.cs" />
     <Compile Include="Neuron\NetworkInstance.cs" />
     <Compile Include="Neuron\Atoms\FloatNeuronNetwork.cs" />
     <Compile Include="Neuron\Atoms\NeuronNetwork.cs" />

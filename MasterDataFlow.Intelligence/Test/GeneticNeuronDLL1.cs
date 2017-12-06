@@ -127,7 +127,7 @@ namespace MasterDataFlow.Intelligence.Test
             {
                 sum += neuron.Inputs[i] * weights[neuron.WeightsOffset + i];
             }
-            neuron.Outputs[neuron.layerIndex] = 1.0 / (1.0 + Math.Exp(-(alpha * sum)));
+            neuron.Outputs[neuron.layerIndex] = 1.0 / (1.0 + System.Math.Exp(-(alpha * sum)));
 
         }
 

@@ -420,7 +420,7 @@ namespace MasterDataFlow.Intelligence.Neuron.Atoms
             //return ((2 / (1 + AsmCall.MathExp(-value))) - 1);
             //return ((2 / (1 + (float)Math.Exp(-value))) - 1);
             //return 1 / (1 + Math.Exp(-value));
-            return ToValue(1 / (1 + Math.Exp(Negative(value))));
+            return ToValue(1 / (1 + System.Math.Exp(Negative(value))));
         }
 
         private TValue MathSigmoidDerivative(TValue value)
