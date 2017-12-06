@@ -109,3 +109,4 @@ UpgradeLog*.XML
 .nuget/NuGet.Config
 .nuget/NuGet.exe
 .nuget/NuGet.targets
+/.vs
