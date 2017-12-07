@@ -10,6 +10,7 @@ namespace MasterDataFlow.Trading.Importer
     {
         static void Main(string[] args)
         {
+            AlfaDirectImporter.Execute();
         }
     }
 }

@@ -32,6 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ADClientSDK, Version=4.0.1758.1118, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Alfa-Direct Pro\ADClientSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="BaseStructures">
+      <HintPath>C:\Program Files (x86)\Alfa-Direct Pro\BaseStructures.dll</HintPath>
+    </Reference>
+    <Reference Include="ClientStructures">
+      <HintPath>C:\Program Files (x86)\Alfa-Direct Pro\ClientStructures.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,12 +59,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="Libs\ad.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Libs\ADClientSDK.dll">
+    <Folder Include="Libs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ad.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
