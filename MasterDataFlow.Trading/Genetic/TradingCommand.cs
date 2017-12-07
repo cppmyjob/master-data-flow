@@ -19,14 +19,17 @@ namespace MasterDataFlow.Trading.Genetic
     {
         public LearningData TrainingData { get; }
         public LearningData ValidationData { get; }
+        public int HistoryWindowLength { get; }
 
-        public TradingDataObject(LearningData trainingData, LearningData validationData, 
+        public TradingDataObject(LearningData trainingData, LearningData validationData, int historyWindowLength,
             int itemsCount, int surviveCount)
         {
             TrainingData = trainingData;
             ValidationData = validationData;
+            HistoryWindowLength = historyWindowLength;
             RepeatCount = 10;
-            CellInitData = new GeneticInitData(itemsCount, surviveCount, TradingCommand.GetWeightsCount());
+            CellInitData = new GeneticInitData(itemsCount, surviveCount, 
+                TradingCommand.GetWeightsCount(historyWindowLength));
         }
 
     }
@@ -34,9 +37,6 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class TradingItem : GeneticFloatItem
     {
-        // Сколько баров будем проверять.
-        public const int BAR_COUNT = 48;
-
         public const int INDICATOR_NUMBER = 5;
         public const int ALPHA_NUMBER = 1;
         public const int STOPLOSS_NUMBER = 1;
@@ -53,6 +53,11 @@ namespace MasterDataFlow.Trading.Genetic
         public override float CreateValue(IRandom random)
         {
             return (float)random.NextDouble();
+        }
+
+        public int GetIndicatorIndex(int index)
+        {
+            return (int) (Values[index] * INDICATOR_NUMBER);
         }
 
         public float Alpha
@@ -76,32 +81,31 @@ namespace MasterDataFlow.Trading.Genetic
 
     public class TradingCommand : GeneticFloatCommand<TradingDataObject, TradingItem>
     {
-
         private GeneticNeuronDLL1 _dll;
 
         private GeneticNeuronDLL1 CreateNeuronDll()
         {
             GeneticNeuronDLL1 dll = new GeneticNeuronDLL1();
             float alpha = 1.5F;
-            dll.NetworkCreate(alpha, GetNeuronsConfig());
-            dll.CreateWeigths(GetWeightsCount());
+            dll.NetworkCreate(alpha, GetNeuronsConfig(DataObject.HistoryWindowLength));
+            dll.CreateWeigths(GetWeightsCount(DataObject.HistoryWindowLength));
             return dll;
         }
 
-        public static int[] GetNeuronsConfig()
+        public static int[] GetNeuronsConfig(int historyWindowLength)
         {
             return new int[] {
-                                 TradingItem.BAR_COUNT * TradingItem.INDICATOR_NUMBER,
-                                 1 * (TradingItem.BAR_COUNT * TradingItem.INDICATOR_NUMBER),
-                                 1 * (TradingItem.BAR_COUNT * TradingItem.INDICATOR_NUMBER), 
+                                 historyWindowLength * TradingItem.INDICATOR_NUMBER,
+                                 1 * (historyWindowLength * TradingItem.INDICATOR_NUMBER),
+                                 1 * (historyWindowLength * TradingItem.INDICATOR_NUMBER), 
                                  2,
                              };
         }
 
 
-        public static int GetWeightsCount()
+        public static int GetWeightsCount(int historyWindowLength)
         {
-            int[] neurons = GetNeuronsConfig();
+            int[] neurons = GetNeuronsConfig(historyWindowLength);
             int result = 0;
             for (int i = 1; i < neurons.Length; i++)
             {
@@ -169,7 +173,7 @@ namespace MasterDataFlow.Trading.Genetic
 
         private FxTesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData)
         {
-            var tester = new DirectionTester(dll, learningData);
+            var tester = new DirectionTester(dll, item, DataObject.HistoryWindowLength, learningData);
             FxTesterResult result = tester.Run();
             return result;
         }

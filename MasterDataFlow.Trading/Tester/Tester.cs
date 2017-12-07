@@ -211,20 +211,16 @@ namespace MasterDataFlow.Trading.Tester
 
     }
 
-    public delegate FxDirection FxDirectionGetDirection(int index);
-
     public abstract class FxDirectionTester : FxAbstractTester
     {
         private FxOrder _currentOrder;
-        private FxDirectionGetDirection _getDirection;
 
         public FxDirectionTester(double deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)
         {
-            _getDirection = GetDirectionDelegate();
         }
 
-        protected abstract FxDirectionGetDirection GetDirectionDelegate();
+        protected abstract FxDirection GetDirection(int index);
         protected abstract int GetStopLoss();
 
         private int _lastBarNumber = -1;
@@ -249,7 +245,7 @@ namespace MasterDataFlow.Trading.Tester
             if (_currentOrder == null)
             {
                 //switch (_getDirection(CurrentBar - From))
-                switch (_getDirection(CurrentBar))
+                switch (GetDirection(CurrentBar))
                 {
                     case FxDirection.Up:
                         _currentOrder = Buy();
@@ -264,7 +260,7 @@ namespace MasterDataFlow.Trading.Tester
             else
             {
                 //switch (_getDirection(CurrentBar - From))
-                switch (_getDirection(CurrentBar))
+                switch (GetDirection(CurrentBar))
                 {
                     case FxDirection.Up:
                         if (_currentOrder.Type == FxOrderType.Sell)
