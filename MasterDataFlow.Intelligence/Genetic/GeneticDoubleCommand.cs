@@ -6,14 +6,14 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticDoubleDataObject<TGeneticDoubleItem> : GeneticDataObject<TGeneticDoubleItem, int>
+    public class GeneticDoubleDataObject<TGeneticDoubleItem> : GeneticDataObject<TGeneticDoubleItem, double>
         where TGeneticDoubleItem : GeneticDoubleItem
     {
 
     }
 
     [Serializable]
-    public abstract class GeneticDoubleItem : GeneticItem<int>
+    public abstract class GeneticDoubleItem : GeneticItem<double>
     {
         protected GeneticDoubleItem(GeneticItemInitData initData)
             : base(initData)
@@ -22,7 +22,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     public abstract class GeneticDoubleCommand<TGeneticDoubleDataObject, TGeneticDoubleItem>
-        : GeneticCommand<TGeneticDoubleDataObject, TGeneticDoubleItem, int>
+        : GeneticCommand<TGeneticDoubleDataObject, TGeneticDoubleItem, double>
         where TGeneticDoubleDataObject : GeneticDoubleDataObject<TGeneticDoubleItem>
         where TGeneticDoubleItem : GeneticDoubleItem
     {

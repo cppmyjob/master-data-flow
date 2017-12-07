@@ -22,13 +22,13 @@ namespace MasterDataFlow.Common.Tests.Genetic
     }
 
     [Serializable]
-    public class OrderDataObject : GeneticDoubleDataObject
+    public class OrderDataObject : GeneticDoubleDataObject<OrderGeneticItem>
     {
     }
 
-    public class OrderCommand : GeneticDoubleCommand<OrderDataObject>
+    public class OrderCommand : GeneticDoubleCommand<OrderDataObject, OrderGeneticItem>
     {
-        public static GeneticDataObject<GeneticDoubleItem, double> StaticDataObject;
+        public static OrderDataObject StaticDataObject;
 
         protected override BaseMessage BaseExecute()
         {
@@ -37,12 +37,12 @@ namespace MasterDataFlow.Common.Tests.Genetic
             return base.BaseExecute();
         }
 
-        protected override GeneticDoubleItem CreateItem(GeneticItemInitData initData)
+        protected override OrderGeneticItem CreateItem(GeneticItemInitData initData)
         {
             return new OrderGeneticItem(initData);
         }
 
-        public override double CalculateFitness(GeneticDoubleItem item, int processor)
+        public override double CalculateFitness(OrderGeneticItem item, int processor)
         {
             var result = 1;
             var lastValue = item.Values[0];

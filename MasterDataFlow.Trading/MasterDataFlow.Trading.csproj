@@ -41,9 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Bar.cs" />
-    <Compile Include="Genetic\FNGeneticItem.cs" />
-    <Compile Include="Genetic\FNGeneticManager.cs" />
-    <Compile Include="Genetic\FNDirectionTester.cs" />
+    <Compile Include="Genetic\DirectionTester.cs" />
+    <Compile Include="Genetic\TradingCommand.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,6 +50,10 @@
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
       <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
       <Name>MasterDataFlow.Intelligence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow\MasterDataFlow.csproj">
+      <Project>{28FB7AE9-49AC-476A-AF50-5A3B0C94FD72}</Project>
+      <Name>MasterDataFlow</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

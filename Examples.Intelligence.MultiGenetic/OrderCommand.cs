@@ -19,12 +19,12 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class OrderDataObject : GeneticDoubleDataObject
+    public class OrderDataObject : GeneticDoubleDataObject<OrderGeneticItem>
     {
     }
 
 
-    public class OrderCommand : GeneticDoubleCommand<GeneticDoubleDataObject>
+    public class OrderCommand : GeneticDoubleCommand<OrderDataObject, OrderGeneticItem>
     {
 
         protected override BaseMessage BaseExecute()
@@ -35,12 +35,12 @@ namespace Examples.Intelligence.MultiGenetic
             return result;
         }
 
-        protected override GeneticDoubleItem CreateItem(GeneticItemInitData initData)
+        protected override OrderGeneticItem CreateItem(GeneticItemInitData initData)
         {
             return new OrderGeneticItem(initData);
         }
 
-        public override double CalculateFitness(GeneticDoubleItem item, int processor)
+        public override double CalculateFitness(OrderGeneticItem item, int processor)
         {
             var result = 1;
             var lastValue = item.Values[0];
