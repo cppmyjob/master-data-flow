@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MasterDataFlow.Trading.Data
 {
+    [Serializable]
     public class Bar
     {
         public DateTime Time { get; set; }

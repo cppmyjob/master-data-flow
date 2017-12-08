@@ -90,7 +90,9 @@ namespace MasterDataFlow.Trading.Importer
                 File.Delete(filename);
             using (var writer = new StreamWriter(filename))
             {
-                string[] headers = new string[] { "DateTime", "Open", "Close", "High", "Low", "Volume" };
+                // DateTime,Open,High,Low,Close,Volume
+
+                string[] headers = new string[] { "DateTime", "Open", "High", "Low", "Close", "Volume" };
                 writer.Write(string.Join(",", headers));
                 writer.WriteLine();
 
@@ -102,11 +104,11 @@ namespace MasterDataFlow.Trading.Importer
                     writer.Write(",");
                     writer.Write(candle.Open.ToString(CultureInfo.InvariantCulture));
                     writer.Write(",");
-                    writer.Write(candle.Close.ToString(CultureInfo.InvariantCulture));
-                    writer.Write(",");
                     writer.Write(candle.High.ToString(CultureInfo.InvariantCulture));
                     writer.Write(",");
                     writer.Write(candle.Low.ToString(CultureInfo.InvariantCulture));
+                    writer.Write(",");
+                    writer.Write(candle.Close.ToString(CultureInfo.InvariantCulture));
                     writer.Write(",");
                     writer.Write(candle.Volume.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine();

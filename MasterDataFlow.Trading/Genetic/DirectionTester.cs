@@ -9,7 +9,7 @@ using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Genetic
 {
-    public class DirectionTester : FxDirectionTester
+    public class DirectionTester : Tester.DirectionTester
     {
         private readonly GeneticNeuronDLL1 _dll;
         private readonly TradingItem _tradingItem;
@@ -28,7 +28,7 @@ namespace MasterDataFlow.Trading.Genetic
 
         private float[] _inputs;
 
-        protected override FxDirection GetDirection(int index)
+        protected override Direction GetDirection(int index)
         {
             if (_inputs == null)
             {
@@ -38,7 +38,7 @@ namespace MasterDataFlow.Trading.Genetic
             for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
             {
                 var indicatorIndex = _tradingItem.GetIndicatorIndex(i);
-                var indicatorValues = _learningData.Indicators[indicatorIndex];
+                var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
                 Array.Copy(indicatorValues, index, _inputs, _historyWindowLength * i, _historyWindowLength);
             }
 
@@ -46,12 +46,12 @@ namespace MasterDataFlow.Trading.Genetic
             var isBuy = outputs[0] > 0.5F;
             var isSell = outputs[1] > 0.5F;
             if (isBuy && isSell)
-                return FxDirection.None;
+                return Direction.None;
             if (isBuy)
-                return FxDirection.Up;
+                return Direction.Up;
             if (isSell)
-                return FxDirection.Down;
-            return FxDirection.None;
+                return Direction.Down;
+            return Direction.None;
         }
 
 

@@ -8,10 +8,19 @@ using MasterDataFlow.Trading.Tester;
 namespace MasterDataFlow.Trading.Genetic
 {
 
+    [Serializable]
+    public class LearningDataIndicator
+    {
+        public string Name { get; set; }
+        public float[] Values { get; set; }
+        public DateTime[] Times { get; set; }
+    }
+
+    [Serializable]
     public class LearningData
     {
         public Bar[] Prices { get; set; }
-        public float[][] Indicators { get; set; }
+        public LearningDataIndicator[] Indicators { get; set; }
     }
 
     [Serializable]
@@ -73,9 +82,9 @@ namespace MasterDataFlow.Trading.Genetic
             get { return (int)(Values[OFFSET_STOPLOSS] * 100); }
         }
 
-        public FxTesterResult ValidationTesterResult { get; set; }
+        public TesterResult ValidationTesterResult { get; set; }
 
-        public FxTesterResult TrainingTesterResult { get; set; }
+        public TesterResult TrainingTesterResult { get; set; }
     }
 
 
@@ -171,10 +180,10 @@ namespace MasterDataFlow.Trading.Genetic
 
         }
 
-        private FxTesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData)
+        private TesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData)
         {
             var tester = new DirectionTester(dll, item, DataObject.HistoryWindowLength, learningData);
-            FxTesterResult result = tester.Run();
+            TesterResult result = tester.Run();
             return result;
         }
 

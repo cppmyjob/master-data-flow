@@ -7,13 +7,13 @@ using MasterDataFlow.Trading.Data;
 
 namespace MasterDataFlow.Trading.Tester
 {
-    public enum FxStoryType { Sell, Buy, Close, CloseByStopLoss, CloseByTakeProfit, CloseByForceStop, CloseByStop }
+    public enum StoryType { Sell, Buy, Close, CloseByStopLoss, CloseByTakeProfit, CloseByForceStop, CloseByStop }
 
-    public class FxStory
+    public class Story
     {
         public int Id { get; internal set; }
         public DateTime Time { get; internal set; }
-        public FxStoryType Type { get; internal set; }
+        public StoryType Type { get; internal set; }
         public int OrderTicket { get; internal set; }
         public decimal Volume { get; internal set; }
         public decimal Price { get; internal set; }
@@ -23,7 +23,7 @@ namespace MasterDataFlow.Trading.Tester
         public decimal Balance { get; internal set; }
     }
 
-    public class FxTesterResult
+    public class TesterResult
     {
         private double _profit = 0.0;
         private int _orderCount = 0;
@@ -38,7 +38,7 @@ namespace MasterDataFlow.Trading.Tester
 
         private int _sellCount = 0;
         private int _buyCount = 0;
-        private List<FxStory> _stories = new List<FxStory>();
+        private List<Story> _stories = new List<Story>();
 
         public bool ForceStop
         {
@@ -112,35 +112,35 @@ namespace MasterDataFlow.Trading.Tester
             internal set { _buyCount = value; }
         }
 
-        internal void AddStory(FxStory story)
+        internal void AddStory(Story story)
         {
             story.Id = _stories.Count + 1;
             _stories.Add(story);
         }
 
-        public IEnumerable<FxStory> Stories
+        public IEnumerable<Story> Stories
         {
             get { return _stories; }
         }
 
     }
 
-    public enum FxDirection { None = 0, Down = 1, Up = 2 }
+    public enum Direction { None = 0, Down = 1, Up = 2 }
 
-    public enum FxOrderType { Sell, Buy }
+    public enum OrderType { Sell, Buy }
 
-    public class FxOrder
+    public class Order
     {
         private int _ticket;
         private double _price;
-        private FxOrderType _type;
+        private OrderType _type;
         private double _stopLoss;
         private int _openBarIndex;
         private int _closeBarIndex;
 
         private decimal _volume = 0.1m; // TODO now fixing
 
-        public FxOrder(FxOrderType type, double price, double stopLoss)
+        public Order(OrderType type, double price, double stopLoss)
         {
             _price = price;
             _type = type;
@@ -171,7 +171,7 @@ namespace MasterDataFlow.Trading.Tester
             internal set { _closeBarIndex = value; }
         }
 
-        public FxOrderType Type
+        public OrderType Type
         {
             get { return _type; }
         }
@@ -188,18 +188,18 @@ namespace MasterDataFlow.Trading.Tester
 
     }
 
-    public class FxHistoryItem
+    public class HistoryItem
     {
-        private FxOrder _order;
+        private Order _order;
         private double _profit;
 
-        public FxHistoryItem(FxOrder order, double profit)
+        public HistoryItem(Order order, double profit)
         {
             _order = order;
             _profit = profit;
         }
 
-        public FxOrder Order
+        public Order Order
         {
             get { return _order; }
         }
@@ -211,16 +211,16 @@ namespace MasterDataFlow.Trading.Tester
 
     }
 
-    public abstract class FxDirectionTester : FxAbstractTester
+    public abstract class DirectionTester : AbstractTester
     {
-        private FxOrder _currentOrder;
+        private Order _currentOrder;
 
-        public FxDirectionTester(double deposit, Bar[] prices, int from, int length) :
+        public DirectionTester(double deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)
         {
         }
 
-        protected abstract FxDirection GetDirection(int index);
+        protected abstract Direction GetDirection(int index);
         protected abstract int GetStopLoss();
 
         private int _lastBarNumber = -1;
@@ -247,13 +247,13 @@ namespace MasterDataFlow.Trading.Tester
                 //switch (_getDirection(CurrentBar - From))
                 switch (GetDirection(CurrentBar))
                 {
-                    case FxDirection.Up:
+                    case Direction.Up:
                         _currentOrder = Buy();
                         break;
-                    case FxDirection.Down:
+                    case Direction.Down:
                         _currentOrder = Sell();
                         break;
-                    case FxDirection.None:
+                    case Direction.None:
                         break;
                 }
             }
@@ -262,21 +262,21 @@ namespace MasterDataFlow.Trading.Tester
                 //switch (_getDirection(CurrentBar - From))
                 switch (GetDirection(CurrentBar))
                 {
-                    case FxDirection.Up:
-                        if (_currentOrder.Type == FxOrderType.Sell)
+                    case Direction.Up:
+                        if (_currentOrder.Type == OrderType.Sell)
                         {
                             CloseOrder(_currentOrder.Ticket);
                             _currentOrder = Buy();
                         }
                         break;
-                    case FxDirection.Down:
-                        if (_currentOrder.Type == FxOrderType.Buy)
+                    case Direction.Down:
+                        if (_currentOrder.Type == OrderType.Buy)
                         {
                             CloseOrder(_currentOrder.Ticket);
                             _currentOrder = Sell();
                         }
                         break;
-                    case FxDirection.None:
+                    case Direction.None:
                         CloseOrder(_currentOrder.Ticket);
                         _currentOrder = null;
                         break;
@@ -285,7 +285,7 @@ namespace MasterDataFlow.Trading.Tester
 
         }
 
-        private FxOrder Buy()
+        private Order Buy()
         {
             int intSellOrder = GetStopLoss();
             double stopLoss = 0.0;
@@ -293,12 +293,12 @@ namespace MasterDataFlow.Trading.Tester
             {
                 stopLoss = CurrentPrice - (double)intSellOrder / DecimalFactor;
             }
-            FxOrder order = new FxOrder(FxOrderType.Buy, CurrentPrice, stopLoss);
+            Order order = new Order(OrderType.Buy, CurrentPrice, stopLoss);
             Buy(order);
             return order;
         }
 
-        private FxOrder Sell()
+        private Order Sell()
         {
             int intSellOrder = GetStopLoss();
             double stopLoss = 0.0;
@@ -306,21 +306,21 @@ namespace MasterDataFlow.Trading.Tester
             {
                 stopLoss = CurrentPrice + (double)intSellOrder / DecimalFactor;
             }
-            FxOrder order = new FxOrder(FxOrderType.Sell, CurrentPrice, stopLoss);
+            Order order = new Order(OrderType.Sell, CurrentPrice, stopLoss);
             Sell(order);
             return order;
         }
     }
 
-    public abstract class FxAbstractTester
+    public abstract class AbstractTester
     {
         private Bar[] _prices;
         private int _from;
         private int _length;
 
         private int _lastTicket;
-        private Dictionary<int, FxOrder> _orders;
-        private List<FxHistoryItem> _history;
+        private Dictionary<int, Order> _orders;
+        private List<HistoryItem> _history;
 
         private int _currentBar;
         private double _deposit;
@@ -329,18 +329,18 @@ namespace MasterDataFlow.Trading.Tester
         protected int _decimalsFactor = 10000;
         private decimal _point = 0.0001m;
 
-        protected FxTesterResult _result;
+        protected TesterResult _result;
 
         private int _tickNumber = -1;
         private double[] _ticks;
         private DateTime[] _ticksTimes;
 
-        public FxAbstractTester(double deposit, Bar[] prices)
+        public AbstractTester(double deposit, Bar[] prices)
             : this(deposit, prices, 0, prices.Length)
         {
         }
 
-        public List<FxHistoryItem> History
+        public List<HistoryItem> History
         {
             get { return _history; }
         }
@@ -372,7 +372,7 @@ namespace MasterDataFlow.Trading.Tester
             set { _spred = value; }
         }
 
-        protected Dictionary<int, FxOrder> Orders
+        protected Dictionary<int, Order> Orders
         {
             get { return _orders; }
         }
@@ -383,7 +383,7 @@ namespace MasterDataFlow.Trading.Tester
             set { _deposit = value; }
         }
 
-        public FxAbstractTester(double deposit, Bar[] prices, int from, int length)
+        public AbstractTester(double deposit, Bar[] prices, int from, int length)
         {
             _deposit = deposit;
             _prices = prices;
@@ -401,17 +401,17 @@ namespace MasterDataFlow.Trading.Tester
 
         public virtual void Reset()
         {
-            _orders = new Dictionary<int, FxOrder>();
-            _history = new List<FxHistoryItem>();
+            _orders = new Dictionary<int, Order>();
+            _history = new List<HistoryItem>();
             _lastTicket = 0;
             _currentBar = 0;
-            _result = new FxTesterResult();
+            _result = new TesterResult();
             _result.Equities = new double[_prices.Length];
         }
 
         protected abstract void OnTick();
 
-        public virtual FxTesterResult Run()
+        public virtual TesterResult Run()
         {
             for (int i = _from; i < _from + _length; i++)
             {
@@ -424,7 +424,7 @@ namespace MasterDataFlow.Trading.Tester
             while (_orders.Keys.Count > 0)
             {
                 // TODO неоптимально
-                FxStoryType closeType = _result.ForceStop ? FxStoryType.CloseByForceStop : FxStoryType.CloseByStop;
+                StoryType closeType = _result.ForceStop ? StoryType.CloseByForceStop : StoryType.CloseByStop;
                 CloseOrder(_orders.Keys.ToArray()[0], CurrentPrice, closeType);
             }
             return _result;
@@ -461,25 +461,25 @@ namespace MasterDataFlow.Trading.Tester
 
         private void MakeStopLoss()
         {
-            List<FxOrder> localOrders = new List<FxOrder>(_orders.Values);
+            List<Order> localOrders = new List<Order>(_orders.Values);
             foreach (var order in localOrders)
             {
                 if (order.StopLoss == 0)
                     continue;
                 switch (order.Type)
                 {
-                    case FxOrderType.Buy:
+                    case OrderType.Buy:
                         if (CurrentPrice <= order.StopLoss)
                         {
                             CalculateEquity(order.StopLoss);
-                            CloseOrder(order.Ticket, order.StopLoss, FxStoryType.CloseByStopLoss);
+                            CloseOrder(order.Ticket, order.StopLoss, StoryType.CloseByStopLoss);
                         }
                         break;
-                    case FxOrderType.Sell:
+                    case OrderType.Sell:
                         if (CurrentPrice >= order.StopLoss)
                         {
                             CalculateEquity(order.StopLoss);
-                            CloseOrder(order.Ticket, order.StopLoss, FxStoryType.CloseByStopLoss);
+                            CloseOrder(order.Ticket, order.StopLoss, StoryType.CloseByStopLoss);
                         }
                         break;
                     default:
@@ -498,13 +498,13 @@ namespace MasterDataFlow.Trading.Tester
             double profit = 0.0;
             foreach (var pair in _orders)
             {
-                FxOrder order = pair.Value;
+                Order order = pair.Value;
                 switch (order.Type)
                 {
-                    case FxOrderType.Buy:
+                    case OrderType.Buy:
                         profit += price - order.Price - (double)_spred / (double)DecimalFactor;
                         break;
-                    case FxOrderType.Sell:
+                    case OrderType.Sell:
                         profit += order.Price - price - (double)_spred / (double)DecimalFactor;
                         break;
                     default:
@@ -550,11 +550,11 @@ namespace MasterDataFlow.Trading.Tester
             get { return _currentBar; }
         }
 
-        protected void Buy(FxOrder order)
+        protected void Buy(Order order)
         {
             ++_lastTicket;
 
-            FxStory story = new FxStory()
+            Story story = new Story()
             {
                 Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
                 OrderTicket = _lastTicket,
@@ -563,7 +563,7 @@ namespace MasterDataFlow.Trading.Tester
                 StopLoss = order.StopLoss > 0 ? (decimal?)order.StopLoss : (decimal?)null,
                 TakeProfit = null, // TODO
                 Time = CurrentTime,
-                Type = FxStoryType.Buy,
+                Type = StoryType.Buy,
                 Volume = (decimal)order.Volume
             };
             _result.AddStory(story);
@@ -573,11 +573,11 @@ namespace MasterDataFlow.Trading.Tester
             _orders.Add(_lastTicket, order);
         }
 
-        protected void Sell(FxOrder order)
+        protected void Sell(Order order)
         {
             ++_lastTicket;
 
-            FxStory story = new FxStory()
+            Story story = new Story()
             {
                 Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
                 OrderTicket = _lastTicket,
@@ -586,7 +586,7 @@ namespace MasterDataFlow.Trading.Tester
                 StopLoss = order.StopLoss > 0 ? (decimal?)order.StopLoss : (decimal?)null,
                 TakeProfit = null, // TODO
                 Time = CurrentTime,
-                Type = FxStoryType.Sell,
+                Type = StoryType.Sell,
                 Volume = (decimal)order.Volume
             };
 
@@ -598,19 +598,19 @@ namespace MasterDataFlow.Trading.Tester
 
         protected void CloseOrder(int ticket)
         {
-            CloseOrder(ticket, CurrentPrice, FxStoryType.Close);
+            CloseOrder(ticket, CurrentPrice, StoryType.Close);
         }
 
-        private void CloseOrder(int ticket, double price, FxStoryType closeType)
+        private void CloseOrder(int ticket, double price, StoryType closeType)
         {
-            FxOrder order = _orders[ticket];
+            Order order = _orders[ticket];
             double profit = 0.0;
             switch (order.Type)
             {
-                case FxOrderType.Buy:
+                case OrderType.Buy:
                     profit = CloseBuyOrder(order, price);
                     break;
-                case FxOrderType.Sell:
+                case OrderType.Sell:
                     profit = CloseSellOrder(order, price);
                     break;
                 default:
@@ -618,9 +618,9 @@ namespace MasterDataFlow.Trading.Tester
             }
             _orders.Remove(ticket);
             order.CloseBarIndex = CurrentBar;
-            _history.Add(new FxHistoryItem(order, profit));
+            _history.Add(new HistoryItem(order, profit));
 
-            FxStory story = new FxStory()
+            Story story = new Story()
             {
                 Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
                 OrderTicket = ticket,
@@ -635,7 +635,7 @@ namespace MasterDataFlow.Trading.Tester
             _result.AddStory(story);
         }
 
-        private double CloseSellOrder(FxOrder order, double price)
+        private double CloseSellOrder(Order order, double price)
         {
             double profit = order.Price - price - (double)_spred / (double)DecimalFactor;
             if (profit >= 0)
@@ -648,7 +648,7 @@ namespace MasterDataFlow.Trading.Tester
             return profit;
         }
 
-        private double CloseBuyOrder(FxOrder order, double price)
+        private double CloseBuyOrder(Order order, double price)
         {
             double profit = price - order.Price - (double)_spred / (double)DecimalFactor;
             if (profit >= 0)
