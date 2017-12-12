@@ -1,1 +1,0 @@
-﻿http://www.eyecatch.no/projects/nuget-package-template/
