@@ -19,6 +19,11 @@ namespace MasterDataFlow.Intelligence.Genetic
             : base(initData)
         {
         }
+
+        public override int ParseStringValue(string value)
+        {
+            return int.Parse(value);
+        }
     }
 
     public abstract class GeneticIntCommand<TGeneticIntDataObject, TGeneticIntItem> 

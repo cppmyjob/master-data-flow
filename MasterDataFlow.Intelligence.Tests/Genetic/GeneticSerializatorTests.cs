@@ -22,6 +22,12 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             {
                 return System.Math.Floor(random.NextDouble() * 5);
             }
+
+            public override double ParseStringValue(string value)
+            {
+                throw new NotImplementedException();
+            }
+
         }
 
         [TestMethod]
@@ -38,7 +44,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
 
             var item = new MockGeneticItem(initData);
 
-            var dataObject = new GeneticStopDataObject
+            var dataObject = new GeneticInfoDataObject
             {
                 Best = item
             };
@@ -51,7 +57,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
 
             // ASSERT
             Assert.AreEqual(key.Key, newMessage.Key.Key);
-            var newDataOBject = newMessage.Data as GeneticStopDataObject;
+            var newDataOBject = newMessage.Data as GeneticInfoDataObject;
             Assert.IsTrue(newDataOBject.Best is MockGeneticItem);
         }
 

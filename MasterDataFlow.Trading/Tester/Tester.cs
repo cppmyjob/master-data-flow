@@ -9,6 +9,7 @@ namespace MasterDataFlow.Trading.Tester
 {
     public enum StoryType { Sell, Buy, Close, CloseByStopLoss, CloseByTakeProfit, CloseByForceStop, CloseByStop }
 
+    [Serializable]
     public class Story
     {
         public int Id { get; internal set; }
@@ -23,6 +24,7 @@ namespace MasterDataFlow.Trading.Tester
         public decimal Balance { get; internal set; }
     }
 
+    [Serializable]
     public class TesterResult
     {
         private double _profit = 0.0;

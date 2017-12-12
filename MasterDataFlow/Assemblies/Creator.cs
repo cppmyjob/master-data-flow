@@ -19,17 +19,21 @@ namespace MasterDataFlow.Assemblies
             return result;
         }
 
-        public static BaseCommand CreateCommandInstance(CommandKey commandKey, string commandTypeName, ICommandDataObject commandDataObject)
+        public static BaseCommand CreateCommandInstance(WorkflowKey creatorWorkflowKey, CommandKey commandKey, 
+            string commandTypeName, ICommandDataObject commandDataObject, IMessageSender messageSender)
         {
             var commandType = Type.GetType(commandTypeName);
-            return CreateCommandInstance(commandKey, commandType, commandDataObject);
+            return CreateCommandInstance(creatorWorkflowKey, commandKey, commandType, commandDataObject, messageSender);
         }
 
-        public static BaseCommand CreateCommandInstance(CommandKey commandKey, Type commandType, ICommandDataObject commandDataObject)
+        public static BaseCommand CreateCommandInstance(WorkflowKey creatorWorkflowKey, CommandKey commandKey,
+            Type commandType, ICommandDataObject commandDataObject, IMessageSender messageSender)
         {
             var instance = (BaseCommand) Activator.CreateInstance(commandType);
 
             instance.Key = commandKey;
+            instance.CreatorWorkflowKey = creatorWorkflowKey;
+            instance.MessageSender = messageSender;
             if (commandDataObject != null)
             {
                 PropertyInfo dataObjectProperty = commandType.GetProperty("DataObject", BindingFlags.Instance | BindingFlags.Public);

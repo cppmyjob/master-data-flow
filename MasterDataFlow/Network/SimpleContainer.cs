@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MasterDataFlow.Actions;
 using MasterDataFlow.Assemblies;
+using MasterDataFlow.Interfaces;
 using MasterDataFlow.Interfaces.Network;
 using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
@@ -12,7 +13,7 @@ using MasterDataFlow.Utils;
 
 namespace MasterDataFlow.Network
 {
-    public class SimpleContainer : EventLoopHub
+    public class SimpleContainer : EventLoopHub, IMessageSender
     {
         private readonly ServiceKey _key = new ServiceKey();
         private CommandRunner _runner;
@@ -53,7 +54,7 @@ namespace MasterDataFlow.Network
                     commandInfo.DataObject,
                     commandInfo.DataObjectType,
                     commandInfo.CommandKey,
-                    out resultType);
+                    out resultType, this);
                 Logger.Instance.Debug("Finished command : {0}", commandInfo.CommandType);
                 var message = new SerializedCommandMessage((CommandKey) BaseKey.DeserializeKey(commandInfo.CommandKey));
                 message.Data = result;
@@ -74,7 +75,8 @@ namespace MasterDataFlow.Network
             try
             {
                 Logger.Instance.Debug("Starting command execution");
-                var commandInstance = Creator.CreateCommandInstance(commandInfo.CommandKey, commandInfo.CommandType, commandInfo.CommandDataObject);
+                var commandInstance = Creator.CreateCommandInstance(commandInfo.WorkflowKey, commandInfo.CommandKey, 
+                    commandInfo.CommandType, commandInfo.CommandDataObject, this);
                 var result = commandInstance.BaseExecute();
                 Logger.Instance.Debug("Finished command execution");
                 var resultPacket = new Packet(Key, commandInfo.WorkflowKey, result);
@@ -89,6 +91,12 @@ namespace MasterDataFlow.Network
             {
                 //_commandInstance = null;
             }
+        }
+
+        public void Send(BaseKey recipient, CommandMessage message)
+        {
+            var packet = new Packet(message.Key, recipient, message);
+            _runner.Send(packet);
         }
     }
 }

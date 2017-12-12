@@ -8,16 +8,20 @@ using MasterDataFlow.Messages;
 
 namespace MasterDataFlow
 {
+
     public abstract class BaseCommand 
     {
         // TODO move setting key value to constructor
         public CommandKey Key { get; internal set; }
+        public WorkflowKey CreatorWorkflowKey { get; internal set; }
 
-        internal protected abstract BaseMessage BaseExecute();
+        public IMessageSender MessageSender { get; internal set; }
 
-        protected virtual void SendMessage(BaseKey key)
+        protected internal abstract BaseMessage BaseExecute();
+
+        protected virtual void SendMessage(BaseKey recipient, CommandMessage message)
         {
-            
+            MessageSender.Send(recipient, message);
         }
 
         protected virtual void OnSubscribed(BaseKey key)
@@ -27,7 +31,7 @@ namespace MasterDataFlow
 
         protected virtual void OnUnsubscribed(BaseKey key)
         {
-            
+
         }
     }
 }

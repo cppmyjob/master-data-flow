@@ -65,7 +65,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             Assert.AreEqual(5, OrderCommand.StaticDataObject.CellInitData.ValuesCount);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
 
         }
 
@@ -97,7 +97,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             _event.WaitOne(5000);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticStopDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
 
 
         }

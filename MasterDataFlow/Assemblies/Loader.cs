@@ -66,11 +66,13 @@ namespace MasterDataFlow.Assemblies
             return result;
         }
 
-        public string Execute(string commandType, string dataObject, string dataObjectType, string commandKey, out Type resultType)
+        public string Execute(string commandType, string dataObject, string dataObjectType, string workflowKey, string commandKey, 
+            out Type resultType, IMessageSender messageSender)
         {
-            var commandKeyInstance = (CommandKey) BaseKey.DeserializeKey(commandKey);
+            var commandKeyInstance = (CommandKey)BaseKey.DeserializeKey(commandKey);
+            var workflowKeyInstance = (WorkflowKey)BaseKey.DeserializeKey(workflowKey);
             var dataObjectInstance = Creator.CreateDataObjectInstance(dataObject, dataObjectType);
-            var command = Creator.CreateCommandInstance(commandKeyInstance, commandType, dataObjectInstance);
+            var command = Creator.CreateCommandInstance(workflowKeyInstance, commandKeyInstance, commandType, dataObjectInstance, messageSender);
             var commandResult = command.BaseExecute();
             resultType = commandResult.GetType();
             var result = Serialization.Serializator.Serialize(commandResult);

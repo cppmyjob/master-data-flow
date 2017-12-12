@@ -12,6 +12,7 @@ namespace MasterDataFlow.Interfaces
 
         string[] GetDomainAssemblies();
 
-        string Execute(string commandType, string dataObject, string dataObjectType, string commandKey, out Type resultType);
+        string Execute(string commandType, string dataObject, string dataObjectType, string workflowKey, 
+            string commandKey, out Type resultType, IMessageSender messageSender);
     }
 }

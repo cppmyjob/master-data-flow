@@ -19,6 +19,11 @@ namespace MasterDataFlow.Intelligence.Genetic
             : base(initData)
         {
         }
+
+        public override double ParseStringValue(string value)
+        {
+            return Double.Parse(value);
+        }
     }
 
     public abstract class GeneticDoubleCommand<TGeneticDoubleDataObject, TGeneticDoubleItem>

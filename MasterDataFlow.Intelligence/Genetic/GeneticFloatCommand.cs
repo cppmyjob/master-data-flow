@@ -19,6 +19,12 @@ namespace MasterDataFlow.Intelligence.Genetic
             : base(initData)
         {
         }
+
+        public override float ParseStringValue(string value)
+        {
+            return float.Parse(value);
+        }
+
     }
 
     public abstract class GeneticFloatCommand<TGeneticFloatDataObject, TGeneticFloatItem>

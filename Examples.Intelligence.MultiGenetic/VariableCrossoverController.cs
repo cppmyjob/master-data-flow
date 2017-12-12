@@ -28,7 +28,7 @@ namespace Examples.Intelligence.MultiGenetic
                                                        var stopMessage = message as StopCommandMessage;
                                                        if (stopMessage != null)
                                                        {
-                                                           var best = (VariableCrossoverGeneticItem)(stopMessage.Data as GeneticStopDataObject).Best;
+                                                           var best = (VariableCrossoverGeneticItem)(stopMessage.Data as GeneticInfoDataObject).Best;
                                                            lock (this)
                                                            {
                                                                theBests.Add(best);

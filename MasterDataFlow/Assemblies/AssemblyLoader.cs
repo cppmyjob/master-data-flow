@@ -73,7 +73,8 @@ namespace MasterDataFlow.Assemblies
             return domain.Loader.GetDomainAssemblies();
         }
 
-        public string LocalExecuteCommandAction(WorkflowKey workflowKey,string commandType, string dataObject, string dataObjectType, string commandKey, out Type resultType)
+        public string LocalExecuteCommandAction(WorkflowKey workflowKey,string commandType, string dataObject, string dataObjectType, 
+            string commandKey, out Type resultType, IMessageSender messageSender)
         {
             InternalDomain domain;
             if (!_domains.TryGetValue(workflowKey, out domain))
@@ -83,7 +84,7 @@ namespace MasterDataFlow.Assemblies
                 return null;
             }
 
-            var result = domain.Loader.Execute(commandType, dataObject, dataObjectType, commandKey, out resultType);
+            var result = domain.Loader.Execute(commandType, dataObject, dataObjectType, workflowKey.Key, commandKey, out resultType, messageSender);
             return result;
         }
 

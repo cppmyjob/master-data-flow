@@ -1,14 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Random;
 using MasterDataFlow.Interfaces;
+using MasterDataFlow.Keys;
 using MasterDataFlow.Messages;
 
 namespace MasterDataFlow.Intelligence.Genetic
 {
+    [Serializable]
+    public class GeneticEndCycleMessage : CommandMessage
+    {
+        private readonly GeneticInfoDataObject _data;
+
+        public GeneticEndCycleMessage(CommandKey key, GeneticInfoDataObject data) : base(key)
+        {
+            _data = data;
+        }
+
+        public GeneticInfoDataObject Data
+        {
+            get { return _data; }
+        }
+    }
+
+
     [Serializable]
     public class GeneticInitData
     {
@@ -53,7 +73,7 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     [Serializable]
-    public class GeneticStopDataObject : ICommandDataObject
+    public class GeneticInfoDataObject : ICommandDataObject
     {
         public object Best { get; set; }
     }
@@ -84,11 +104,33 @@ namespace MasterDataFlow.Intelligence.Genetic
                 InitPopulation();
                 CreatingPopulation(DataObject.InitPopulation.Count);
             }
-            for (int i = 0; i < DataObject.RepeatCount; i++)
+
+            if (DataObject.RepeatCount == 0)
             {
-                Process();
+                while (true)
+                {
+                    Process();
+
+                    var info = new GeneticInfoDataObject
+                                 {
+                                     Best = _theBest ?? _itemsArray[0]
+                                 };
+                    SendMessage(CreatorWorkflowKey, new GeneticEndCycleMessage(Key, info));
+                }
             }
-            var result = new GeneticStopDataObject
+            else
+            {
+                for (int i = 0; i < DataObject.RepeatCount; i++)
+                {
+                    Process();
+                    var info = new GeneticInfoDataObject
+                               {
+                                   Best = _theBest ?? _itemsArray[0]
+                               };
+                    SendMessage(CreatorWorkflowKey, new GeneticEndCycleMessage(Key, info));
+                }
+            }
+            var result = new GeneticInfoDataObject
             {
                 Best = _theBest ?? _itemsArray[0]
             };
@@ -303,6 +345,5 @@ namespace MasterDataFlow.Intelligence.Genetic
             }
             return child;
         }
-
     }
 }

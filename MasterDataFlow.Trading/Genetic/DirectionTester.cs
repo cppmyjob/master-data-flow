@@ -37,7 +37,7 @@ namespace MasterDataFlow.Trading.Genetic
 
             for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
             {
-                var indicatorIndex = _tradingItem.GetIndicatorIndex(i);
+                var indicatorIndex = (int)_tradingItem.GetIndicatorIndex(i);
                 var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
                 Array.Copy(indicatorValues, index, _inputs, _historyWindowLength * i, _historyWindowLength);
             }

@@ -77,13 +77,15 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tbFitness = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
+            this.tbIndicators = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(909, 598);
+            this.button1.Location = new System.Drawing.Point(978, 622);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
@@ -511,11 +513,28 @@
             this.label12.TabIndex = 49;
             this.label12.Text = "Fitness :";
             // 
+            // tbIndicators
+            // 
+            this.tbIndicators.Location = new System.Drawing.Point(422, 593);
+            this.tbIndicators.Name = "tbIndicators";
+            this.tbIndicators.ReadOnly = true;
+            this.tbIndicators.Size = new System.Drawing.Size(501, 20);
+            this.tbIndicators.TabIndex = 77;
+            // 
+            // label22
+            // 
+            this.label22.Location = new System.Drawing.Point(349, 597);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(80, 16);
+            this.label22.TabIndex = 78;
+            this.label22.Text = "Indicators :";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1075, 647);
+            this.Controls.Add(this.tbIndicators);
             this.Controls.Add(this.tbPredictionMinusCount);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.tbPredictionPlusCount);
@@ -547,6 +566,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
+            this.Controls.Add(this.label22);
             this.Name = "Form1";
             this.Text = "Form1";
             this.groupBox2.ResumeLayout(false);
@@ -608,6 +628,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbFitness;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox tbIndicators;
+        private System.Windows.Forms.Label label22;
     }
 }
 

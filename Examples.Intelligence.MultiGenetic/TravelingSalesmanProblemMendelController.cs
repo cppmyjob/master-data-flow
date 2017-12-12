@@ -27,7 +27,7 @@ namespace Examples.Intelligence.MultiGenetic
                     var stopMessage = message as StopCommandMessage;
                     if (stopMessage != null)
                     {
-                        var best = (MendelGeneticItem)(stopMessage.Data as GeneticStopDataObject).Best;
+                        var best = (MendelGeneticItem)(stopMessage.Data as GeneticInfoDataObject).Best;
                         lock (this)
                         {
                             theBests.Add(best);

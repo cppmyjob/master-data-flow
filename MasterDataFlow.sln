@@ -31,8 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Intelligence.Tests", "MasterDataFlow.Intelligence.Tests\MasterDataFlow.Intelligence.Tests.csproj", "{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.NuGet.Packager", "MasterDataFlow.NuGet.Packager\MasterDataFlow.NuGet.Packager.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDataFlow.Common.Tests", "MasterDataFlow.Common.Tests\MasterDataFlow.Common.Tests.csproj", "{AD12D97E-6339-4D9E-9C44-C62055F952D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.Wcf.Client", "Examples.Wcf.Client\Examples.Wcf.Client.csproj", "{E1458973-5FAD-4522-9720-E3A621D672A9}"
@@ -95,10 +93,6 @@ Global
 		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7861BFA9-E83F-45A7-8FE1-0B5AFD432611}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD12D97E-6339-4D9E-9C44-C62055F952D5}.Release|Any CPU.ActiveCfg = Release|Any CPU

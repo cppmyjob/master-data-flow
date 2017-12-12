@@ -19,6 +19,11 @@ namespace Examples.Intelligence.MultiGenetic
         public TravelingSalesmanProblemMendelGeneticItem(GeneticItemInitData initData, IRandom random) : base(initData, random)
         {
         }
+
+        public override GenePair ParseStringValue(string value)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
