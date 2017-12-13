@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Neuron;
@@ -28,17 +29,15 @@ namespace MasterDataFlow.Trading.Genetic
     {
         public LearningData TrainingData { get; }
         public LearningData ValidationData { get; }
-        public int HistoryWindowLength { get; }
 
-        public TradingDataObject(LearningData trainingData, LearningData validationData, int historyWindowLength,
+        public TradingDataObject(LearningData trainingData, LearningData validationData,
             int itemsCount, int surviveCount)
         {
             TrainingData = trainingData;
             ValidationData = validationData;
-            HistoryWindowLength = historyWindowLength;
             RepeatCount = 10;
             CellInitData = new GeneticInitData(itemsCount, surviveCount, 
-                TradingCommand.GetWeightsCount(historyWindowLength) + TradingItem.OFFSET_VALUES);
+                TradingCommand.GetWeightsCount() + TradingItem.OFFSET_VALUES);
         }
 
     }
@@ -46,6 +45,8 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class TradingItem : GeneticFloatItem
     {
+        public const int HISTORY_WINDOW_LENGTH = 24;
+
         public const int INDICATOR_NUMBER = 3;
         public const int ALPHA_NUMBER = 1;
         public const int STOPLOSS_NUMBER = 1;
@@ -99,6 +100,15 @@ namespace MasterDataFlow.Trading.Genetic
 
         public override double CalculateFitness(TradingItem item, int processor)
         {
+            bool[] oldValues = new bool[DataObject.TrainingData.Indicators.Length];
+            for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+            {
+                var index = (int)item.Values[i];
+                if (oldValues[index])
+                    return Double.MinValue;
+                oldValues[index] = true;
+            }
+
 
             //if (item.StopLoss < 30 || item.StopLoss > 100000)
             //{
@@ -118,43 +128,96 @@ namespace MasterDataFlow.Trading.Genetic
             {
                 return Double.MinValue;
             }
+            if ((float)validationResult.MinusCount / (validationResult.PlusCount + validationResult.MinusCount) > 0.5)
+            {
+                return Double.MinValue;
+            }
+
             if (validationResult.BuyCount == 0 || validationResult.SellCount == 0)
             {
                 return Double.MinValue;
             }
+
+            if (validationResult.BuyCount > validationResult.SellCount)
+            {
+                if (validationResult.BuyCount / (float)validationResult.SellCount > 2)
+                {
+                    return Double.MinValue;
+                }
+            }
+            else
+            {
+                if (validationResult.SellCount / (float)validationResult.BuyCount > 2)
+                {
+                    return Double.MinValue;
+                }
+            }
+
 
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData);
             item.TrainingTesterResult = trainingResult;
 
-            if (trainingResult.Profit <= 0)
+            if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
             {
-                return Double.MinValue;
+                if (((float)validationResult.PlusCount / validationResult.MinusCount) <
+                    ((float)trainingResult.PlusCount / trainingResult.MinusCount))
+                {
+                    return Double.MinValue;
+                }
             }
-            if (trainingResult.PlusCount < trainingResult.MinusCount)
-            {
-                return Double.MinValue;
-            }
-            if (validationResult.BuyCount == 0 || validationResult.SellCount == 0)
-            {
-                return Double.MinValue;
-            }
-            float buysell;
-            if (validationResult.BuyCount > validationResult.SellCount)
-                buysell = (float)validationResult.SellCount / (float)validationResult.BuyCount;
-            else
-                buysell = (float)validationResult.BuyCount / (float)validationResult.SellCount;
+
+
+            //if (trainingResult.Profit <= 0)
+            //{
+            //    return Double.MinValue;
+            //}
+            //if (trainingResult.PlusCount < trainingResult.MinusCount)
+            //{
+            //    return Double.MinValue;
+            //}
+            //if ((float)trainingResult.MinusCount / (trainingResult.PlusCount + trainingResult.MinusCount) > 0.5)
+            //{
+            //    return Double.MinValue;
+            //}
+            //if (trainingResult.BuyCount == 0 || trainingResult.SellCount == 0)
+            //{
+            //    return Double.MinValue;
+            //}
+            //if (trainingResult.BuyCount > trainingResult.SellCount)
+            //{
+            //    if (trainingResult.BuyCount / (float)trainingResult.SellCount > 2)
+            //    {
+            //        return Double.MinValue;
+            //    }
+            //}
+            //else
+            //{
+            //    if (trainingResult.SellCount / (float)trainingResult.BuyCount > 2)
+            //    {
+            //        return Double.MinValue;
+            //    }
+            //}
+
+
+
+            //float buysell;
+            //if (validationResult.BuyCount > validationResult.SellCount)
+            //    buysell = (float) validationResult.SellCount / (float) validationResult.BuyCount;
+            //else
+            //    buysell = (float) validationResult.BuyCount / (float) validationResult.SellCount;
 
 
             return (validationResult.Profit + trainingResult.Profit)
                    * (trainingResult.OrderCount + validationResult.OrderCount)
-                   * (trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
-                   * buysell;
+                   * (trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount -
+                      validationResult.MinusCount);
+                   //* buysell;
 
         }
 
         private TesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData)
         {
-            var tester = new DirectionTester(dll, item, DataObject.HistoryWindowLength, learningData);
+            var tester = new DirectionTester(dll, item, learningData);
             TesterResult result = tester.Run();
             return result;
         }
@@ -180,26 +243,27 @@ namespace MasterDataFlow.Trading.Genetic
         {
             GeneticNeuronDLL1 dll = new GeneticNeuronDLL1();
             float alpha = 1.5F;
-            dll.NetworkCreate(alpha, GetNeuronsConfig(dataObject.HistoryWindowLength));
-            dll.CreateWeigths(GetWeightsCount(dataObject.HistoryWindowLength));
+            dll.NetworkCreate(alpha, GetNeuronsConfig());
+            dll.CreateWeigths(GetWeightsCount());
             return dll;
         }
 
-        public static int[] GetNeuronsConfig(int historyWindowLength)
+        private static int[] NeuronsConfig =  new int[] {
+            TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER,
+            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            2 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            2,
+        };
+
+        public static int[] GetNeuronsConfig()
         {
-            return new int[] {
-                                 historyWindowLength * TradingItem.INDICATOR_NUMBER,
-                                 1 * (historyWindowLength * TradingItem.INDICATOR_NUMBER),
-                                 2 * (historyWindowLength * TradingItem.INDICATOR_NUMBER),
-                                 1 * (historyWindowLength * TradingItem.INDICATOR_NUMBER),
-                                 2,
-                             };
+            return NeuronsConfig;
         }
 
-
-        public static int GetWeightsCount(int historyWindowLength)
+        public static int GetWeightsCount()
         {
-            int[] neurons = GetNeuronsConfig(historyWindowLength);
+            int[] neurons = GetNeuronsConfig();
             int result = 0;
             for (int i = 1; i < neurons.Length; i++)
             {
@@ -213,6 +277,9 @@ namespace MasterDataFlow.Trading.Genetic
         {
             var weights = dll.GetWeigths();
             var values = item.Values;
+
+            //Parallel.For(0, weights.Length, i => weights[i] = values[i + TradingItem.OFFSET_VALUES] * 100.0F - 50.0F);
+
             var offset = TradingItem.OFFSET_VALUES;
             for (int i = 0; i < weights.Length; i++)
             {
@@ -231,11 +298,70 @@ namespace MasterDataFlow.Trading.Genetic
                 values[i] = allIndexes[i];
             }
 
-            for (int j = TradingItem.INDICATOR_NUMBER; j < DataObject.CellInitData.ValuesCount; j++)
+            for (int j = TradingItem.OFFSET_ALPHA; j < DataObject.CellInitData.ValuesCount; j++)
             {
                 var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
             }
+        }
+
+        protected override void Mutation(TradingItem item)
+        {
+            if (Random.NextDouble() > 0.999)
+            {
+                var allIndexes = GetUniqueIndicatorIndexes();
+                for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+                {
+                    item.Values[i] = allIndexes[i];
+                }
+            }
+
+            for (int i = TradingItem.OFFSET_ALPHA; i < item.Values.Length; i++)
+            {
+                if (Random.NextDouble() > 0.999)
+                {
+                    var valueValue = item.CreateValue(Random);
+                    item.Values[i] = valueValue;
+                }
+            }
+        }
+
+        protected override TradingItem CreateChild(TradingItem firstParent, TradingItem secondParent)
+        {
+            var child = InternalCreateItem();
+            float[] firstValues = firstParent.Values;
+            float[] secondValues = secondParent.Values;
+            float[] childValues = child.Values;
+
+            for (int i = 0; i < TradingItem.OFFSET_VALUES; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    childValues[i] = firstValues[i];
+                }
+                else
+                {
+                    childValues[i] = secondValues[i];
+                }
+            }
+
+            int[] neurons = GetNeuronsConfig();
+            var offset = TradingItem.OFFSET_VALUES;
+            for (int i = 1; i < neurons.Length; i++)
+            {
+                var layerWeights = neurons[i - 1] * neurons[i];
+                if (i % 2 == 0)
+                {
+                    Array.Copy(firstValues, offset, childValues, offset, layerWeights);
+                }
+                else
+                {
+                    Array.Copy(secondValues, offset, childValues, offset, layerWeights);
+                }
+                offset += layerWeights;
+            }
+
+            return child;
         }
 
 

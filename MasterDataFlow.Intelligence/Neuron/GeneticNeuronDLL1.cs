@@ -128,7 +128,6 @@ namespace MasterDataFlow.Intelligence.Neuron
                 sum += neuron.Inputs[i] * weights[neuron.WeightsOffset + i];
             }
             neuron.Outputs[neuron.layerIndex] = (float)(1.0 / (1.0 + global::System.Math.Exp(-(alpha * sum))));
-
         }
 
         private void QueueProcess(GeneticQueue1 queue)

@@ -13,7 +13,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         private GeneticItemInitData _initData;
         private TValue[] _oldValues;
         private GeneticHistory<GeneticItem<TValue>, TValue> _history;
-        private readonly Guid _guid = Guid.NewGuid();
+        private Guid _guid = Guid.NewGuid();
 
         protected GeneticItem()
         {
@@ -110,6 +110,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             root.Add(best);
 
             best.Add(new XElement("Fitness", Fitness.ToString()));
+            best.Add(new XElement("Guid", Guid.ToString()));
 
             XElement values = new XElement("Values");
             best.Add(values);
@@ -126,6 +127,12 @@ namespace MasterDataFlow.Intelligence.Genetic
 
             XElement eFitness = eBest.Element("Fitness");
             Fitness = Double.Parse(eFitness.Value);
+
+            XElement guid = eBest.Element("Guid");
+            if (guid != null)
+            {
+                _guid = Guid.Parse(guid.Value);
+            }
 
             XElement eValues = eBest.Element("Values");
             int i = 0;

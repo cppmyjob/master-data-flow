@@ -197,7 +197,7 @@ namespace MasterDataFlow.Trading.Ui
             }
 
             var dll = TradingCommand.CreateNeuronDll(_dataObject, neuronItem);
-            var tester = new DirectionTester(dll, neuronItem, HistoryWindowLength, _testData);
+            var tester = new DirectionTester(dll, neuronItem, _testData);
             TesterResult testResult = tester.Run();
             SetText(tbPredictionProfit, (testResult.Profit).ToString("F10"));
             SetText(tbPredictionOrderCount, (testResult.OrderCount).ToString("D"));
@@ -264,7 +264,6 @@ namespace MasterDataFlow.Trading.Ui
             return result;
         }
 
-        private const int HistoryWindowLength = 24;
         private const int IndicatorsOffset = 50;
 
         private async Task<TradingDataObject> CreateDataObject()
@@ -272,9 +271,9 @@ namespace MasterDataFlow.Trading.Ui
             await LoadInputData();
 
 
-            var result = new TradingDataObject(_trainingData, _validationData, HistoryWindowLength,
+            var result = new TradingDataObject(_trainingData, _validationData, 
                 100 * (int)nudPopulationFactor.Value, 33 * (int)nudPopulationFactor.Value);
-            result.RepeatCount = 300;
+            result.RepeatCount = 3000000;
 
 
             return result;
@@ -303,16 +302,6 @@ namespace MasterDataFlow.Trading.Ui
         {
             _indicators = new List<LearningDataIndicator>();
 
-            // MACD
-            //var macds = _candles.Macd(12, 26, 9);
-
-            //var macd = new MovingAverageConvergenceDivergence(_candles, 12, 26, 9);
-            //macd.Compute(null, null);
-
-            //AddIndicator("MACD Histogram", macds.Select(t => (float) t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            //AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            //AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-
             // RSI
             IReadOnlyList<AnalyzableTick<decimal?>> rsi = _candles.Rsi(14);
             AddIndicator("RSI ", rsi);
@@ -330,6 +319,13 @@ namespace MasterDataFlow.Trading.Ui
             AddIndicator("EMA 15", ema15);
             var ema20 = _candles.Ema(20);
             AddIndicator("EMA 20", ema20);
+
+            // MACD
+            var macds = _candles.Macd(12, 26, 9);
+
+            AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+            AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+            AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
         }
 
         private void AddIndicator(string name, float[] values, DateTime[] times)
@@ -358,7 +354,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private void SetDataBoundaris()
         {
-            var startTrainingDate = _tradingBars[IndicatorsOffset + HistoryWindowLength].Time.Date.AddDays(1);
+            var startTrainingDate = _tradingBars[IndicatorsOffset + TradingItem.HISTORY_WINDOW_LENGTH].Time.Date.AddDays(1);
 
             var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
             var days = (endTestDate - startTrainingDate).TotalDays;
@@ -392,7 +388,7 @@ namespace MasterDataFlow.Trading.Ui
             var firstTime = result.Prices[0].Time;
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
-            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - HistoryWindowLength - 1;
+            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - TradingItem.HISTORY_WINDOW_LENGTH - 1;
             var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime) - 1;
 
             foreach (var indicator in _indicators)

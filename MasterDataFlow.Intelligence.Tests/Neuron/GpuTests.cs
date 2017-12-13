@@ -16,8 +16,31 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
         private const int Length = 1000000;
 
         [TestMethod]
-        public static void DelegateWithClosureCpu()
+        public void Exp()
         {
+
+            var arg1 = Enumerable.Range(0, Length).ToArray();
+            var result = new int[Length];
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            sw.Start();
+            Parallel.For(0, result.Length, i => result[i] = (int)Alea.DeviceFunction.Exp((float)-arg1[i]));
+            sw.Stop();
+            Console.WriteLine("Exp Gpu:{0}ms", sw.ElapsedMilliseconds);
+
+
+            sw = System.Diagnostics.Stopwatch.StartNew();
+            sw.Start();
+            Parallel.For(0, result.Length, i => result[i] = (int)System.Math.Exp(-arg1[i]));
+            sw.Stop();
+            Console.WriteLine("Exp Cpu:{0}ms", sw.ElapsedMilliseconds);
+        }
+
+        [TestMethod]
+        public void DelegateWithClosureCpu()
+        {
+            
+
             var arg1 = Enumerable.Range(0, Length).ToArray();
             var arg2 = Enumerable.Range(0, Length).ToArray();
             var result = new int[Length];
@@ -30,7 +53,7 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
         }
 
         [GpuManaged, TestMethod]
-        public static void DelegateWithClosureGpu()
+        public void DelegateWithClosureGpu()
         {
             var arg1 = Enumerable.Range(0, Length).ToArray();
             var arg2 = Enumerable.Range(0, Length).ToArray();
