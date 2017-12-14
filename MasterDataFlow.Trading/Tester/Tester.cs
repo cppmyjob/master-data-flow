@@ -16,7 +16,7 @@ namespace MasterDataFlow.Trading.Tester
         public DateTime Time { get; internal set; }
         public StoryType Type { get; internal set; }
         public int OrderTicket { get; internal set; }
-        public decimal Volume { get; internal set; }
+        //public decimal Volume { get; internal set; }
         public decimal Price { get; internal set; }
         public decimal? StopLoss { get; internal set; }
         public decimal? TakeProfit { get; internal set; }
@@ -27,20 +27,21 @@ namespace MasterDataFlow.Trading.Tester
     [Serializable]
     public class TesterResult
     {
-        private double _profit = 0.0;
+        private decimal _profit = 0.0m;
         private int _orderCount = 0;
         private int _plusCount = 0;
         private int _minusCount = 0;
-        private double[] _equities = null;
-        private double _minEquity = Double.MaxValue;
+        private decimal[] _equities = null;
+        private decimal _minEquity = decimal.MaxValue;
         private int _minusEquityCount = 0;
-        private double _maxEquity = Double.MinValue;
+        private decimal _maxEquity = decimal.MinValue;
         private int _plusEquityCount = 0;
         private bool _forceStop = false;
 
         private int _sellCount = 0;
         private int _buyCount = 0;
         private List<Story> _stories = new List<Story>();
+        private List<Order> _orders = new List<Order>();
 
         public bool ForceStop
         {
@@ -54,7 +55,7 @@ namespace MasterDataFlow.Trading.Tester
             internal set { _plusEquityCount = value; }
         }
 
-        public double MinEquity
+        public decimal MinEquity
         {
             get { return _minEquity; }
             internal set { _minEquity = value; }
@@ -66,19 +67,19 @@ namespace MasterDataFlow.Trading.Tester
             internal set { _minusEquityCount = value; }
         }
 
-        public double MaxEquity
+        public decimal MaxEquity
         {
             get { return _maxEquity; }
             internal set { _maxEquity = value; }
         }
 
-        public double[] Equities
+        public decimal[] Equities
         {
             get { return _equities; }
             internal set { _equities = value; }
         }
 
-        public double Profit
+        public decimal Profit
         {
             get { return _profit; }
             internal set { _profit = value; }
@@ -120,29 +121,39 @@ namespace MasterDataFlow.Trading.Tester
             _stories.Add(story);
         }
 
+        internal void AddOrder(Order order)
+        {
+            _orders.Add(order);
+        }
+
         public IEnumerable<Story> Stories
         {
             get { return _stories; }
         }
 
+        public List<Order> Orders
+        {
+            get { return _orders; }
+        }
     }
 
     public enum Direction { None = 0, Down = 1, Up = 2 }
 
     public enum OrderType { Sell, Buy }
 
+    [Serializable]
     public class Order
     {
         private int _ticket;
-        private double _price;
+        private decimal _price;
         private OrderType _type;
-        private double _stopLoss;
+        private decimal _stopLoss;
         private int _openBarIndex;
         private int _closeBarIndex;
 
-        private decimal _volume = 0.1m; // TODO now fixing
+        //private decimal _volume = 0.1m; // TODO now fixing
 
-        public Order(OrderType type, double price, double stopLoss)
+        public Order(OrderType type, decimal price, decimal stopLoss)
         {
             _price = price;
             _type = type;
@@ -150,7 +161,7 @@ namespace MasterDataFlow.Trading.Tester
         }
 
 
-        public double StopLoss
+        public decimal StopLoss
         {
             get { return _stopLoss; }
         }
@@ -173,29 +184,31 @@ namespace MasterDataFlow.Trading.Tester
             internal set { _closeBarIndex = value; }
         }
 
+        public decimal Profit { get; internal set; }
+
         public OrderType Type
         {
             get { return _type; }
         }
 
-        public double Price
+        public decimal Price
         {
             get { return _price; }
         }
 
-        public decimal Volume
-        {
-            get { return _volume; }
-        }
+        //public decimal Volume
+        //{
+        //    get { return _volume; }
+        //}
 
     }
 
     public class HistoryItem
     {
         private Order _order;
-        private double _profit;
+        private decimal _profit;
 
-        public HistoryItem(Order order, double profit)
+        public HistoryItem(Order order, decimal profit)
         {
             _order = order;
             _profit = profit;
@@ -206,7 +219,7 @@ namespace MasterDataFlow.Trading.Tester
             get { return _order; }
         }
 
-        public double Profit
+        public decimal Profit
         {
             get { return _profit; }
         }
@@ -217,13 +230,13 @@ namespace MasterDataFlow.Trading.Tester
     {
         private Order _currentOrder;
 
-        public DirectionTester(double deposit, Bar[] prices, int from, int length) :
+        public DirectionTester(decimal deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)
         {
         }
 
         protected abstract Direction GetDirection(int index);
-        protected abstract int GetStopLoss();
+        protected abstract decimal GetStopLoss();
 
         private int _lastBarNumber = -1;
 
@@ -289,11 +302,11 @@ namespace MasterDataFlow.Trading.Tester
 
         private Order Buy()
         {
-            int intSellOrder = GetStopLoss();
-            double stopLoss = 0.0;
-            if (intSellOrder != 0)
+            decimal stopLossValue = GetStopLoss();
+            decimal stopLoss = 0.0m;
+            if (stopLossValue != 0)
             {
-                stopLoss = CurrentPrice - (double)intSellOrder / DecimalFactor;
+                stopLoss = CurrentPrice - stopLossValue;
             }
             Order order = new Order(OrderType.Buy, CurrentPrice, stopLoss);
             Buy(order);
@@ -302,11 +315,11 @@ namespace MasterDataFlow.Trading.Tester
 
         private Order Sell()
         {
-            int intSellOrder = GetStopLoss();
-            double stopLoss = 0.0;
-            if (intSellOrder != 0)
+            decimal stopLossValue = GetStopLoss();
+            decimal stopLoss = 0.0m;
+            if (stopLossValue != 0)
             {
-                stopLoss = CurrentPrice + (double)intSellOrder / DecimalFactor;
+                stopLoss = CurrentPrice + stopLossValue;
             }
             Order order = new Order(OrderType.Sell, CurrentPrice, stopLoss);
             Sell(order);
@@ -325,19 +338,16 @@ namespace MasterDataFlow.Trading.Tester
         private List<HistoryItem> _history;
 
         private int _currentBar;
-        private double _deposit;
-        private int _spred = 3;
-        private int _decimals = 4;
-        protected int _decimalsFactor = 10000;
-        private decimal _point = 0.0001m;
+        private decimal _deposit;
+        private decimal _spred = 0.05m;
 
         protected TesterResult _result;
 
         private int _tickNumber = -1;
-        private double[] _ticks;
+        private decimal[] _ticks;
         private DateTime[] _ticksTimes;
 
-        public AbstractTester(double deposit, Bar[] prices)
+        public AbstractTester(decimal deposit, Bar[] prices)
             : this(deposit, prices, 0, prices.Length)
         {
         }
@@ -347,28 +357,8 @@ namespace MasterDataFlow.Trading.Tester
             get { return _history; }
         }
 
-        public int Decimals
-        {
-            get { return _decimals; }
-            set
-            {
-                _decimals = value;
-                _decimalsFactor = (int)Math.Pow(10, _decimals);
-                _point = 1 / _decimalsFactor;
-            }
-        }
 
-        protected int DecimalFactor
-        {
-            get { return _decimalsFactor; }
-        }
-
-        protected decimal Point
-        {
-            get { return _point; }
-        }
-
-        public int Spred
+        public decimal Spred
         {
             get { return _spred; }
             set { _spred = value; }
@@ -379,13 +369,13 @@ namespace MasterDataFlow.Trading.Tester
             get { return _orders; }
         }
 
-        public double Deposit
+        public decimal Deposit
         {
             get { return _deposit; }
             set { _deposit = value; }
         }
 
-        public AbstractTester(double deposit, Bar[] prices, int from, int length)
+        public AbstractTester(decimal deposit, Bar[] prices, int from, int length)
         {
             _deposit = deposit;
             _prices = prices;
@@ -408,7 +398,7 @@ namespace MasterDataFlow.Trading.Tester
             _lastTicket = 0;
             _currentBar = 0;
             _result = new TesterResult();
-            _result.Equities = new double[_prices.Length];
+            _result.Equities = new decimal[_prices.Length];
         }
 
         protected abstract void OnTick();
@@ -434,7 +424,7 @@ namespace MasterDataFlow.Trading.Tester
 
         private void MakeTicks()
         {
-            _ticks = new double[4];
+            _ticks = new decimal[4];
             _ticks[0] = _prices[_currentBar].Open;
             _ticks[1] = _prices[_currentBar].Low;
             _ticks[2] = _prices[_currentBar].High;
@@ -452,7 +442,7 @@ namespace MasterDataFlow.Trading.Tester
                 // TODO Непонятно когда правильно вычислять  Equity
                 MakeStopLoss();
                 CalculateEquity(CurrentPrice);
-                if (_deposit + (_result.Profit + _result.Equities[_currentBar]) * DecimalFactor < 0)
+                if (_deposit + (_result.Profit + _result.Equities[_currentBar]) < 0)
                 {
                     _result.ForceStop = true;
                     break;
@@ -490,24 +480,24 @@ namespace MasterDataFlow.Trading.Tester
             }
         }
 
-        protected double GetCurrentEquity()
+        protected decimal GetCurrentEquity()
         {
             return GetCurrentEquity(CurrentPrice);
         }
 
-        private double GetCurrentEquity(double price)
+        private decimal GetCurrentEquity(decimal price)
         {
-            double profit = 0.0;
+            decimal profit = 0.0m;
             foreach (var pair in _orders)
             {
                 Order order = pair.Value;
                 switch (order.Type)
                 {
                     case OrderType.Buy:
-                        profit += price - order.Price - (double)_spred / (double)DecimalFactor;
+                        profit += price - order.Price - _spred;
                         break;
                     case OrderType.Sell:
-                        profit += order.Price - price - (double)_spred / (double)DecimalFactor;
+                        profit += order.Price - price - _spred;
                         break;
                     default:
                         throw new NotImplementedException();
@@ -516,13 +506,13 @@ namespace MasterDataFlow.Trading.Tester
             return profit;
         }
 
-        private void CalculateEquity(double price)
+        private void CalculateEquity(decimal price)
         {
-            double profit = GetCurrentEquity(price);
+            decimal profit = GetCurrentEquity(price);
             _result.Equities[_currentBar] = profit;
-            if (profit == 0.0)
+            if (profit == 0.0m)
                 return;
-            if (profit >= 0.0)
+            if (profit >= 0.0m)
             {
                 if (profit > _result.MaxEquity)
                     _result.MaxEquity = profit;
@@ -537,7 +527,7 @@ namespace MasterDataFlow.Trading.Tester
         }
 
 
-        protected double CurrentPrice
+        protected decimal CurrentPrice
         {
             get { return _ticks[_tickNumber]; }
         }
@@ -558,7 +548,7 @@ namespace MasterDataFlow.Trading.Tester
 
             Story story = new Story()
             {
-                Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
+                Balance = (decimal)(_deposit + _result.Profit),
                 OrderTicket = _lastTicket,
                 Price = (decimal)CurrentPrice,
                 Profit = null,
@@ -566,13 +556,14 @@ namespace MasterDataFlow.Trading.Tester
                 TakeProfit = null, // TODO
                 Time = CurrentTime,
                 Type = StoryType.Buy,
-                Volume = (decimal)order.Volume
+                //Volume = (decimal)order.Volume
             };
             _result.AddStory(story);
 
             order.Ticket = _lastTicket;
             order.OpenBarIndex = CurrentBar;
             _orders.Add(_lastTicket, order);
+            _result.AddOrder(order);
         }
 
         protected void Sell(Order order)
@@ -581,21 +572,22 @@ namespace MasterDataFlow.Trading.Tester
 
             Story story = new Story()
             {
-                Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
+                Balance = _deposit + _result.Profit,
                 OrderTicket = _lastTicket,
-                Price = (decimal)CurrentPrice,
+                Price = CurrentPrice,
                 Profit = null,
                 StopLoss = order.StopLoss > 0 ? (decimal?)order.StopLoss : (decimal?)null,
                 TakeProfit = null, // TODO
                 Time = CurrentTime,
                 Type = StoryType.Sell,
-                Volume = (decimal)order.Volume
+                //Volume = (decimal)order.Volume
             };
 
             _result.AddStory(story);
             order.Ticket = _lastTicket;
             order.OpenBarIndex = CurrentBar;
             _orders.Add(_lastTicket, order);
+            _result.AddOrder(order);
         }
 
         protected void CloseOrder(int ticket)
@@ -603,10 +595,10 @@ namespace MasterDataFlow.Trading.Tester
             CloseOrder(ticket, CurrentPrice, StoryType.Close);
         }
 
-        private void CloseOrder(int ticket, double price, StoryType closeType)
+        private void CloseOrder(int ticket, decimal price, StoryType closeType)
         {
             Order order = _orders[ticket];
-            double profit = 0.0;
+            decimal profit = 0.0m;
             switch (order.Type)
             {
                 case OrderType.Buy:
@@ -624,40 +616,42 @@ namespace MasterDataFlow.Trading.Tester
 
             Story story = new Story()
             {
-                Balance = (decimal)(_deposit + _result.Profit * DecimalFactor),
+                Balance = (decimal)_deposit + _result.Profit,
                 OrderTicket = ticket,
                 Price = (decimal)CurrentPrice,
-                Profit = (decimal)profit * DecimalFactor,
-                StopLoss = order.StopLoss > 0 ? (decimal?)order.StopLoss : (decimal?)null,
+                Profit = (decimal)profit,
+                StopLoss = order.StopLoss > 0 ? order.StopLoss : (decimal?)null,
                 TakeProfit = null, // TODO
                 Time = CurrentTime,
                 Type = closeType,
-                Volume = (decimal)order.Volume
+                //Volume = (decimal)order.Volume
             };
             _result.AddStory(story);
         }
 
-        private double CloseSellOrder(Order order, double price)
+        private decimal CloseSellOrder(Order order, decimal price)
         {
-            double profit = order.Price - price - (double)_spred / (double)DecimalFactor;
+            decimal profit = order.Price - price - _spred;
             if (profit >= 0)
                 _result.PlusCount += 1;
             else
                 _result.MinusCount += 1;
             _result.Profit += profit;
+            order.Profit = profit;
             ++_result.OrderCount;
             ++_result.SellCount;
             return profit;
         }
 
-        private double CloseBuyOrder(Order order, double price)
+        private decimal CloseBuyOrder(Order order, decimal price)
         {
-            double profit = price - order.Price - (double)_spred / (double)DecimalFactor;
+            decimal profit = price - order.Price - _spred;
             if (profit >= 0)
                 _result.PlusCount += 1;
             else
                 _result.MinusCount += 1;
             _result.Profit += profit;
+            order.Profit = profit;
             ++_result.OrderCount;
             ++_result.BuyCount;
             return profit;

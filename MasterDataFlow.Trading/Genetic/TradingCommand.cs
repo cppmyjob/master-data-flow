@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Intelligence.Interfaces;
@@ -78,9 +79,9 @@ namespace MasterDataFlow.Trading.Genetic
             }
         }
 
-        public int StopLoss
+        public float StopLoss
         {
-            get { return (int)(Values[OFFSET_STOPLOSS] * 100000); }
+            get { return Values[OFFSET_STOPLOSS] * 100; }
         }
 
         public TesterResult ValidationTesterResult { get; set; }
@@ -117,42 +118,11 @@ namespace MasterDataFlow.Trading.Genetic
 
             var dll = GetNeuronDll(item);
 
-
             var validationResult = GetProfit(dll, item, DataObject.ValidationData);
             item.ValidationTesterResult = validationResult;
-            if (validationResult.Profit <= 0)
-            {
-                return Double.MinValue;
-            }
-            if (validationResult.PlusCount < validationResult.MinusCount)
-            {
-                return Double.MinValue;
-            }
-            if ((float)validationResult.MinusCount / (validationResult.PlusCount + validationResult.MinusCount) > 0.5)
-            {
-                return Double.MinValue;
-            }
 
-            if (validationResult.BuyCount == 0 || validationResult.SellCount == 0)
-            {
+            if (FilterBadResult(validationResult))
                 return Double.MinValue;
-            }
-
-            if (validationResult.BuyCount > validationResult.SellCount)
-            {
-                if (validationResult.BuyCount / (float)validationResult.SellCount > 2)
-                {
-                    return Double.MinValue;
-                }
-            }
-            else
-            {
-                if (validationResult.SellCount / (float)validationResult.BuyCount > 2)
-                {
-                    return Double.MinValue;
-                }
-            }
-
 
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData);
             item.TrainingTesterResult = trainingResult;
@@ -166,53 +136,56 @@ namespace MasterDataFlow.Trading.Genetic
                 }
             }
 
-
-            //if (trainingResult.Profit <= 0)
-            //{
+            //if (FilterBadResult(trainingResult))
             //    return Double.MinValue;
-            //}
-            //if (trainingResult.PlusCount < trainingResult.MinusCount)
-            //{
-            //    return Double.MinValue;
-            //}
-            //if ((float)trainingResult.MinusCount / (trainingResult.PlusCount + trainingResult.MinusCount) > 0.5)
-            //{
-            //    return Double.MinValue;
-            //}
-            //if (trainingResult.BuyCount == 0 || trainingResult.SellCount == 0)
-            //{
-            //    return Double.MinValue;
-            //}
-            //if (trainingResult.BuyCount > trainingResult.SellCount)
-            //{
-            //    if (trainingResult.BuyCount / (float)trainingResult.SellCount > 2)
-            //    {
-            //        return Double.MinValue;
-            //    }
-            //}
-            //else
-            //{
-            //    if (trainingResult.SellCount / (float)trainingResult.BuyCount > 2)
-            //    {
-            //        return Double.MinValue;
-            //    }
-            //}
 
+            var m = 1m;
 
+            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
+            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
+            //        (validationResult.Orders.Count + trainingResult.Orders.Count);
 
-            //float buysell;
-            //if (validationResult.BuyCount > validationResult.SellCount)
-            //    buysell = (float) validationResult.SellCount / (float) validationResult.BuyCount;
-            //else
-            //    buysell = (float) validationResult.BuyCount / (float) validationResult.SellCount;
+            return (double)(validationResult.Profit + trainingResult.Profit)
+                   * (double)(trainingResult.OrderCount + validationResult.OrderCount)
+                   * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
+                   * (double)m;
+        }
 
+        private bool FilterBadResult(TesterResult testerResult)
+        {
+            if (testerResult.Profit <= 0)
+            {
+                    return true;
+            }
+            if (testerResult.PlusCount < testerResult.MinusCount)
+            {
+                    return true;
+            }
+            if ((float) testerResult.MinusCount / (testerResult.PlusCount + testerResult.MinusCount) > 0.7)
+            {
+                    return true;
+            }
 
-            return (validationResult.Profit + trainingResult.Profit)
-                   * (trainingResult.OrderCount + validationResult.OrderCount)
-                   * (trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount -
-                      validationResult.MinusCount);
-                   //* buysell;
+            if (testerResult.BuyCount == 0 || testerResult.SellCount == 0)
+            {
+                    return true;
+            }
 
+            if (testerResult.BuyCount > testerResult.SellCount)
+            {
+                if (testerResult.BuyCount / (float) testerResult.SellCount > 4)
+                {
+                        return true;
+                }
+            }
+            else
+            {
+                if (testerResult.SellCount / (float) testerResult.BuyCount > 4)
+                {
+                        return true;
+                }
+            }
+            return false;
         }
 
         private TesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData)
@@ -305,26 +278,26 @@ namespace MasterDataFlow.Trading.Genetic
             }
         }
 
-        protected override void Mutation(TradingItem item)
-        {
-            if (Random.NextDouble() > 0.999)
-            {
-                var allIndexes = GetUniqueIndicatorIndexes();
-                for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
-                {
-                    item.Values[i] = allIndexes[i];
-                }
-            }
+        //protected override void Mutation(TradingItem item)
+        //{
+        //    if (Random.NextDouble() > 0.999)
+        //    {
+        //        var allIndexes = GetUniqueIndicatorIndexes();
+        //        for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+        //        {
+        //            item.Values[i] = allIndexes[i];
+        //        }
+        //    }
 
-            for (int i = TradingItem.OFFSET_ALPHA; i < item.Values.Length; i++)
-            {
-                if (Random.NextDouble() > 0.999)
-                {
-                    var valueValue = item.CreateValue(Random);
-                    item.Values[i] = valueValue;
-                }
-            }
-        }
+        //    for (int i = TradingItem.OFFSET_ALPHA; i < item.Values.Length; i++)
+        //    {
+        //        if (Random.NextDouble() > 0.999)
+        //        {
+        //            var valueValue = item.CreateValue(Random);
+        //            item.Values[i] = valueValue;
+        //        }
+        //    }
+        //}
 
         protected override TradingItem CreateChild(TradingItem firstParent, TradingItem secondParent)
         {

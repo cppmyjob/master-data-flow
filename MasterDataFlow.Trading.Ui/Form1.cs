@@ -186,7 +186,7 @@ namespace MasterDataFlow.Trading.Ui
             SetText(tbIndicators, indicators);
 
             SetText(tbFitness, (fitness).ToString("F10"));
-            SetText(tbStopLoss, neuronItem.StopLoss.ToString("D"));
+            SetText(tbStopLoss, neuronItem.StopLoss.ToString("F10"));
             if (neuronItem.TrainingTesterResult != null)
             {
                 SetText(tbTrainingMinusCount, (neuronItem.TrainingTesterResult.MinusCount).ToString("D"));
@@ -254,11 +254,11 @@ namespace MasterDataFlow.Trading.Ui
         {
             var result = candles.Select(t => new Bar
             {
-                Close = (double)t.Close,
-                High = (double)t.High,
-                Low = (double)t.Low,
-                Open = (double)t.Open,
-                Volume = (double)t.Volume,
+                Close = t.Close,
+                High = t.High,
+                Low = t.Low,
+                Open = t.Open,
+                Volume = t.Volume,
                 Time = t.DateTime.DateTime,
             }).ToArray();
             return result;
@@ -321,11 +321,11 @@ namespace MasterDataFlow.Trading.Ui
             AddIndicator("EMA 20", ema20);
 
             // MACD
-            var macds = _candles.Macd(12, 26, 9);
+            //var macds = _candles.Macd(12, 26, 9);
 
-            AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+            //AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+            //AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+            //AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
         }
 
         private void AddIndicator(string name, float[] values, DateTime[] times)
@@ -455,9 +455,9 @@ namespace MasterDataFlow.Trading.Ui
 
         private void AddHeader(StreamWriter writer)
         {
-            string line = "Guid; ";
-            line += "Fitness; ";
-            line += "StopLoss; ";
+            string line = "Guid, ";
+            line += "Fitness, ";
+            line += "StopLoss, ";
             line += AddHeaderTestResult("tr");
             line += AddHeaderTestResult("pr");
             line += AddHeaderTestResult("fr");
@@ -467,22 +467,22 @@ namespace MasterDataFlow.Trading.Ui
         private string AddHeaderTestResult(string prefix)
         {
             string line = "";
-            line += prefix + ".Profit; ";
-            line += prefix + ".OrderCount; ";
-            line += prefix + ".PlusCount; ";
-            line += prefix + ".MinusCount; ";
-            line += prefix + ".MaxEquity; ";
-            line += prefix + ".MinEquity; ";
-            line += prefix + ".PlusEquityCount; ";
-            line += prefix + ".MinusEquityCount; ";
+            line += prefix + ".Profit, ";
+            line += prefix + ".OrderCount, ";
+            line += prefix + ".PlusCount, ";
+            line += prefix + ".MinusCount, ";
+            line += prefix + ".MaxEquity, ";
+            line += prefix + ".MinEquity, ";
+            line += prefix + ".PlusEquityCount, ";
+            line += prefix + ".MinusEquityCount, ";
             return line;
         }
 
         private void AddItemToFile(StreamWriter writer, TradingItem item, TesterResult futureResult)
         {
-            string line = item.Guid.ToString() + "; ";
-            line += item.Fitness.ToString("F10") + "; ";
-            line += item.StopLoss.ToString("D") + "; ";
+            string line = item.Guid.ToString() + ", ";
+            line += item.Fitness.ToString("F10") + ", ";
+            line += item.StopLoss.ToString("F10") + ", ";
             line = SaveTestResult(item.TrainingTesterResult, line);
             line = SaveTestResult(item.ValidationTesterResult, line);
             line = SaveTestResult(futureResult, line);
@@ -492,14 +492,14 @@ namespace MasterDataFlow.Trading.Ui
 
         private string SaveTestResult(TesterResult tr, string line)
         {
-            line += tr.Profit.ToString("F10") + "; ";
-            line += tr.OrderCount.ToString("D") + "; ";
-            line += tr.PlusCount.ToString("D") + "; ";
-            line += tr.MinusCount.ToString("D") + "; ";
-            line += tr.MaxEquity.ToString("F10") + "; ";
-            line += tr.MinEquity.ToString("F10") + "; ";
-            line += tr.PlusEquityCount.ToString("D") + "; ";
-            line += tr.MinusEquityCount.ToString("D") + "; ";
+            line += tr.Profit.ToString("F10") + ", ";
+            line += tr.OrderCount.ToString("D") + ", ";
+            line += tr.PlusCount.ToString("D") + ", ";
+            line += tr.MinusCount.ToString("D") + ", ";
+            line += tr.MaxEquity.ToString("F10") + ", ";
+            line += tr.MinEquity.ToString("F10") + ", ";
+            line += tr.PlusEquityCount.ToString("D") + ", ";
+            line += tr.MinusEquityCount.ToString("D") + ", ";
             return line;
         }
 
@@ -525,6 +525,35 @@ namespace MasterDataFlow.Trading.Ui
 
             item.Write(root);
             root.Save(writer);
+        }
+
+        public void WriteFlexible(TextWriter writer, TradingItem item)
+        {
+            XElement root = new XElement("Genetic");
+
+            WriteConfig(root);
+
+            item.Write(root);
+            root.Save(writer);
+        }
+
+        private void WriteConfig(XElement root)
+        {
+            XElement config = new XElement("Config");
+            root.Add(config);
+            config.Add(new XElement("ItemsCount", _dataObject.CellInitData.ItemsCount));
+            config.Add(new XElement("SurviveCount", _dataObject.CellInitData.SurviveCount));
+            config.Add(new XElement("ValuesCount", _dataObject.CellInitData.ValuesCount));
+            WriteNeuronNetworkConfig(config);
+        }
+
+        private void WriteNeuronNetworkConfig(XElement config)
+        {
+            var neuronNetwork = new XElement("NeuronNetwork");
+            config.Add(neuronNetwork);
+
+            var levels = new XElement("Levels");
+
         }
 
         public TradingItem ReadLast()

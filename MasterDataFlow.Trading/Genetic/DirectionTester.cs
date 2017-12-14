@@ -14,7 +14,7 @@ namespace MasterDataFlow.Trading.Genetic
         private readonly GeneticNeuronDLL1 _dll;
         private readonly TradingItem _tradingItem;
         private readonly LearningData _learningData;
-        private const double START_DEPOSIT = 100000;
+        private const decimal START_DEPOSIT = 100000;
 
         public DirectionTester(GeneticNeuronDLL1 dll, TradingItem tradingItem, LearningData learningData) 
             : base(START_DEPOSIT, learningData.Prices, 0, learningData.Prices.Length)
@@ -53,9 +53,9 @@ namespace MasterDataFlow.Trading.Genetic
         }
 
 
-        protected override int GetStopLoss()
+        protected override decimal GetStopLoss()
         {
-            return _tradingItem.StopLoss;
+            return (decimal)_tradingItem.StopLoss;
         }
     }
 }
