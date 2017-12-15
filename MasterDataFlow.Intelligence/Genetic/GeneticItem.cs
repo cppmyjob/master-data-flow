@@ -6,13 +6,13 @@ using MasterDataFlow.Intelligence.Interfaces;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public abstract class GeneticItem<TValue>
+    public abstract class GeneticItem<TGeneticItemInitData, TValue> where TGeneticItemInitData : GeneticItemInitData
     {
         protected TValue[] _values;
         private double _fitness;
-        private GeneticItemInitData _initData;
+        private TGeneticItemInitData _initData;
         private TValue[] _oldValues;
-        private GeneticHistory<GeneticItem<TValue>, TValue> _history;
+        private GeneticHistory<GeneticItem<TGeneticItemInitData, TValue>, TValue, TGeneticItemInitData> _history;
         private Guid _guid = Guid.NewGuid();
 
         protected GeneticItem()
@@ -20,15 +20,15 @@ namespace MasterDataFlow.Intelligence.Genetic
             
         }
 
-        protected GeneticItem(GeneticItemInitData initData)
+        protected GeneticItem(TGeneticItemInitData initData)
         {
             _initData = initData;
             _values = new TValue[initData.Count];
             if (initData.IsAddHistory)
-                _history = new GeneticHistory<GeneticItem<TValue>, TValue>();
+                _history = new GeneticHistory<GeneticItem<TGeneticItemInitData, TValue>, TValue, TGeneticItemInitData>();
         }
 
-        public GeneticItemInitData InitData
+        public TGeneticItemInitData InitData
         {
             get { return _initData; }
         }
@@ -50,9 +50,9 @@ namespace MasterDataFlow.Intelligence.Genetic
             }
         }
 
-        public virtual GeneticItem<TValue> Clone()
+        public virtual GeneticItem<TGeneticItemInitData, TValue> Clone()
         {
-            var result = (GeneticItem<TValue>)Activator.CreateInstance(this.GetType());
+            var result = (GeneticItem<TGeneticItemInitData, TValue>)Activator.CreateInstance(this.GetType());
             var isCloneInterface = typeof(TValue).IsAssignableFrom(typeof(IValueClone<TValue>));
             result._values = new TValue[_initData.Count];
             for (int i = 0; i < result._values.Length; i++)
@@ -76,7 +76,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             get { return _values; }
         }
 
-        public GeneticHistory<GeneticItem<TValue>, TValue> History
+        public GeneticHistory<GeneticItem<TGeneticItemInitData, TValue>, TValue, TGeneticItemInitData> History
         {
             get { return _history; }
         }
@@ -84,6 +84,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         public Guid Guid
         {
             get { return _guid; }
+            set { _guid = value; }
         }
 
         public abstract TValue CreateValue(IRandom random);

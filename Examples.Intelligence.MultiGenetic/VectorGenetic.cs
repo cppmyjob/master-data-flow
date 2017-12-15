@@ -7,7 +7,7 @@ using MasterDataFlow.Intelligence.Genetic;
 namespace Examples.Intelligence.MultiGenetic
 {
     [Serializable]
-    public class VectorGeneticDataObject : GeneticDataObject<GeneticItem<Vector>, Vector>
+    public class VectorGeneticDataObject : GeneticDataObject<GeneticItemInitData, GeneticItem<GeneticItemInitData, Vector>, Vector>
     {
 
     }
@@ -17,13 +17,13 @@ namespace Examples.Intelligence.MultiGenetic
         
     }
 
-    public abstract class VectorGeneticItem : GeneticItem<Vector>
+    public abstract class VectorGeneticItem : GeneticItem<GeneticItemInitData, Vector>
     {
     }
 
     public abstract class VectorGeneticCommand<TGeneticCellDataObject> :
-        GeneticCommand<TGeneticCellDataObject, VectorGeneticItem, Vector>
-        where TGeneticCellDataObject : GeneticDataObject<VectorGeneticItem, Vector>
+        GeneticCommand<TGeneticCellDataObject, GeneticItemInitData, VectorGeneticItem, Vector>
+        where TGeneticCellDataObject : GeneticDataObject<GeneticItemInitData, VectorGeneticItem, Vector>
     {
     }
 }

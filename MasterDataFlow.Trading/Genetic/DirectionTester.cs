@@ -30,14 +30,14 @@ namespace MasterDataFlow.Trading.Genetic
         {
             if (_inputs == null)
             {
-              _inputs = new float[TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER];
+              _inputs = new float[TradingItem.GetHistoryWidowLength(_tradingItem) * TradingItem.INDICATOR_NUMBER];
             }
 
             for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
             {
                 var indicatorIndex = (int)_tradingItem.GetIndicatorIndex(i);
                 var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
-                Array.Copy(indicatorValues, index, _inputs, TradingItem.HISTORY_WINDOW_LENGTH * i, TradingItem.HISTORY_WINDOW_LENGTH);
+                Array.Copy(indicatorValues, index, _inputs, TradingItem.GetHistoryWidowLength(_tradingItem) * i, TradingItem.GetHistoryWidowLength(_tradingItem));
             }
 
             var outputs = _dll.NetworkCompute(_inputs);

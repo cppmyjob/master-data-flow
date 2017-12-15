@@ -10,22 +10,25 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
         public void SerializationTest()
         {
             // ASSERT
-            var initData = new GeneticInitData(100, 30, 50);
-            var value = new GeneticDataObject<GeneticDoubleItem, double>
+            var initItemData = new GeneticItemInitData(50);
+            var initData = new GeneticCommandInitData(100, 30, 10);
+            var value = new GeneticDataObject<GeneticItemInitData, GeneticDoubleItem, double>
             {
-                CellInitData = initData
+                ItemInitData = initItemData,
+                CommandInitData = initData
             };
 
 
             // ACT
             var serializatedValue = Serialization.Serializator.Serialize(value);
-            var newValue = (GeneticDataObject<GeneticDoubleItem, double>)Serialization.Serializator.Deserialize(typeof(GeneticDataObject<GeneticDoubleItem, double>), serializatedValue);
+            var newValue = (GeneticDataObject<GeneticItemInitData, GeneticDoubleItem, double>)Serialization.Serializator.Deserialize(typeof(GeneticDataObject<GeneticItemInitData, GeneticDoubleItem, double>), serializatedValue);
 
             // ARRANGE
-            Assert.IsNotNull(newValue.CellInitData);
-            Assert.AreEqual(100, newValue.CellInitData.ItemsCount);
-            Assert.AreEqual(30, newValue.CellInitData.SurviveCount);
-            Assert.AreEqual(50, newValue.CellInitData.ValuesCount);
+            Assert.IsNotNull(newValue.CommandInitData);
+            Assert.AreEqual(100, newValue.CommandInitData.ItemsCount);
+            Assert.AreEqual(30, newValue.CommandInitData.SurviveCount);
+            Assert.AreEqual(10, newValue.CommandInitData.RepeatCount);
+            Assert.AreEqual(50, newValue.ItemInitData.Count);
         }
     }
 }

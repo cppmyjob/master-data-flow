@@ -79,11 +79,12 @@ namespace Examples.Intelligence.MultiGenetic
 
         private static VariableCrossoverGeneticInitData CreateTravelingSalesmanProblemInitData()
         {
-            var initData = new GeneticInitData(1000, 700, 30);
+            var initItemData = new GeneticItemInitData(30);
+            var initData = new GeneticCommandInitData(1000, 700, 20000);
             var dataObject = new VariableCrossoverGeneticInitData
             {
-                                 CellInitData = initData,
-                                 RepeatCount = 20000,
+                                 ItemInitData = initItemData,
+                                 CommandInitData = initData,
                                  Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),
@@ -108,7 +109,7 @@ namespace Examples.Intelligence.MultiGenetic
             return dataObject;
         }
 
-        private void PrintTheBest(GeneticItem<int> theBestItem)
+        private void PrintTheBest(GeneticItem<GeneticItemInitData, int> theBestItem)
         {
             var values = theBestItem.Values.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray();
             var result = string.Join(",", values);
@@ -285,13 +286,13 @@ namespace Examples.Intelligence.MultiGenetic
 
         private void AddLengths(VariableCrossoverGeneticItem item)
         {
-            for (int i = 0; i < DataObject.CellInitData.ValuesCount; i++)
+            for (int i = 0; i < DataObject.ItemInitData.Count; i++)
             {
-                var length = Random.Next(DataObject.CellInitData.ValuesCount) / 3 + 1;
+                var length = Random.Next(DataObject.ItemInitData.Count) / 3 + 1;
                 //var length = 3;
-                if (i + length > DataObject.CellInitData.ValuesCount)
+                if (i + length > DataObject.ItemInitData.Count)
                 {
-                    length = DataObject.CellInitData.ValuesCount - i;
+                    length = DataObject.ItemInitData.Count - i;
                 }
                 item.Lengths[i] = length;
             }

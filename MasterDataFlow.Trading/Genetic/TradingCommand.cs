@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MasterDataFlow.Intelligence.Genetic;
@@ -26,38 +27,103 @@ namespace MasterDataFlow.Trading.Genetic
     }
 
     [Serializable]
-    public class TradingDataObject : GeneticFloatDataObject<TradingItem>
+    public class NeuronNetworkLevel
+    {
+        public int Length { get; set; }
+    }
+
+
+    [Serializable]
+    public class NeuronNetwork
+    {
+        public NeuronNetworkLevel[] Layers { get; set; }
+
+        public int[] GetNeuronsConfig()
+        {
+            return Layers.Select(t => t.Length).ToArray();
+        }
+    }
+
+
+    [Serializable]
+    public class TradingItemInitData : GeneticItemInitData
+    {
+        public TradingItemInitData()
+        {
+        }
+
+        public TradingItemInitData(int count, bool isAddHistory = false) : base(count, isAddHistory)
+        {
+        }
+    }
+
+
+
+    [Serializable]
+    public class TradingDataObject : GeneticFloatDataObject<TradingItemInitData, TradingItem>
     {
         public LearningData TrainingData { get; }
         public LearningData ValidationData { get; }
+        public NeuronNetwork DefaultNeuronNetwork { get; private set; }
+
+        //public TradingDataObject(NeuronNetwork neuronNetwork, LearningData trainingData, LearningData validationData,
+        //    int itemsCount, int surviveCount)
+        //{
+        //    DefaultNeuronNetwork = neuronNetwork;
+        //    TrainingData = trainingData;
+        //    ValidationData = validationData;
+        //    RepeatCount = 10;
+        //    CellInitData = new GeneticInitData(itemsCount, surviveCount, 
+        //        TradingCommand.GetWeightsCount(this) + TradingItem.OFFSET_VALUES);
+        //}
 
         public TradingDataObject(LearningData trainingData, LearningData validationData,
             int itemsCount, int surviveCount)
         {
             TrainingData = trainingData;
             ValidationData = validationData;
-            RepeatCount = 10;
-            CellInitData = new GeneticInitData(itemsCount, surviveCount, 
-                TradingCommand.GetWeightsCount() + TradingItem.OFFSET_VALUES);
+            CommandInitData = new GeneticCommandInitData(itemsCount, surviveCount, 3000000);
+            SetDefaultNeuronNetwork(new NeuronNetwork
+                                    {
+                                        Layers = NeuronsConfig.Select(t => new NeuronNetworkLevel() { Length = t })
+                                            .ToArray(),
+                                    });
         }
 
+
+        public void SetDefaultNeuronNetwork(NeuronNetwork neuronNetwork)
+        {
+            DefaultNeuronNetwork = neuronNetwork;
+            //CommandInitData.SetValuesCount(TradingCommand.GetWeightsCount(this) + TradingItem.OFFSET_VALUES);
+        }
+
+        private static int[] NeuronsConfig = new int[] {
+            TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER,
+            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            2 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
+            2,
+        };
     }
 
     [Serializable]
-    public class TradingItem : GeneticFloatItem
+    public class TradingItem : GeneticFloatItem<TradingItemInitData>
     {
-        public const int HISTORY_WINDOW_LENGTH = 24;
+        internal const int HISTORY_WINDOW_LENGTH = 24;
+        private int? _historyWidowLength;
 
         public const int INDICATOR_NUMBER = 3;
         public const int ALPHA_NUMBER = 1;
         public const int STOPLOSS_NUMBER = 1;
+
+        public const int MAX_STOPLOSS = 100;
 
         public const int OFFSET_INDICATOR = 0;
         public const int OFFSET_ALPHA = OFFSET_INDICATOR + INDICATOR_NUMBER;
         public const int OFFSET_STOPLOSS = OFFSET_INDICATOR + INDICATOR_NUMBER + 1;
         public const int OFFSET_VALUES = OFFSET_INDICATOR + INDICATOR_NUMBER + 2;
 
-        public TradingItem(GeneticItemInitData initData) : base(initData)
+        public TradingItem(TradingItemInitData initData) : base(initData)
         {
         }
 
@@ -81,7 +147,22 @@ namespace MasterDataFlow.Trading.Genetic
 
         public float StopLoss
         {
-            get { return Values[OFFSET_STOPLOSS] * 100; }
+            get { return Values[OFFSET_STOPLOSS] * MAX_STOPLOSS; }
+        }
+
+        public static int GetHistoryWidowLength(TradingItem item)
+        {
+            if (item != null)
+            {
+                if (item._historyWidowLength.HasValue)
+                    return item._historyWidowLength.Value;
+            }
+            return HISTORY_WINDOW_LENGTH;
+        }
+
+        public void SetHistoryWidowLength(int value)
+        {
+            _historyWidowLength = value;
         }
 
         public TesterResult ValidationTesterResult { get; set; }
@@ -90,11 +171,11 @@ namespace MasterDataFlow.Trading.Genetic
     }
 
 
-    public class TradingCommand : GeneticFloatCommand<TradingDataObject, TradingItem>
+    public class TradingCommand : GeneticFloatCommand<TradingDataObject, TradingItemInitData, TradingItem>
     {
         private GeneticNeuronDLL1 _dll;
 
-        protected override TradingItem CreateItem(GeneticItemInitData initData)
+        protected override TradingItem CreateItem(TradingItemInitData initData)
         {
             return new TradingItem(initData);
         }
@@ -136,18 +217,29 @@ namespace MasterDataFlow.Trading.Genetic
                 }
             }
 
+            if (trainingResult.Profit <= 0)
+            {
+                return Double.MinValue;
+            }
+
+
+            if (validationResult.MinusCount == 0 || trainingResult.MinusCount == 0)
+                return Double.MinValue;
+
             //if (FilterBadResult(trainingResult))
             //    return Double.MinValue;
 
-            var m = 1m;
+            //var m = 1m;
 
-            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
-            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
-            //        (validationResult.Orders.Count + trainingResult.Orders.Count);
+            var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
+                     trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
+                    (validationResult.Orders.Count + trainingResult.Orders.Count);
 
             return (double)(validationResult.Profit + trainingResult.Profit)
-                   * (double)(trainingResult.OrderCount + validationResult.OrderCount)
+                   * (double) (TradingItem.MAX_STOPLOSS - item.StopLoss)
+                   //* (double)(trainingResult.OrderCount + validationResult.OrderCount)
                    * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
+                   * (double)((double)(trainingResult.PlusCount + validationResult.PlusCount ) / (trainingResult.MinusCount + validationResult.MinusCount))
                    * (double)m;
         }
 
@@ -161,7 +253,7 @@ namespace MasterDataFlow.Trading.Genetic
             {
                     return true;
             }
-            if ((float) testerResult.MinusCount / (testerResult.PlusCount + testerResult.MinusCount) > 0.7)
+            if ((float) testerResult.MinusCount / (testerResult.PlusCount + testerResult.MinusCount) > 0.5)
             {
                     return true;
             }
@@ -173,14 +265,14 @@ namespace MasterDataFlow.Trading.Genetic
 
             if (testerResult.BuyCount > testerResult.SellCount)
             {
-                if (testerResult.BuyCount / (float) testerResult.SellCount > 4)
+                if (testerResult.BuyCount / (float) testerResult.SellCount > 2)
                 {
                         return true;
                 }
             }
             else
             {
-                if (testerResult.SellCount / (float) testerResult.BuyCount > 4)
+                if (testerResult.SellCount / (float) testerResult.BuyCount > 2)
                 {
                         return true;
                 }
@@ -216,27 +308,14 @@ namespace MasterDataFlow.Trading.Genetic
         {
             GeneticNeuronDLL1 dll = new GeneticNeuronDLL1();
             float alpha = 1.5F;
-            dll.NetworkCreate(alpha, GetNeuronsConfig());
-            dll.CreateWeigths(GetWeightsCount());
+            dll.NetworkCreate(alpha, dataObject.DefaultNeuronNetwork.GetNeuronsConfig());
+            dll.CreateWeigths(GetWeightsCount(dataObject));
             return dll;
         }
 
-        private static int[] NeuronsConfig =  new int[] {
-            TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER,
-            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
-            2 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
-            1 * (TradingItem.HISTORY_WINDOW_LENGTH * TradingItem.INDICATOR_NUMBER),
-            2,
-        };
-
-        public static int[] GetNeuronsConfig()
+        public static int GetWeightsCount(TradingDataObject dataObject)
         {
-            return NeuronsConfig;
-        }
-
-        public static int GetWeightsCount()
-        {
-            int[] neurons = GetNeuronsConfig();
+            int[] neurons = dataObject.DefaultNeuronNetwork.GetNeuronsConfig();
             int result = 0;
             for (int i = 1; i < neurons.Length; i++)
             {
@@ -271,33 +350,33 @@ namespace MasterDataFlow.Trading.Genetic
                 values[i] = allIndexes[i];
             }
 
-            for (int j = TradingItem.OFFSET_ALPHA; j < DataObject.CellInitData.ValuesCount; j++)
+            for (int j = TradingItem.OFFSET_ALPHA; j < DataObject.ItemInitData.Count; j++)
             {
                 var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
             }
         }
 
-        //protected override void Mutation(TradingItem item)
-        //{
-        //    if (Random.NextDouble() > 0.999)
-        //    {
-        //        var allIndexes = GetUniqueIndicatorIndexes();
-        //        for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
-        //        {
-        //            item.Values[i] = allIndexes[i];
-        //        }
-        //    }
+        protected override void Mutation(TradingItem item)
+        {
+            if (Random.NextDouble() > 0.999)
+            {
+                var allIndexes = GetUniqueIndicatorIndexes();
+                for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+                {
+                    item.Values[i] = allIndexes[i];
+                }
+            }
 
-        //    for (int i = TradingItem.OFFSET_ALPHA; i < item.Values.Length; i++)
-        //    {
-        //        if (Random.NextDouble() > 0.999)
-        //        {
-        //            var valueValue = item.CreateValue(Random);
-        //            item.Values[i] = valueValue;
-        //        }
-        //    }
-        //}
+            for (int i = TradingItem.OFFSET_ALPHA; i < item.Values.Length; i++)
+            {
+                if (Random.NextDouble() > 0.999)
+                {
+                    var valueValue = item.CreateValue(Random);
+                    item.Values[i] = valueValue;
+                }
+            }
+        }
 
         protected override TradingItem CreateChild(TradingItem firstParent, TradingItem secondParent)
         {
@@ -318,7 +397,7 @@ namespace MasterDataFlow.Trading.Genetic
                 }
             }
 
-            int[] neurons = GetNeuronsConfig();
+            int[] neurons = DataObject.DefaultNeuronNetwork.GetNeuronsConfig();
             var offset = TradingItem.OFFSET_VALUES;
             for (int i = 1; i < neurons.Length; i++)
             {

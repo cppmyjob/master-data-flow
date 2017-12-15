@@ -49,23 +49,24 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
                     _event.Set();
             };
 
-            var initData = new GeneticInitData(1000, 300, 5);
+            var initItemData = new GeneticItemInitData(5);
+            var initData = new GeneticCommandInitData(1000, 300, 200);
             var dataObject = new OrderDataObject
             {
-                CellInitData = initData,
-                RepeatCount = 200
+                ItemInitData = initItemData,
+                CommandInitData = initData,
             };
             сommandWorkflow.Start<OrderCommand>(dataObject);
 
             // ASSERT
             _event.WaitOne(5000);
             Assert.IsNotNull(OrderCommand.StaticDataObject);
-            Assert.AreEqual(1000, OrderCommand.StaticDataObject.CellInitData.ItemsCount);
-            Assert.AreEqual(300, OrderCommand.StaticDataObject.CellInitData.SurviveCount);
-            Assert.AreEqual(5, OrderCommand.StaticDataObject.CellInitData.ValuesCount);
+            Assert.AreEqual(1000, OrderCommand.StaticDataObject.CommandInitData.ItemsCount);
+            Assert.AreEqual(300, OrderCommand.StaticDataObject.CommandInitData.SurviveCount);
+            Assert.AreEqual(5, OrderCommand.StaticDataObject.ItemInitData.Count);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<GeneticItemInitData, double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
 
         }
 
@@ -83,11 +84,12 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
                     _event.Set();
             };
 
-            var initData = new GeneticInitData(1000, 300, 5);
+            var initItemData = new GeneticItemInitData(5);
+            var initData = new GeneticCommandInitData(1000, 300, 200);
             var dataObject = new OrderDataObject
             {
-                CellInitData = initData,
-                RepeatCount = 200
+                ItemInitData = initItemData,
+                CommandInitData = initData,
             };
 
             // ASSERT
@@ -97,7 +99,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             _event.WaitOne(5000);
 
             Assert.IsNotNull(stopMessage);
-            Assert.AreEqual(10, ((GeneticItem<double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
+            Assert.AreEqual(10, ((GeneticItem<GeneticItemInitData, double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);
 
 
         }

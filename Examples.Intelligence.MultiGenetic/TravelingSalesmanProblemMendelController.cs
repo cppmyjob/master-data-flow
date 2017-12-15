@@ -16,7 +16,7 @@ namespace Examples.Intelligence.MultiGenetic
         {
             using (var @event = new ManualResetEvent(false))
             {
-                var dataObject = CreateTravelingSalesmanProblemInitData();
+                var dataObject = CreateTravelingSalesmanProblemInitData(1000);
                 var instancesCount = 7;
 
                 var theBests = new List<MendelGeneticItem>();
@@ -52,8 +52,7 @@ namespace Examples.Intelligence.MultiGenetic
                 }
                 Console.WriteLine("The best fitness is {0}", theBests.Max(t => t.Fitness));
 
-                dataObject = CreateTravelingSalesmanProblemInitData();
-                dataObject.RepeatCount = 200;
+                dataObject = CreateTravelingSalesmanProblemInitData(200);
                 dataObject.InitPopulation = new List<GenePair[]>();
                 for (int i = 0; i < theBests.Count; i++)
                 {
@@ -74,13 +73,14 @@ namespace Examples.Intelligence.MultiGenetic
 
         }
 
-        private static TravelingSalesmanProblemMendelInitData CreateTravelingSalesmanProblemInitData()
+        private static TravelingSalesmanProblemMendelInitData CreateTravelingSalesmanProblemInitData(int repeatCount)
         {
-            var initData = new GeneticInitData(1000, 380, 10, true);
+            var initItemData = new GeneticItemInitData(10, true);
+            var initData = new GeneticCommandInitData(1000, 380, repeatCount);
             var dataObject = new TravelingSalesmanProblemMendelInitData
             {
-                CellInitData = initData,
-                RepeatCount = 1000,
+                ItemInitData = initItemData,
+                CommandInitData = initData,
                 Points = new[]
                                           {
                                               new TravalingPoint(1, 1), new TravalingPoint(10, 1),

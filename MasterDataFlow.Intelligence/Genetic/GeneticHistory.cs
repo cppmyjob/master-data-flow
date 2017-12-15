@@ -6,8 +6,9 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticHistoryItem<TGeneticItem, TValue>
-        where TGeneticItem : GeneticItem<TValue>
+    public class GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
         private readonly TGeneticItem _item;
 
@@ -23,8 +24,9 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     [Serializable]
-    public class GeneticHistoryMutationItem<TGeneticItem, TValue> : GeneticHistoryItem<TGeneticItem, TValue>
-        where TGeneticItem : GeneticItem<TValue>
+    public class GeneticHistoryMutationItem<TGeneticItem, TValue, TGeneticItemInitData> : GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>
+        where TGeneticItemInitData: GeneticItemInitData
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
         public GeneticHistoryMutationItem(TGeneticItem item) : base(item)
         {
@@ -32,8 +34,9 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     [Serializable]
-    public class GeneticHistoryReproductionItem<TGeneticItem, TValue> : GeneticHistoryItem<TGeneticItem, TValue>
-        where TGeneticItem : GeneticItem<TValue>
+    public class GeneticHistoryReproductionItem<TGeneticItem, TValue, TGeneticItemInitData> : GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
         private readonly TGeneticItem _firstParent;
         private readonly TGeneticItem _secondParent;
@@ -56,17 +59,18 @@ namespace MasterDataFlow.Intelligence.Genetic
     }
 
     [Serializable]
-    public class GeneticHistory<TGeneticItem, TValue> 
-        where TGeneticItem : GeneticItem<TValue>
+    public class GeneticHistory<TGeneticItem, TValue, TGeneticItemInitData>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
-        private readonly IList<GeneticHistoryItem<TGeneticItem, TValue>> _items;
+        private readonly IList<GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>> _items;
 
         public GeneticHistory()
         {
-            _items = new List<GeneticHistoryItem<TGeneticItem, TValue>>();
+            _items = new List<GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>>();
         }
 
-        public IList<GeneticHistoryItem<TGeneticItem, TValue>> Items
+        public IList<GeneticHistoryItem<TGeneticItem, TValue, TGeneticItemInitData>> Items
         {
             get { return _items; }
         }

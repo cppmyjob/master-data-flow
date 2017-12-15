@@ -30,19 +30,17 @@ namespace MasterDataFlow.Intelligence.Genetic
 
 
     [Serializable]
-    public class GeneticInitData
+    public class GeneticCommandInitData
     {
         private readonly int _itemsCount;
         private readonly int _surviveCount;
-        private readonly int _valuesCount;
-        private readonly bool _isAddFistory;
+        private readonly int _repeatCount;
 
-        public GeneticInitData(int itemsCount, int surviveCount, int valuesCount, bool isAddFistory = false)
+        public GeneticCommandInitData(int itemsCount, int surviveCount, int repeatCount)
         {
             _itemsCount = itemsCount;
             _surviveCount = surviveCount;
-            _valuesCount = valuesCount;
-            _isAddFistory = isAddFistory;
+            _repeatCount = repeatCount;
 
             if (_surviveCount > _itemsCount)
                 throw new Exception("Число выживших > число особей");
@@ -54,16 +52,18 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         public int ItemsCount { get { return _itemsCount; } }
         public int SurviveCount { get { return _surviveCount; } }
-        public int ValuesCount { get { return _valuesCount; } }
-        public bool IsAddFistory { get { return _isAddFistory; } }
+        public int RepeatCount { get { return _repeatCount; } }
+
     }
-    
+
     [Serializable]
-    public class GeneticDataObject<TGeneticItem, TValue> : ICommandDataObject
-        where TGeneticItem : GeneticItem<TValue>
+    public class GeneticDataObject<TGeneticItemInitData, TGeneticItem, TValue> : ICommandDataObject
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
-        public GeneticInitData CellInitData { get; set; }
-        public int RepeatCount { get; set; }
+        public GeneticCommandInitData CommandInitData { get; set; }
+        public TGeneticItemInitData ItemInitData { get; set; }
+
         public IList<TValue[]> InitPopulation { get; set; }
 
         public virtual void Init(TGeneticItem item, int index)
@@ -78,12 +78,12 @@ namespace MasterDataFlow.Intelligence.Genetic
         public object Best { get; set; }
     }
 
-    public abstract class GeneticCommand<TGeneticDataObject, TGeneticItem, TValue> : Command<TGeneticDataObject> 
-        where TGeneticDataObject : GeneticDataObject<TGeneticItem, TValue>
-        where TGeneticItem : GeneticItem<TValue>
+    public abstract class GeneticCommand<TGeneticDataObject, TGeneticItemInitData, TGeneticItem, TValue> : Command<TGeneticDataObject>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticDataObject : GeneticDataObject<TGeneticItemInitData, TGeneticItem, TValue>
+        where TGeneticItem : GeneticItem<TGeneticItemInitData, TValue>
     {
         protected TGeneticItem[] _itemsArray;
-        private int _currentYear = 1;
         protected IRandom Random = RandomFactory.Instance.Create();
         private TGeneticItem _theBest;
 
@@ -105,7 +105,7 @@ namespace MasterDataFlow.Intelligence.Genetic
                 CreatingPopulation(DataObject.InitPopulation.Count);
             }
 
-            if (DataObject.RepeatCount == 0)
+            if (DataObject.CommandInitData.RepeatCount == 0)
             {
                 while (true)
                 {
@@ -120,7 +120,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             }
             else
             {
-                for (int i = 0; i < DataObject.RepeatCount; i++)
+                for (int i = 0; i < DataObject.CommandInitData.RepeatCount; i++)
                 {
                     Process();
                     var info = new GeneticInfoDataObject
@@ -149,7 +149,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void Init()
         {
-            _itemsArray = new TGeneticItem[DataObject.CellInitData.ItemsCount];
+            _itemsArray = new TGeneticItem[DataObject.CommandInitData.ItemsCount];
         }
 
         private void CreatingPopulation(int from)
@@ -164,24 +164,18 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         protected TGeneticItem InternalCreateItem()
         {
-            GeneticItemInitData initData = new GeneticItemInitData
-            {
-                Count = DataObject.CellInitData.ValuesCount,
-                IsAddHistory = DataObject.CellInitData.IsAddFistory,
-                YearOfBorn = _currentYear
-            };
-            var child = CreateItem(initData);
+            var child = CreateItem(DataObject.ItemInitData);
             return child;
         }
 
-        protected abstract TGeneticItem CreateItem(GeneticItemInitData initData);
+        protected abstract TGeneticItem CreateItem(TGeneticItemInitData initData);
 
         public abstract double CalculateFitness(TGeneticItem item, int processor);
 
         protected virtual void FillValues(TGeneticItem item)
         {
             TValue[] values = item.Values;
-            for (int j = 0; j < DataObject.CellInitData.ValuesCount; j++)
+            for (int j = 0; j < DataObject.ItemInitData.Count; j++)
             {
                 var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
@@ -194,7 +188,6 @@ namespace MasterDataFlow.Intelligence.Genetic
             Random = RandomFactory.Instance.Create();
             Reproduction();
             Selection();
-            ++_currentYear;
             return _itemsArray[0].Fitness;
         }
 
@@ -223,7 +216,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             var list = (from item in _itemsArray
                                       orderby item.Fitness descending
                                       select item).ToList();
-            while (list.Count < DataObject.CellInitData.ItemsCount)
+            while (list.Count < DataObject.CommandInitData.ItemsCount)
             {
                 var item = InternalCreateItem();
                 FillValues(item);
@@ -234,7 +227,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void CalculateWithOneProcessor()
         {
-            for (var i = 0; i < DataObject.CellInitData.ItemsCount; i++)
+            for (var i = 0; i < DataObject.CommandInitData.ItemsCount; i++)
             {
                 var item = _itemsArray[i];
                 if (item.Fitness > 0.0)
@@ -251,11 +244,11 @@ namespace MasterDataFlow.Intelligence.Genetic
         private void Reproduction()
         {
             int surveyI = 0;
-            for (int i = 0; i < DataObject.CellInitData.ItemsCount - DataObject.CellInitData.SurviveCount; i++)
+            for (int i = 0; i < DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount; i++)
             {
                 var firstParent = _itemsArray[surveyI];
                 //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
-                var secondParentIndex = Random.Next(DataObject.CellInitData.ItemsCount);
+                var secondParentIndex = Random.Next(DataObject.CommandInitData.ItemsCount);
                 var secondParent = _itemsArray[secondParentIndex];
                 var child = CreateChild(firstParent, secondParent);
                 if (child != null)
@@ -267,10 +260,10 @@ namespace MasterDataFlow.Intelligence.Genetic
                     child = InternalCreateItem();
                     FillValues(child);
                 }
-                _itemsArray[i + DataObject.CellInitData.SurviveCount] = child;
+                _itemsArray[i + DataObject.CommandInitData.SurviveCount] = child;
 
                 ++surveyI;
-                if (surveyI >= DataObject.CellInitData.SurviveCount)
+                if (surveyI >= DataObject.CommandInitData.SurviveCount)
                     surveyI = 0;
             }
         }
@@ -291,8 +284,8 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
             var child = InternalCreateItem();
             // Определяем количество частей для обмена
-            int partCount = Random.Next(DataObject.CellInitData.ValuesCount) + 1;
-            float coeff = (partCount / (float)DataObject.CellInitData.ValuesCount);
+            int partCount = Random.Next(DataObject.ItemInitData.Count) + 1;
+            float coeff = (partCount / (float)DataObject.ItemInitData.Count);
             // Признак того, кто будет первым при копировании 1 или 2 предок
             bool isFirst = Random.Next(10) < 5;
             int lastPartIndex = 0;
@@ -304,9 +297,9 @@ namespace MasterDataFlow.Intelligence.Genetic
             int secondOffset = 0;
             if (Random.NextDouble() > 0.999)
                 //if (_random.NextDouble() > 0.9)
-                secondOffset = Random.Next(DataObject.CellInitData.ValuesCount) + 1;
+                secondOffset = Random.Next(DataObject.ItemInitData.Count) + 1;
             // 
-            for (int i = 0; i < DataObject.CellInitData.ValuesCount; i++)
+            for (int i = 0; i < DataObject.ItemInitData.Count; i++)
             {
                 TValue value;
                 if (secondOffset == 0)
@@ -319,7 +312,7 @@ namespace MasterDataFlow.Intelligence.Genetic
                     }
                     else
                     {
-                        if (secondOffset + i < DataObject.CellInitData.ValuesCount)
+                        if (secondOffset + i < DataObject.ItemInitData.Count)
                             value = secondValues[secondOffset + i];
                         else
                         {

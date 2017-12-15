@@ -28,7 +28,7 @@ namespace Examples.Intelligence.MultiGenetic
 
 
     [Serializable]
-    public class TravelingSalesmanProblemMendelInitData : GeneticDataObject<MendelGeneticItem, GenePair>
+    public class TravelingSalesmanProblemMendelInitData : GeneticDataObject<GeneticItemInitData, MendelGeneticItem, GenePair>
     {
         public TravalingPoint[] Points { get; set; }
     }

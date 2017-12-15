@@ -88,15 +88,15 @@ namespace Examples.Intelligence.MultiGenetic
     }
 
     [Serializable]
-    public class MendelGeneticDataObject<TGeneticItem, TValue> : GeneticDataObject<GeneticItem<TValue>, TValue>
-        where TGeneticItem : GeneticItem<TValue>
+    public class MendelGeneticDataObject<TGeneticItem, TValue> : GeneticDataObject<GeneticItemInitData, GeneticItem<GeneticItemInitData, TValue>, TValue>
+        where TGeneticItem : GeneticItem<GeneticItemInitData, TValue>
         where TValue : GenePair
     {
 
     }
 
     [Serializable]
-    public abstract class MendelGeneticItem : GeneticItem<GenePair>
+    public abstract class MendelGeneticItem : GeneticItem<GeneticItemInitData, GenePair>
     {
         public int Age { get; set; }
         public int Sex { get; set; }
@@ -134,7 +134,7 @@ namespace Examples.Intelligence.MultiGenetic
             return result;
         }
 
-        public override GeneticItem<GenePair> Clone()
+        public override GeneticItem<GeneticItemInitData, GenePair> Clone()
         {
             var result = (MendelGeneticItem)base.Clone();
             result.Age = Age;
@@ -143,8 +143,9 @@ namespace Examples.Intelligence.MultiGenetic
         }
     }
 
-    public abstract class MendelGeneticCommand<TGeneticCellDataObject> : GeneticCommand<TGeneticCellDataObject, MendelGeneticItem, GenePair>
-        where TGeneticCellDataObject : GeneticDataObject<MendelGeneticItem, GenePair>
+    public abstract class MendelGeneticCommand<TGeneticCellDataObject> 
+        : GeneticCommand<TGeneticCellDataObject, GeneticItemInitData, MendelGeneticItem, GenePair>
+        where TGeneticCellDataObject : GeneticDataObject<GeneticItemInitData, MendelGeneticItem, GenePair>
     {
 
         protected override void SortFitness()
@@ -153,7 +154,7 @@ namespace Examples.Intelligence.MultiGenetic
                                                  //where item.Age > 0 && item.Fitness > 0
                                             orderby item.Fitness descending
                                             select item).ToList();
-            while (list.Count < DataObject.CellInitData.ItemsCount)
+            while (list.Count < DataObject.CommandInitData.ItemsCount)
             {
                 var item = InternalCreateItem();
                 FillValues(item);
@@ -169,7 +170,7 @@ namespace Examples.Intelligence.MultiGenetic
             {
                 if (item.History != null)
                 {
-                    var history = new GeneticHistoryMutationItem<GeneticItem<GenePair>, GenePair>(item.Clone());
+                    var history = new GeneticHistoryMutationItem<GeneticItem<GeneticItemInitData, GenePair>, GenePair, GeneticItemInitData>(item.Clone());
                     item.History.Items.Add(history);
                 }
 
@@ -191,14 +192,14 @@ namespace Examples.Intelligence.MultiGenetic
                     //item.Values[i] = newValue;
                     if (item.History != null)
                     {
-                        var history = new GeneticHistoryMutationItem<GeneticItem<GenePair>, GenePair>(item.Clone());
+                        var history = new GeneticHistoryMutationItem<GeneticItem<GeneticItemInitData, GenePair>, GenePair, GeneticItemInitData>(item.Clone());
                         item.History.Items.Add(history);
                     }
 
                     var newValue = item.Values[i].Value + item.Values[i].Mutation;
-                    if (newValue >= DataObject.CellInitData.ValuesCount)
+                    if (newValue >= DataObject.ItemInitData.Count)
                     {
-                        item.Values[i].Value = DataObject.CellInitData.ValuesCount - 1;
+                        item.Values[i].Value = DataObject.ItemInitData.Count - 1;
                     }
                     else
                     {
@@ -230,7 +231,7 @@ namespace Examples.Intelligence.MultiGenetic
             }
             if (result.History != null)
             {
-                var history = new GeneticHistoryReproductionItem<GeneticItem<GenePair>, GenePair>(result.Clone(), firstParent.Clone(), secondParent.Clone());
+                var history = new GeneticHistoryReproductionItem<GeneticItem<GeneticItemInitData, GenePair>, GenePair, GeneticItemInitData>(result.Clone(), firstParent.Clone(), secondParent.Clone());
                 result.History.Items.Add(history);
             }
             return result;

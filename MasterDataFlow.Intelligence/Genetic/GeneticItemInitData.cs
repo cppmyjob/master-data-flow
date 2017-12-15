@@ -8,26 +8,28 @@ namespace MasterDataFlow.Intelligence.Genetic
     [Serializable]
     public class GeneticItemInitData
     {
-        private int _count;
-        private bool _isAddHistory;
-        private int _yearOfBorn;
+
+        public GeneticItemInitData()
+        {
+        }
+
+        public GeneticItemInitData(int count, bool isAddHistory = false)
+        {
+            _count = count;
+            _isAddHistory = isAddHistory;
+        }
+
+        private readonly int _count;
+        private readonly bool _isAddHistory;
 
         public int Count
         {
             get { return _count; }
-            set { _count = value; }
-        }
-
-        public int YearOfBorn
-        {
-            get { return _yearOfBorn; }
-            set { _yearOfBorn = value; }
         }
 
         public bool IsAddHistory
         {
             get { return _isAddHistory; }
-            set { _isAddHistory = value; }
         }
     }
 }

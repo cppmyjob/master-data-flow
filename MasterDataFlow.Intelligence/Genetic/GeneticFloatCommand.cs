@@ -6,16 +6,18 @@ using System.Text;
 namespace MasterDataFlow.Intelligence.Genetic
 {
     [Serializable]
-    public class GeneticFloatDataObject<TGeneticFloatItem> : GeneticDataObject<TGeneticFloatItem, float>
-        where TGeneticFloatItem : GeneticFloatItem
+    public class GeneticFloatDataObject<TGeneticItemInitData, TGeneticFloatItem> : GeneticDataObject<TGeneticItemInitData, TGeneticFloatItem, float>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticFloatItem : GeneticFloatItem<TGeneticItemInitData>
     {
 
     }
 
     [Serializable]
-    public abstract class GeneticFloatItem : GeneticItem<float>
+    public abstract class GeneticFloatItem<TGeneticItemInitData> : GeneticItem<TGeneticItemInitData, float>
+        where TGeneticItemInitData : GeneticItemInitData
     {
-        protected GeneticFloatItem(GeneticItemInitData initData)
+        protected GeneticFloatItem(TGeneticItemInitData initData)
             : base(initData)
         {
         }
@@ -27,10 +29,11 @@ namespace MasterDataFlow.Intelligence.Genetic
 
     }
 
-    public abstract class GeneticFloatCommand<TGeneticFloatDataObject, TGeneticFloatItem>
-        : GeneticCommand<TGeneticFloatDataObject, TGeneticFloatItem, float>
-        where TGeneticFloatDataObject : GeneticFloatDataObject<TGeneticFloatItem>
-        where TGeneticFloatItem : GeneticFloatItem
+    public abstract class GeneticFloatCommand<TGeneticFloatDataObject, TGeneticItemInitData, TGeneticFloatItem>
+        : GeneticCommand<TGeneticFloatDataObject, TGeneticItemInitData, TGeneticFloatItem, float>
+        where TGeneticItemInitData : GeneticItemInitData
+        where TGeneticFloatDataObject : GeneticFloatDataObject<TGeneticItemInitData, TGeneticFloatItem>
+        where TGeneticFloatItem : GeneticFloatItem<TGeneticItemInitData>
     {
 
     }
