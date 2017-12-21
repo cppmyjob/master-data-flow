@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using MasterDataFlow.Common.Tests;
@@ -35,6 +36,7 @@ namespace MasterDataFlow.Trading.Ui
         public Form1()
         {
             InitializeComponent();
+            chartProgress.MouseWheel += ChartProgressOnMouseWheel;
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -56,6 +58,13 @@ namespace MasterDataFlow.Trading.Ui
                 using (var @event = new ManualResetEvent(false))
                 {
                     _dataObject = await CreateDataObject();
+
+                    var tradingItem = LoadItem(_dataObject.ItemInitData);
+                    if (tradingItem != null)
+                    {
+                        _dataObject.InitPopulation = new List<float[]>();
+                        _dataObject.InitPopulation.Add(tradingItem.Values);
+                    }
 
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
@@ -205,7 +214,7 @@ namespace MasterDataFlow.Trading.Ui
         private string GetIndicators(TradingItem neuronItem)
         {
             var names = new List<string>();
-            for (int i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+            for (int i = 0; i < neuronItem.InitData.IndicatorNumber; i++)
             {
                 var indicatorIndex = (int)neuronItem.GetIndicatorIndex(i);
                 var name = _testData.Indicators[indicatorIndex].Name;
@@ -262,19 +271,21 @@ namespace MasterDataFlow.Trading.Ui
 
         private async Task<TradingDataObject> CreateDataObject()
         {
-            var tradingItem = LoadItem();
+            var itemInitData = LoadItemInitData();
 
-            await LoadInputData(tradingItem);
+            await LoadInputData(itemInitData);
 
-            var result = new TradingDataObject(_trainingData, _validationData, 
+            var result = new TradingDataObject(itemInitData, _trainingData, _validationData, 
                 100 * (int)nudPopulationFactor.Value, 33 * (int)nudPopulationFactor.Value);
 
-            var network = LoadNetwork();
-
-            if (network != null)
-                result.SetDefaultNeuronNetwork(network);
+            DisplayProgressChart();
 
             return result;
+        }
+
+        private void DisplayProgressChart()
+        {
+            //chartProgress.DataBindTable();
         }
 
         private IEnumerable<IOhlcv> _candles = null;
@@ -284,7 +295,7 @@ namespace MasterDataFlow.Trading.Ui
         private LearningData _validationData = null;
         private LearningData _testData = null;
 
-        private async Task LoadInputData(TradingItem tradingItem)
+        private async Task LoadInputData(TradingItemInitData itemInitData)
         {
             var csvImporter = new CsvImporter(@"Data\output.csv", new CultureInfo("en-US"));
             _candles = await csvImporter.ImportAsync("fb");
@@ -293,7 +304,7 @@ namespace MasterDataFlow.Trading.Ui
 
             CreateIndicatorsValues();
 
-            SetDataBoundaris(tradingItem);
+            SetDataBoundaris(itemInitData);
         }
 
         private void CreateIndicatorsValues()
@@ -348,11 +359,11 @@ namespace MasterDataFlow.Trading.Ui
             _indicators.Add(indicator);
         }
 
+        // https://www.youtube.com/watch?v=IGKSaH4yz-g
 
-
-        private void SetDataBoundaris(TradingItem item)
+        private void SetDataBoundaris(TradingItemInitData itemInitData)
         {
-            var startTrainingDate = _tradingBars[IndicatorsOffset + TradingItem.GetHistoryWidowLength(item)].Time.Date.AddDays(1);
+            var startTrainingDate = _tradingBars[IndicatorsOffset + itemInitData.HistoryWidowLength].Time.Date.AddDays(1);
 
             var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
             var days = (endTestDate - startTrainingDate).TotalDays;
@@ -364,16 +375,18 @@ namespace MasterDataFlow.Trading.Ui
             var startValidationDate = startTrainingDate.AddDays(trainingDays);
             var startTestDate = startValidationDate.AddDays(validationDays);
 
-            _trainingData = CreateLearningData(item, startTrainingDate, trainingDays);
-            _validationData = CreateLearningData(item, startValidationDate, validationDays);
-            _testData = CreateLearningData(item, startTestDate, testDays);
+            //var startTestDate = new DateTime(2017, 12, 9);
+
+            _trainingData = CreateLearningData(itemInitData, startTrainingDate, trainingDays);
+            _validationData = CreateLearningData(itemInitData, startValidationDate, validationDays);
+            _testData = CreateLearningData(itemInitData, startTestDate, testDays);
 
             SetDateTimePicker(dtpStartTrainingDate, startTrainingDate);
             SetDateTimePicker(dtpStartValidationDate, startValidationDate);
             SetDateTimePicker(dtpStartTestDate, startTestDate);
         }
 
-        private LearningData CreateLearningData(TradingItem item, DateTime startDate, double days)
+        private LearningData CreateLearningData(TradingItemInitData itemInitData, DateTime startDate, double days)
         {
             var result = new LearningData();
             result.Prices = _tradingBars
@@ -386,7 +399,7 @@ namespace MasterDataFlow.Trading.Ui
             var firstTime = result.Prices[0].Time;
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
-            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - TradingItem.GetHistoryWidowLength(item) - 1;
+            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength - 1;
             var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime) - 1;
 
             foreach (var indicator in _indicators)
@@ -423,7 +436,7 @@ namespace MasterDataFlow.Trading.Ui
 
             using (StreamWriter writer = new StreamWriter("genetic.save"))
             {
-                WriteNew(writer, _dataObject, _indicators, item);
+                WriteNew(writer, _indicators, item);
             }
 
             if (!(
@@ -509,7 +522,7 @@ namespace MasterDataFlow.Trading.Ui
             StreamWriter writer = new StreamWriter("Best/" + item.Guid.ToString() + ".save");
             try
             {
-                WriteNew(writer, _dataObject, _indicators, item);
+                WriteNew(writer, _indicators, item);
             }
             finally
             {
@@ -517,47 +530,17 @@ namespace MasterDataFlow.Trading.Ui
             }
         }
 
-        public void Write(TextWriter writer, TradingItem item)
-        {
-            XElement root = new XElement("Genetic");
-            root.Add(new XElement("ItemsCount", _dataObject.CommandInitData.ItemsCount));
-            root.Add(new XElement("SurviveCount", _dataObject.CommandInitData.SurviveCount));
-            root.Add(new XElement("ValuesCount", _dataObject.ItemInitData.Count));
 
-            item.Write(root);
-            root.Save(writer);
-        }
-
-        public void WriteNew(TextWriter writer, TradingDataObject dataObject, List<LearningDataIndicator> indicators, TradingItem item)
+        public void WriteNew(TextWriter writer, List<LearningDataIndicator> indicators, TradingItem item)
         {
             XElement root = new XElement("genetic");
 
-            WriteDataObject(root, dataObject);
+            item.InitData.Write(root);
+            
             WriteItem(root, indicators, item);
             root.Save(writer);
         }
 
-        private void WriteDataObject(XElement root, TradingDataObject dataObject)
-        {
-            var dataObjectElement = new XElement("dataObject");
-            root.Add(dataObjectElement);
-            WriteNeuronNetworkConfig(dataObjectElement, dataObject);
-        }
-
-        private void WriteNeuronNetworkConfig(XElement dataObjectElement, TradingDataObject dataObject)
-        {
-            var neuronNetwork = new XElement("neuronNetwork");
-            dataObjectElement.Add(neuronNetwork);
-
-            var levels = new XElement("levels");
-            neuronNetwork.Add(levels);
-
-            var neuronConfig = dataObject.DefaultNeuronNetwork.GetNeuronsConfig();
-            for (int i = 0; i < neuronConfig.Length; i++)
-            {
-                levels.Add(new XElement("level", neuronConfig[i].ToString()));
-            }
-        }
 
         private void WriteItem(XElement root, List<LearningDataIndicator> indicators, TradingItem item)
         {
@@ -566,7 +549,7 @@ namespace MasterDataFlow.Trading.Ui
 
             itemElement.Add(new XElement("fitness", item.Fitness.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("guid", item.Guid.ToString()));
-            itemElement.Add(new XElement("historyWidowLength", TradingItem.GetHistoryWidowLength(item).ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("historyWidowLength", item.InitData.HistoryWidowLength.ToString(CultureInfo.InvariantCulture)));
 
 
             itemElement.Add(new XElement("valuesCount", item.Values.Length.ToString(CultureInfo.InvariantCulture)));
@@ -574,7 +557,7 @@ namespace MasterDataFlow.Trading.Ui
             var namedValues = new XElement("namedValues");
             itemElement.Add(namedValues);
 
-            for (var i = 0; i < TradingItem.INDICATOR_NUMBER; i++)
+            for (var i = 0; i < item.InitData.IndicatorNumber; i++)
             {
                 var value = item.Values[i];
                 var v = new XElement("v", value.ToString(CultureInfo.InvariantCulture));
@@ -583,24 +566,24 @@ namespace MasterDataFlow.Trading.Ui
                 namedValues.Add(v);
             }
 
-            var alfa = new XElement("v", item.Values[TradingItem.OFFSET_ALPHA].ToString(CultureInfo.InvariantCulture));
+            var alfa = new XElement("v", item.Values[item.InitData.OFFSET_ALPHA].ToString(CultureInfo.InvariantCulture));
             alfa.Add(new XAttribute("type", "alfa"));
             namedValues.Add(alfa);
 
-            var stopLoss = new XElement("v", item.Values[TradingItem.OFFSET_STOPLOSS].ToString(CultureInfo.InvariantCulture));
+            var stopLoss = new XElement("v", item.Values[item.InitData.OFFSET_STOPLOSS].ToString(CultureInfo.InvariantCulture));
             stopLoss.Add(new XAttribute("type", "stopLoss"));
             namedValues.Add(stopLoss);
 
             var values = new XElement("values");
             itemElement.Add(values);
-            for (var i = TradingItem.OFFSET_VALUES; i < item.Values.Length; i++)
+            for (var i = item.InitData.OFFSET_VALUES; i < item.Values.Length; i++)
             {
                 var value = item.Values[i];
                 values.Add(new XElement("v", value.ToString(CultureInfo.InvariantCulture)));
             }
         }
 
-        public TradingItem LoadItem()
+        public TradingItem LoadItem(TradingItemInitData itemInitData)
         {
             if (!File.Exists("genetic.save"))
                 return null;
@@ -610,7 +593,7 @@ namespace MasterDataFlow.Trading.Ui
             {
 
                 XElement root = XElement.Load(reader, LoadOptions.None);
-                var item = CreateItem(root);
+                var item = CreateItem(root, itemInitData);
                 ReadItemValues(root, item);
 
                 DisplayBest(item);
@@ -622,17 +605,19 @@ namespace MasterDataFlow.Trading.Ui
             }
         }
 
-        public NeuronNetwork LoadNetwork()
+        public TradingItemInitData LoadItemInitData()
         {
             if (!File.Exists("genetic.save"))
-                return null;
+            {
+                return new TradingItemInitData();
+            }
 
             StreamReader reader = new StreamReader("genetic.save");
             try
             {
-
                 XElement root = XElement.Load(reader, LoadOptions.None);
-                var result = ReadNetwork(root);
+                var result = new TradingItemInitData();
+                result.Read(root);
                 return result;
             }
             finally
@@ -641,24 +626,6 @@ namespace MasterDataFlow.Trading.Ui
             }
         }
 
-        private NeuronNetwork ReadNetwork(XElement root)
-        {
-            var dataObjectElement = root.Element("dataObject");
-            var networkElement = dataObjectElement.Element("neuronNetwork");
-
-
-            var networkLayers = new List<NeuronNetworkLevel>();
-
-            var levels = networkElement.Element("levels");
-            foreach (var eValue in levels.Elements("level"))
-            {
-                networkLayers.Add(new NeuronNetworkLevel { Length = Convert.ToInt32(eValue.Value)});
-            }
-
-            var network = new NeuronNetwork {Layers = networkLayers.ToArray()};
-
-            return network;
-        }
 
         private void ReadItemValues(XElement root, TradingItem item)
         {
@@ -667,14 +634,8 @@ namespace MasterDataFlow.Trading.Ui
             XElement eFitness = itemElement.Element("fitness");
             item.Fitness = Double.Parse(eFitness.Value);
 
-            var historyWidowLength = itemElement.Element("historyWidowLength");
-            item.SetHistoryWidowLength(int.Parse(historyWidowLength.Value));
-
             XElement guid = itemElement.Element("guid");
-            if (guid != null)
-            {
-                item.Guid = Guid.Parse(guid.Value);
-            }
+            item.Guid = Guid.Parse(guid.Value);
 
             XElement eValues = itemElement.Element("namedValues");
             int offset = 0;
@@ -699,40 +660,63 @@ namespace MasterDataFlow.Trading.Ui
             return (float)result;
         }
 
-        private TradingItem CreateItem(XElement root)
+        private TradingItem CreateItem(XElement root, TradingItemInitData itemInitData)
         {
-            var valuesCountElement = root.XPathSelectElements("item/valuesCount").Single();
-            var valuesCount = Convert.ToInt32(valuesCountElement.Value);
-
-            TradingItemInitData initData = new TradingItemInitData(valuesCount, false);
-
-            TradingItem item = new TradingItem(initData);
+            TradingItem item = new TradingItem(itemInitData);
             return item;
         }
 
-        public TradingItem ReadLast()
-        {
-            if (!File.Exists("genetic.save"))
-                return null;
 
-            StreamReader reader = new StreamReader("genetic.save");
+        // https://stackoverflow.com/questions/5887292/asp-net-mvc-3-mschart-error-only-1-y-values-can-be-set-for-this-data-series
+        // https://msdn.microsoft.com/en-us/library/dd456730.aspx
+        //https://stackoverflow.com/questions/13584061/how-to-enable-zooming-in-microsoft-chart-control-by-using-mouse-wheel
+        // google c.net chart zoom
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            var itemInitData = LoadItemInitData();
+
+            await LoadInputData(itemInitData);
+
+            var prices = chartProgress.Series["Prices"];
+
+            foreach (var quote in _tradingBars)
+            {
+                prices.Points.AddXY(quote.Time, quote.Open, quote.High, quote.Low, quote.Close);
+                
+            }
+            
+        }
+
+        private void ChartProgressOnMouseWheel(object sender, MouseEventArgs mouseEventArgs)
+        {
+            
             try
             {
-                var initData = new TradingItemInitData(_dataObject.ItemInitData.Count, false);
+                if (mouseEventArgs.Delta < 0)
+                {
+                    chartProgress.ChartAreas[0].AxisX.ScaleView.ZoomReset();
+                    chartProgress.ChartAreas[0].AxisY.ScaleView.ZoomReset();
+                }
 
-                TradingItem item = new TradingItem(initData);
+                if (mouseEventArgs.Delta > 0)
+                {
+                    double xMin = chartProgress.ChartAreas[0].AxisX.ScaleView.ViewMinimum;
+                    double xMax = chartProgress.ChartAreas[0].AxisX.ScaleView.ViewMaximum;
+                    double yMin = chartProgress.ChartAreas[0].AxisY.ScaleView.ViewMinimum;
+                    double yMax = chartProgress.ChartAreas[0].AxisY.ScaleView.ViewMaximum;
 
-                XElement root = XElement.Load(reader, LoadOptions.None);
-                item.Read(root);
-                DisplayBest(item);
-                return item;
+                    double posXStart = chartProgress.ChartAreas[0].AxisX.PixelPositionToValue(mouseEventArgs.Location.X) - (xMax - xMin) / 4;
+                    double posXFinish = chartProgress.ChartAreas[0].AxisX.PixelPositionToValue(mouseEventArgs.Location.X) + (xMax - xMin) / 4;
+                    double posYStart = chartProgress.ChartAreas[0].AxisY.PixelPositionToValue(mouseEventArgs.Location.Y) - (yMax - yMin) / 4;
+                    double posYFinish = chartProgress.ChartAreas[0].AxisY.PixelPositionToValue(mouseEventArgs.Location.Y) + (yMax - yMin) / 4;
 
+                    chartProgress.ChartAreas[0].AxisX.ScaleView.Zoom(posXStart, posXFinish);
+                    chartProgress.ChartAreas[0].AxisY.ScaleView.Zoom(posYStart, posYFinish);
+                }
             }
-            finally
-            {
-                reader.Close();
-            }
-
+            catch { }
         }
+
+
     }
 }

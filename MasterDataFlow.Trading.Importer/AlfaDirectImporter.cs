@@ -69,7 +69,7 @@ namespace MasterDataFlow.Trading.Importer
                                                 };
 
             archiveIndex = client.Archive.RequestChartArchive(CandleType.Standard, id, DateTime.Today,
-                BaseTimeFrame.Hour, 365);
+                BaseTimeFrame.Hour, (int)(365 * 1.95));
 
 
             if (!manualResetEvent.WaitOne(new TimeSpan(0, 0, 60)))

@@ -19,7 +19,7 @@ namespace MasterDataFlow.Intelligence.Genetic
             _isAddHistory = isAddHistory;
         }
 
-        private readonly int _count;
+        protected int _count;
         private readonly bool _isAddHistory;
 
         public int Count
