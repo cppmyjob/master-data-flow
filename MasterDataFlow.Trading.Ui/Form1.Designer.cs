@@ -28,13 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.chartProgress = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.tradingChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.nudPopulationFactor = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
@@ -86,7 +85,7 @@
             this.label22 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartProgress)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tradingChart)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).BeginInit();
             this.SuspendLayout();
@@ -103,7 +102,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.chartProgress);
+            this.groupBox1.Controls.Add(this.tradingChart);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(1051, 335);
@@ -111,25 +110,20 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "SBER";
             // 
-            // chartProgress
+            // tradingChart
             // 
-            chartArea1.CursorX.IsUserEnabled = true;
-            chartArea1.CursorY.IsUserEnabled = true;
             chartArea1.Name = "ChartArea1";
-            this.chartProgress.ChartAreas.Add(chartArea1);
+            this.tradingChart.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
-            this.chartProgress.Legends.Add(legend1);
-            this.chartProgress.Location = new System.Drawing.Point(6, 9);
-            this.chartProgress.Name = "chartProgress";
+            this.tradingChart.Legends.Add(legend1);
+            this.tradingChart.Location = new System.Drawing.Point(6, 19);
+            this.tradingChart.Name = "tradingChart";
             series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
             series1.Legend = "Legend1";
-            series1.Name = "Prices";
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            series1.YValuesPerPoint = 4;
-            this.chartProgress.Series.Add(series1);
-            this.chartProgress.Size = new System.Drawing.Size(1035, 300);
-            this.chartProgress.TabIndex = 0;
+            series1.Name = "Series1";
+            this.tradingChart.Series.Add(series1);
+            this.tradingChart.Size = new System.Drawing.Size(1014, 300);
+            this.tradingChart.TabIndex = 0;
             // 
             // groupBox2
             // 
@@ -610,7 +604,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chartProgress)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tradingChart)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).EndInit();
@@ -672,8 +666,8 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox tbIndicators;
         private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chartProgress;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart tradingChart;
     }
 }
 

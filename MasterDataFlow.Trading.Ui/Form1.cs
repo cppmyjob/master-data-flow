@@ -33,10 +33,13 @@ namespace MasterDataFlow.Trading.Ui
 {
     public partial class Form1 : Form
     {
+        private TradingChart _tradingChart;
+
         public Form1()
         {
             InitializeComponent();
-            chartProgress.MouseWheel += ChartProgressOnMouseWheel;
+
+            _tradingChart = new TradingChart(tradingChart);
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -673,50 +676,32 @@ namespace MasterDataFlow.Trading.Ui
         // google c.net chart zoom
         private async void button2_Click(object sender, EventArgs e)
         {
-            var itemInitData = LoadItemInitData();
+            var csvImporter = new CsvImporter(@"Data\output.csv", new CultureInfo("en-US"));
+            _candles = await csvImporter.ImportAsync("fb");
 
-            await LoadInputData(itemInitData);
+            _tradingBars = CandlesToBars(_candles);
 
-            var prices = chartProgress.Series["Prices"];
+            _tradingChart.SetPrices(_tradingBars);
 
-            foreach (var quote in _tradingBars)
-            {
-                prices.Points.AddXY(quote.Time, quote.Open, quote.High, quote.Low, quote.Close);
-                
-            }
-            
+            //SetChartMinMaxPrices(_tradingBars);
+
+
+
+            //var prices = chartProgress.Series["Prices"];
+            //var buy = chartProgress.Series["Buy"];
+
+            ////prices.Points.AddXY(DateTime.Now, 10, 20, 40, 30);
+
+            //foreach (var quote in _tradingBars)
+            //{
+            //    prices.Points.AddXY(quote.Time, quote.Low, quote.High, quote.Open, quote.Close);
+            //}
+
+            //foreach (var quote in _tradingBars)
+            //{
+            //   var index = buy.Points.AddXY(quote.Time, quote.Low);
+            //}
         }
-
-        private void ChartProgressOnMouseWheel(object sender, MouseEventArgs mouseEventArgs)
-        {
-            
-            try
-            {
-                if (mouseEventArgs.Delta < 0)
-                {
-                    chartProgress.ChartAreas[0].AxisX.ScaleView.ZoomReset();
-                    chartProgress.ChartAreas[0].AxisY.ScaleView.ZoomReset();
-                }
-
-                if (mouseEventArgs.Delta > 0)
-                {
-                    double xMin = chartProgress.ChartAreas[0].AxisX.ScaleView.ViewMinimum;
-                    double xMax = chartProgress.ChartAreas[0].AxisX.ScaleView.ViewMaximum;
-                    double yMin = chartProgress.ChartAreas[0].AxisY.ScaleView.ViewMinimum;
-                    double yMax = chartProgress.ChartAreas[0].AxisY.ScaleView.ViewMaximum;
-
-                    double posXStart = chartProgress.ChartAreas[0].AxisX.PixelPositionToValue(mouseEventArgs.Location.X) - (xMax - xMin) / 4;
-                    double posXFinish = chartProgress.ChartAreas[0].AxisX.PixelPositionToValue(mouseEventArgs.Location.X) + (xMax - xMin) / 4;
-                    double posYStart = chartProgress.ChartAreas[0].AxisY.PixelPositionToValue(mouseEventArgs.Location.Y) - (yMax - yMin) / 4;
-                    double posYFinish = chartProgress.ChartAreas[0].AxisY.PixelPositionToValue(mouseEventArgs.Location.Y) + (yMax - yMin) / 4;
-
-                    chartProgress.ChartAreas[0].AxisX.ScaleView.Zoom(posXStart, posXFinish);
-                    chartProgress.ChartAreas[0].AxisY.ScaleView.Zoom(posYStart, posYFinish);
-                }
-            }
-            catch { }
-        }
-
 
     }
 }
