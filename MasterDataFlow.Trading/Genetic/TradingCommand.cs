@@ -382,20 +382,20 @@ namespace MasterDataFlow.Trading.Genetic
                 return true;
             }
 
-            //if (testerResult.BuyCount > testerResult.SellCount)
-            //{
-            //    if (testerResult.BuyCount / (float) testerResult.SellCount > 2)
-            //    {
-            //            return true;
-            //    }
-            //}
-            //else
-            //{
-            //    if (testerResult.SellCount / (float) testerResult.BuyCount > 2)
-            //    {
-            //            return true;
-            //    }
-            //}
+            if (testerResult.BuyCount > testerResult.SellCount)
+            {
+                if (testerResult.BuyCount / (float)testerResult.SellCount > 2)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (testerResult.SellCount / (float)testerResult.BuyCount > 2)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 

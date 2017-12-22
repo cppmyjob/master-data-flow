@@ -62,6 +62,8 @@ namespace MasterDataFlow.Trading.Ui
                 {
                     _dataObject = await CreateDataObject();
 
+                    SetChartPrices();
+
                     var tradingItem = LoadItem(_dataObject.ItemInitData);
                     if (tradingItem != null)
                     {
@@ -193,6 +195,8 @@ namespace MasterDataFlow.Trading.Ui
 
             SetText(tbFitness, (fitness).ToString("F10"));
             SetText(tbStopLoss, neuronItem.StopLoss.ToString("F10"));
+
+            var stories = new List<Story>();
             if (neuronItem.TrainingTesterResult != null)
             {
                 SetText(tbTrainingMinusCount, (neuronItem.TrainingTesterResult.MinusCount).ToString("D"));
@@ -200,6 +204,10 @@ namespace MasterDataFlow.Trading.Ui
                 SetText(tbTrainingPlusCount, (neuronItem.TrainingTesterResult.PlusCount).ToString("D"));
                 SetText(tbTrainingProfit, (neuronItem.TrainingTesterResult.Profit).ToString("F10"));
                 SetText(tbTrainingDiff, (neuronItem.TrainingTesterResult.MinEquity).ToString("F10"));
+                stories.AddRange(neuronItem.TrainingTesterResult.Stories);
+            }
+            if (neuronItem.ValidationTesterResult != null) { 
+                stories.AddRange(neuronItem.ValidationTesterResult.Stories);
             }
 
             var dll = TradingCommand.CreateNeuronDll(_dataObject, neuronItem);
@@ -210,6 +218,12 @@ namespace MasterDataFlow.Trading.Ui
             SetText(tbPredictionDiff, (testResult.MinEquity).ToString("F10"));
             SetText(tbPredictionMinusCount, (testResult.MinusCount).ToString("D"));
             SetText(tbPredictionPlusCount, (testResult.PlusCount).ToString("D"));
+
+            stories.AddRange(testResult.Stories);
+
+            SetChartHistory(tradingChart, stories);
+
+
             if (isSaveBest)
                 SaveBest(neuronItem, testResult);
         }
@@ -241,6 +255,7 @@ namespace MasterDataFlow.Trading.Ui
             }
         }
 
+
         private delegate void SetDateTimePickerCallback(DateTimePicker control, DateTime value);
 
         private void SetDateTimePicker(DateTimePicker control, DateTime value)
@@ -253,6 +268,36 @@ namespace MasterDataFlow.Trading.Ui
             else
             {
                 control.Value = value;
+            }
+        }
+
+        private delegate void SetChartHistoryCallBack(Chart chart, IEnumerable<Story> stories);
+
+        private void SetChartHistory(Chart chart, IEnumerable<Story> stories)
+        {
+            if (chart.InvokeRequired)
+            {
+                SetChartHistoryCallBack d = new SetChartHistoryCallBack(SetChartHistory);
+                this.Invoke(d, new object[] { chart, stories });
+            }
+            else
+            {
+                _tradingChart.SetStories(stories);
+            }
+        }
+
+        private delegate void SetChartPricesCallBack();
+
+        private void SetChartPrices()
+        {
+            if (tradingChart.InvokeRequired)
+            {
+                SetChartPricesCallBack d = new SetChartPricesCallBack(SetChartPrices);
+                this.Invoke(d, new object[] {  });
+            }
+            else
+            {
+                _tradingChart.SetPrices(_tradingBars);
             }
         }
 
@@ -682,6 +727,8 @@ namespace MasterDataFlow.Trading.Ui
             _tradingBars = CandlesToBars(_candles);
 
             _tradingChart.SetPrices(_tradingBars);
+
+            _tradingChart.Test();
 
             //SetChartMinMaxPrices(_tradingBars);
 
