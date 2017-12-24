@@ -18,8 +18,6 @@ namespace MasterDataFlow.Trading.Genetic
             _prices = prices;
         }
 
-        public 
-
 
         protected override Direction GetDirection()
         {

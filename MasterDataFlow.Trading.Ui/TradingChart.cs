@@ -18,13 +18,17 @@ namespace MasterDataFlow.Trading.Ui
         private readonly Series _buySeries;
         private readonly Series _sellSeries;
         private readonly Series _closeSeries;
+        private readonly Series _zigZagSeries;
+        
         private readonly ChartArea _chartArea;
+        private readonly ChartArea _chartArea2;
 
         private Bar[] _prices;
 
         public TradingChart(Chart chart)
         {
             _chart = chart;
+            _chart.DataManipulator.IsEmptyPointIgnored = false;
             _chart.Series.Clear();
             _chart.Legends.Clear();
             _chart.ChartAreas.Clear();
@@ -35,30 +39,34 @@ namespace MasterDataFlow.Trading.Ui
 
 
             _chartArea = _chart.ChartAreas.Add("MainChartArea");
-            _chartArea.AxisX.LabelStyle.Format = "dd.MM.yyyy hh:mm";
-            _chartArea.CursorX.IsUserEnabled = true;
-            _chartArea.CursorY.IsUserEnabled = true;
+            //_chartArea.AxisX.LabelStyle.Format = "dd.MM.yyyy hh:mm";
+
+
+            const bool isXValueIndexed = false;
+
+            //_chartArea.CursorX.IsUserEnabled = true;
+            //_chartArea.CursorY.IsUserEnabled = true;
 
             _pricesSeries = _chart.Series.Add("Prices");
             _pricesSeries.ChartType = SeriesChartType.Candlestick;
             _pricesSeries.Color = Color.Black;
             _pricesSeries.ChartArea = _chartArea.Name;
-            _pricesSeries.IsXValueIndexed = true;
-            _pricesSeries.XValueType = ChartValueType.DateTime;
+            _pricesSeries.IsXValueIndexed = isXValueIndexed;
+            //_pricesSeries.XValueType = ChartValueType.DateTime;
             _pricesSeries.YValuesPerPoint = 4;
 
             _buySeries = _chart.Series.Add("Buy");
             _buySeries.ChartArea = _chartArea.Name;
             _buySeries.Color = Color.Blue;
             _buySeries.ChartType = SeriesChartType.Point;
-            _buySeries.IsXValueIndexed = true;
+            _buySeries.IsXValueIndexed = isXValueIndexed;
             _buySeries.YValuesPerPoint = 2;
 
             _sellSeries = _chart.Series.Add("Sell");
             _sellSeries.ChartArea = _chartArea.Name;
             _sellSeries.Color = Color.Green;
             _sellSeries.ChartType = SeriesChartType.Point;
-            _sellSeries.IsXValueIndexed = true;
+            _sellSeries.IsXValueIndexed = isXValueIndexed;
             _sellSeries.YValuesPerPoint = 2;
 
 
@@ -66,31 +74,53 @@ namespace MasterDataFlow.Trading.Ui
             _closeSeries.ChartArea = _chartArea.Name;
             _closeSeries.Color = Color.Red;
             _closeSeries.ChartType = SeriesChartType.Point;
-            _closeSeries.IsXValueIndexed = true;
+            _closeSeries.IsXValueIndexed = isXValueIndexed;
             _closeSeries.YValuesPerPoint = 2;
 
+
+            _zigZagSeries = _chart.Series.Add("ZigZag");
+            _zigZagSeries.ChartType = SeriesChartType.Line;
+            _zigZagSeries.Color = Color.DarkRed;
+            _zigZagSeries.ChartArea = _chartArea.Name;
+            _zigZagSeries.IsXValueIndexed = isXValueIndexed;
+            _zigZagSeries.XValueType = ChartValueType.DateTime;
+            _zigZagSeries.YValuesPerPoint = 4;
+
+
         }
+
+        public void SetZigZag(int[] indexes)
+        {
+            var isHigh = _prices[indexes[0]].High > _prices[indexes[1]].Low;
+
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                var index = indexes[i];
+                int pi;
+                if (isHigh)
+                    pi = _zigZagSeries.Points.AddXY(index, _prices[index].High);
+                else
+                    pi = _zigZagSeries.Points.AddXY(index, _prices[index].Low);
+                isHigh = !isHigh;
+                _pricesSeries.Points[pi].AxisLabel = _prices[index].Time.ToString("G");
+            }
+        }
+
 
         public void SetPrices(Bar[] prices)
         {
             _prices = prices;
             _pricesSeries.Points.Clear();
-            foreach (var quote in prices)
+
+            for (int i = 0; i < prices.Length; i++)
             {
-                _pricesSeries.Points.AddXY(quote.Time, quote.Low, quote.High, quote.Open, quote.Close);
+                var quote = prices[i];
+                var index = _pricesSeries.Points.AddXY(i, quote.Low, quote.High, quote.Open, quote.Close);
+                _pricesSeries.Points[index].AxisLabel = quote.Time.ToString("G");
             }
+
             SetChartMinMaxPrices(_prices);
         }
-
-        public void Test()
-        {
-            foreach (var quote in _prices)
-            {
-                var index = _buySeries.Points.AddXY(quote.Time, quote.Low);
-                index = _buySeries.Points.AddXY(quote.Time, quote.Low);
-            }
-        }
-
 
         private enum OrderPointType
         {
@@ -99,6 +129,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private class OrderPoint
         {
+            public int Index { get; set; }
             public DateTime Time { get; set; }
             public decimal? Buy { get; set; }
             public decimal? Sell { get; set; }
@@ -115,33 +146,36 @@ namespace MasterDataFlow.Trading.Ui
             if (a.Length == 0)
                 return;
 
-            var i = 0;
+            var j = 0;
 
             OrderPointType currentOrderType = OrderPointType.None;
             OrderPointType lastOrderType = OrderPointType.None;
-            foreach (var price in _prices)
+
+            for (int i = 0; i < _prices.Length; i++)
             {
+                var price = _prices[i];
                 var orderPoint = new OrderPoint();
+                orderPoint.Index = i;
                 orderPoint.Time = price.Time;
                 lastOrderType = currentOrderType;
-                while (i < a.Length && price.Time == a[i].Time)
+                while (j < a.Length && price.Time == a[j].Time)
                 {
-                    switch (a[i].Type)
+                    switch (a[j].Type)
                     {
                         case StoryType.Buy:
-                            orderPoint.Buy = a[i].Price;
+                            orderPoint.Buy = a[j].Price;
                             currentOrderType = OrderPointType.Buy;
                             break;
                         case StoryType.Sell:
-                            orderPoint.Sell = a[i].Price;
+                            orderPoint.Sell = a[j].Price;
                             currentOrderType = OrderPointType.Sell;
                             break;
                         default:
-                            orderPoint.Stop = a[i].Price;
+                            orderPoint.Stop = a[j].Price;
                             currentOrderType = OrderPointType.Close;
                             break;
                     }
-                    ++i;
+                    ++j;
                 }
                 if (lastOrderType == currentOrderType)
                 {
@@ -166,27 +200,27 @@ namespace MasterDataFlow.Trading.Ui
         private void AddOrderPoint(OrderPoint orderPoint)
         {
             if (orderPoint.Buy.HasValue)
-                _buySeries.Points.AddXY(orderPoint.Time, orderPoint.Buy.Value);
+                _buySeries.Points.AddXY(orderPoint.Index, orderPoint.Buy.Value);
             else
             {
-                var index = _buySeries.Points.AddXY(orderPoint.Time, 0);
+                var index = _buySeries.Points.AddXY(orderPoint.Index, 0);
                 _buySeries.Points[index].IsEmpty = true;
             }
 
 
             if (orderPoint.Sell.HasValue)
-                _sellSeries.Points.AddXY(orderPoint.Time, orderPoint.Sell.Value);
+                _sellSeries.Points.AddXY(orderPoint.Index, orderPoint.Sell.Value);
             else
             {
-                var index = _sellSeries.Points.AddXY(orderPoint.Time, 0);
+                var index = _sellSeries.Points.AddXY(orderPoint.Index, 0);
                 _sellSeries.Points[index].IsEmpty = true;
             }
 
             if (orderPoint.Stop.HasValue)
-                _closeSeries.Points.AddXY(orderPoint.Time, orderPoint.Stop.Value);
+                _closeSeries.Points.AddXY(orderPoint.Index, orderPoint.Stop.Value);
             else
             {
-                var index = _closeSeries.Points.AddXY(orderPoint.Time, 0);
+                var index = _closeSeries.Points.AddXY(orderPoint.Index, 0);
                 _closeSeries.Points[index].IsEmpty = true;
             }
         }
@@ -221,6 +255,9 @@ namespace MasterDataFlow.Trading.Ui
                     var dateEnd = _prices[(int)posXFinish].Time;
                     ;
 
+                    //var dateStart = DateTime.FromOADate(posXStart);
+                    //var dateEnd = DateTime.FromOADate(posXFinish);
+
                     var barRange = _prices.SkipWhile(t => t.Time <= dateStart).TakeWhile(t => t.Time <= dateEnd)
                         .ToArray();
                     SetChartMinMaxPrices(barRange);
@@ -251,6 +288,10 @@ namespace MasterDataFlow.Trading.Ui
 
                 var dateStart = _prices[(int)posXStart].Time;
                 var dateEnd = _prices[(int)posXFinish].Time; ;
+
+                //var dateStart = DateTime.FromOADate(posXStart);
+                //var dateEnd = DateTime.FromOADate(posXFinish);
+
 
                 var barRange = _prices.SkipWhile(t => t.Time <= dateStart).TakeWhile(t => t.Time <= dateEnd)
                     .ToArray();

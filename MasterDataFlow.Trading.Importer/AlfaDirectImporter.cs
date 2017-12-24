@@ -54,7 +54,8 @@ namespace MasterDataFlow.Trading.Importer
 
             var manualResetEvent = new ManualResetEvent(false);
 
-            var id = GetIdfi(client, "SBER");
+            //var id = GetIdfi(client, "SBER");
+            var id = GetIdfi(client, "AFLT");
 
             var archiveIndex = Int32.MinValue;
 

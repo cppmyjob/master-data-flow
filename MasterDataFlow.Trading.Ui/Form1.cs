@@ -19,6 +19,7 @@ using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
+using MasterDataFlow.Trading.Indicators;
 using MasterDataFlow.Trading.Tester;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
@@ -292,12 +293,13 @@ namespace MasterDataFlow.Trading.Ui
         {
             if (tradingChart.InvokeRequired)
             {
-                SetChartPricesCallBack d = new SetChartPricesCallBack(SetChartPrices);
+                SetChartPricesCallBack d = SetChartPrices;
                 this.Invoke(d, new object[] {  });
             }
             else
             {
                 _tradingChart.SetPrices(_tradingBars);
+                _tradingChart.SetZigZag(_zigZag);
             }
         }
 
@@ -326,18 +328,13 @@ namespace MasterDataFlow.Trading.Ui
             var result = new TradingDataObject(itemInitData, _trainingData, _validationData, 
                 100 * (int)nudPopulationFactor.Value, 33 * (int)nudPopulationFactor.Value);
 
-            DisplayProgressChart();
-
             return result;
-        }
-
-        private void DisplayProgressChart()
-        {
-            //chartProgress.DataBindTable();
         }
 
         private IEnumerable<IOhlcv> _candles = null;
         private Bar[] _tradingBars = null;
+        private int[] _zigZag = null;
+        private ZigZagValue[] _zigZagLearningData = null;
         private List<LearningDataIndicator> _indicators = null;
         private LearningData _trainingData = null;
         private LearningData _validationData = null;
@@ -345,14 +342,44 @@ namespace MasterDataFlow.Trading.Ui
 
         private async Task LoadInputData(TradingItemInitData itemInitData)
         {
-            var csvImporter = new CsvImporter(@"Data\output.csv", new CultureInfo("en-US"));
+            //var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
+             var csvImporter = new CsvImporter(@"Data\SBER.csv", new CultureInfo("en-US"));
             _candles = await csvImporter.ImportAsync("fb");
 
             _tradingBars = CandlesToBars(_candles);
 
             CreateIndicatorsValues();
 
+            CalculateZigZag();
+
             SetDataBoundaris(itemInitData);
+        }
+
+        private void CalculateZigZag()
+        {
+            _zigZag = ZigZag.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m).ToArray();
+            _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue {Time = t.Time, Value = 0}).ToArray();
+
+            var isHigh = _tradingBars[_zigZag[0]].High > _tradingBars[_zigZag[1]].Low;
+
+            for (int i = 1; i < _zigZag.Length; i++)
+            {
+                if (isHigh)
+                {
+                    for (int j = _zigZag[i - 1]; j < _zigZag[i]; j++)
+                    {
+                        _zigZagLearningData[j].Value = -1;
+                    }
+                }
+                else
+                {
+                    for (int j = _zigZag[i - 1]; j < _zigZag[i]; j++)
+                    {
+                        _zigZagLearningData[j].Value = 1;
+                    }
+                }
+                isHigh = !isHigh;
+            }
         }
 
         private void CreateIndicatorsValues()
@@ -360,22 +387,23 @@ namespace MasterDataFlow.Trading.Ui
             _indicators = new List<LearningDataIndicator>();
 
             // RSI
-            IReadOnlyList<AnalyzableTick<decimal?>> rsi = _candles.Rsi(14);
-            AddIndicator("RSI", rsi);
+            AddIndicator("RSI 3", _candles.Rsi(3));
+            AddIndicator("RSI 7", _candles.Rsi(7));
+            AddIndicator("RSI 14", _candles.Rsi(14));
+            AddIndicator("RSI 21", _candles.Rsi(21));
+            AddIndicator("RSI 28", _candles.Rsi(28));
 
             // Parabolic SAR
             var psar = _candles.Sar(0.02M, 0.2M);
             AddIndicator("SAR", psar);
 
             // EMA
-            var ema5 = _candles.Ema(5);
-            AddIndicator("EMA 5", ema5);
-            var ema10 = _candles.Ema(10);
-            AddIndicator("EMA 10", ema10);
-            var ema15 = _candles.Ema(15);
-            AddIndicator("EMA 15", ema15);
-            var ema20 = _candles.Ema(20);
-            AddIndicator("EMA 20", ema20);
+            AddIndicator("EMA 3", _candles.Ema(3));
+            AddIndicator("EMA 5", _candles.Ema(5));
+            AddIndicator("EMA 10", _candles.Ema(10));
+            AddIndicator("EMA 15", _candles.Ema(15));
+            AddIndicator("EMA 20", _candles.Ema(20));
+            AddIndicator("EMA 25", _candles.Ema(25));
 
             // MACD
             var macds = _candles.Macd(12, 26, 9);
@@ -447,8 +475,8 @@ namespace MasterDataFlow.Trading.Ui
             var firstTime = result.Prices[0].Time;
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
-            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength - 1;
-            var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime) - 1;
+            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength;// - 1;
+            var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime);// - 1;
 
             foreach (var indicator in _indicators)
             {
@@ -463,8 +491,12 @@ namespace MasterDataFlow.Trading.Ui
                 Array.Copy(indicator.Times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
                 indicators.Add(learningIndicator);
             }
-
             result.Indicators = indicators.ToArray();
+
+            result.ZigZags = _zigZagLearningData
+                .SkipWhile(t => t.Time < startDate)
+                .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();
+
             return result;
         }
 
@@ -721,14 +753,13 @@ namespace MasterDataFlow.Trading.Ui
         // google c.net chart zoom
         private async void button2_Click(object sender, EventArgs e)
         {
-            var csvImporter = new CsvImporter(@"Data\output.csv", new CultureInfo("en-US"));
+            var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
             _candles = await csvImporter.ImportAsync("fb");
 
             _tradingBars = CandlesToBars(_candles);
 
             _tradingChart.SetPrices(_tradingBars);
 
-            _tradingChart.Test();
 
             //SetChartMinMaxPrices(_tradingBars);
 
@@ -750,5 +781,18 @@ namespace MasterDataFlow.Trading.Ui
             //}
         }
 
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
+            _candles = await csvImporter.ImportAsync("fb");
+
+            _tradingBars = CandlesToBars(_candles);
+
+            _tradingChart.SetPrices(_tradingBars);
+
+
+            var result = ZigZag.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m);
+            _tradingChart.SetZigZag(result.ToArray());
+        }
     }
 }

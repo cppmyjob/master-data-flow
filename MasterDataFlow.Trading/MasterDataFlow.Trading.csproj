@@ -45,6 +45,7 @@
     <Compile Include="Genetic\DirectionTester.cs" />
     <Compile Include="Genetic\GeneticTestTrading.cs" />
     <Compile Include="Genetic\TradingCommand.cs" />
+    <Compile Include="Indicators\ZigZag.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trade\BaseTrading.cs" />
