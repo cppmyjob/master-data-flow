@@ -358,22 +358,32 @@ namespace MasterDataFlow.Trading.Ui
         private void CalculateZigZag()
         {
             _zigZag = ZigZag.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m).ToArray();
-            _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue {Time = t.Time, Value = 0}).ToArray();
+            _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue {Time = t.Time, Value = Int32.MinValue}).ToArray();
 
             var isHigh = _tradingBars[_zigZag[0]].High > _tradingBars[_zigZag[1]].Low;
 
             for (int i = 1; i < _zigZag.Length; i++)
             {
+                int jBegin;
+                if (i != 1)
+                {
+                    jBegin = _zigZag[i - 1] + 1;
+                    _zigZagLearningData[_zigZag[i]].Value = 0;
+                }
+                else
+                {
+                    jBegin = _zigZag[i - 1];
+                }
                 if (isHigh)
                 {
-                    for (int j = _zigZag[i - 1]; j < _zigZag[i]; j++)
+                    for (int j = jBegin; j < _zigZag[i]; j++)
                     {
                         _zigZagLearningData[j].Value = -1;
                     }
                 }
                 else
                 {
-                    for (int j = _zigZag[i - 1]; j < _zigZag[i]; j++)
+                    for (int j = jBegin; j < _zigZag[i]; j++)
                     {
                         _zigZagLearningData[j].Value = 1;
                     }

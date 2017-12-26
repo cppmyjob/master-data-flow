@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Genetic;
@@ -282,7 +283,7 @@ namespace MasterDataFlow.Trading.Genetic
 
     public class TradingCommand : GeneticFloatCommand<TradingDataObject, TradingItemInitData, TradingItem>
     {
-        private GeneticNeuronDLL1 _dll;
+        private Dictionary<int, GeneticNeuronDLL1> _dlls = new Dictionary<int, GeneticNeuronDLL1>();
 
         protected override TradingItem CreateItem(TradingItemInitData initData)
         {
@@ -424,11 +425,19 @@ namespace MasterDataFlow.Trading.Genetic
 
         private GeneticNeuronDLL1 GetNeuronDll(TradingItem item)
         {
-            if (_dll == null)
-                _dll = CreateNeuronDll(DataObject);
-            _dll.SetAlpha(item.Alpha);
-            SetWeigths(_dll, item);
-            return _dll;
+            var threadId = Thread.CurrentThread.ManagedThreadId;
+            GeneticNeuronDLL1 dll;
+            lock (_dlls) // TODO improve
+            {
+                if (!_dlls.TryGetValue(threadId, out dll))
+                {
+                    dll = CreateNeuronDll(DataObject);
+                    _dlls.Add(threadId, dll);
+                }
+            }
+            dll.SetAlpha(item.Alpha);
+            SetWeigths(dll, item);
+            return dll;
         }
 
         public static GeneticNeuronDLL1 CreateNeuronDll(TradingDataObject dataObject, TradingItem item)

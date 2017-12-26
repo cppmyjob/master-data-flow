@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Random;
@@ -227,13 +229,22 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void CalculateWithOneProcessor()
         {
-            for (var i = 0; i < DataObject.CommandInitData.ItemsCount; i++)
-            {
+            //for (var i = 0; i < DataObject.CommandInitData.ItemsCount; i++)
+            //{
+            //    var item = _itemsArray[i];
+            //    if (item.Fitness > 0.0)
+            //        continue;
+            //    item.Fitness = InternalCalculateFitness(item, 0);
+            //}
+
+            var o = new ParallelOptions();
+            o.MaxDegreeOfParallelism = 2;
+            Parallel.For(0, DataObject.CommandInitData.ItemsCount, o, (i) => {
                 var item = _itemsArray[i];
-                if (item.Fitness > 0.0)
-                    continue;
+                if (item.Fitness < 0.0 || item.Fitness > 0.0)
+                    return;
                 item.Fitness = InternalCalculateFitness(item, 0);
-            }
+            });
         }
 
         protected virtual double InternalCalculateFitness(TGeneticItem item, int processor)
@@ -243,29 +254,54 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void Reproduction()
         {
-            int surveyI = 0;
-            for (int i = 0; i < DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount; i++)
-            {
-                var firstParent = _itemsArray[surveyI];
-                //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
-                var secondParentIndex = Random.Next(DataObject.CommandInitData.ItemsCount);
-                var secondParent = _itemsArray[secondParentIndex];
-                var child = CreateChild(firstParent, secondParent);
-                if (child != null)
+            var gSurveyI = -1;
+            Parallel.For(0, DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount,
+                (i) =>
                 {
-                    Mutation(child);
-                }
-                else
-                {
-                    child = InternalCreateItem();
-                    FillValues(child);
-                }
-                _itemsArray[i + DataObject.CommandInitData.SurviveCount] = child;
+                    var surveyI = Interlocked.Increment(ref gSurveyI) % DataObject.CommandInitData.SurviveCount;
+                    
+                    var firstParent = _itemsArray[surveyI];
+                    //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
+                    var secondParentIndex = Random.Next(DataObject.CommandInitData.ItemsCount);
+                    var secondParent = _itemsArray[secondParentIndex];
+                    var child = CreateChild(firstParent, secondParent);
+                    if (child != null)
+                    {
+                        Mutation(child);
+                    }
+                    else
+                    {
+                        child = InternalCreateItem();
+                        FillValues(child);
+                    }
+                    _itemsArray[i + DataObject.CommandInitData.SurviveCount] = child;
 
-                ++surveyI;
-                if (surveyI >= DataObject.CommandInitData.SurviveCount)
-                    surveyI = 0;
-            }
+
+                });
+
+            //int surveyI = 0;
+            //for (int i = 0; i < DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount; i++)
+            //{
+            //    var firstParent = _itemsArray[surveyI];
+            //    //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
+            //    var secondParentIndex = Random.Next(DataObject.CommandInitData.ItemsCount);
+            //    var secondParent = _itemsArray[secondParentIndex];
+            //    var child = CreateChild(firstParent, secondParent);
+            //    if (child != null)
+            //    {
+            //        Mutation(child);
+            //    }
+            //    else
+            //    {
+            //        child = InternalCreateItem();
+            //        FillValues(child);
+            //    }
+            //    _itemsArray[i + DataObject.CommandInitData.SurviveCount] = child;
+
+            //    ++surveyI;
+            //    if (surveyI >= DataObject.CommandInitData.SurviveCount)
+            //        surveyI = 0;
+            //}
         }
 
         protected virtual void Mutation(TGeneticItem item)
