@@ -348,11 +348,11 @@ namespace MasterDataFlow.Trading.Genetic
             //    return Double.MinValue;
 
 
-            var m = 1m;
+            //var m = 1m;
 
-            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
-            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
-            //        (validationResult.Orders.Count + trainingResult.Orders.Count);
+            var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
+                     trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
+                    (validationResult.Orders.Count + trainingResult.Orders.Count);
 
             var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
                            ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
@@ -370,7 +370,11 @@ namespace MasterDataFlow.Trading.Genetic
                    //* (double)ecRation
                    //* (double)m
                    //* 
-                   (double)(validationZigZagCount + trainingZigZagCount);
+                    //(double)(validationResult.Profit + trainingResult.Profit)  
+                    (double)pmRatio
+                    * (double)m
+                    * (double)(validationZigZagCount + trainingZigZagCount) 
+                   ;
         }
 
         private bool FilterBadResult(TesterResult testerResult)

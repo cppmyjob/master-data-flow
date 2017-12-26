@@ -238,8 +238,8 @@ namespace MasterDataFlow.Intelligence.Genetic
             //}
 
             var o = new ParallelOptions();
-            o.MaxDegreeOfParallelism = 2;
-            Parallel.For(0, DataObject.CommandInitData.ItemsCount, o, (i) => {
+            //o.MaxDegreeOfParallelism = 2;
+            Parallel.For(0, DataObject.CommandInitData.ItemsCount, (i) => {
                 var item = _itemsArray[i];
                 if (item.Fitness < 0.0 || item.Fitness > 0.0)
                     return;

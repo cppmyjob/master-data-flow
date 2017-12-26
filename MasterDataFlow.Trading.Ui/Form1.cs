@@ -13,7 +13,6 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MasterDataFlow.Common.Tests;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Messages;
 using MasterDataFlow.Network;
@@ -29,6 +28,7 @@ using Trady.Core.Infrastructure;
 using Trady.Importer;
 using Trady.Importer.Csv;
 using DirectionTester = MasterDataFlow.Trading.Genetic.DirectionTester;
+using RemoteEnvironment = MasterDataFlow.Trading.Ui.Business.RemoteEnvironment;
 
 namespace MasterDataFlow.Trading.Ui
 {
@@ -105,85 +105,6 @@ namespace MasterDataFlow.Trading.Ui
 
             });
 
-
-            //using (var @event = new ManualResetEvent(false))
-            //{
-            //    TradingDataObject dataObject = await CreateDataObject();
-            //    var instancesCount = 10;
-
-            //    commandWorkflow.MessageRecieved += 
-            //        (key, message) => {
-            //            if (message is StopCommandMessage stopMessage)
-            //            {
-            //                var best = (TradingItem)(stopMessage.Data as GeneticInfoDataObject).Best;
-            //                DisplayBest(best, dataObject);
-            //                @event.Set();
-            //            }
-
-            //            if (message is GeneticEndCycleMessage endCycleMessage)
-            //            {
-            //                var best = (TradingItem)endCycleMessage.Data.Best;
-            //                DisplayBest(best, dataObject);
-            //            }
-            //        };
-
-            //   commandWorkflow.Start<TradingCommand>(dataObject);
-            //    @event.WaitOne(1000000);
-
-            //    //var theBests = new List<VariableCrossoverGeneticItem>();
-            //    //var completedInstances = 0;
-            //    //commandWorkflow.MessageRecieved += (key, message) =>
-            //    //{
-            //    //    Console.WriteLine("Response from {0}", key);
-            //    //    var stopMessage = message as StopCommandMessage;
-            //    //    if (stopMessage != null)
-            //    //    {
-            //    //        var best = (VariableCrossoverGeneticItem)(stopMessage.Data as GeneticStopDataObject).Best;
-            //    //        lock (this)
-            //    //        {
-            //    //            theBests.Add(best);
-            //    //            ++completedInstances;
-            //    //            if (completedInstances == instancesCount)
-            //    //            {
-            //    //                @event.Set();
-            //    //            }
-            //    //        }
-            //    //    }
-            //    //};
-
-            //    //for (int i = 0; i < instancesCount; i++)
-            //    //{
-            //    //    commandWorkflow.Start<VariableCrossoverGeneticCommand>(dataObject);
-            //    //}
-            //    //@event.WaitOne(1000000);
-            //    //Console.WriteLine("The bests");
-            //    //foreach (var theBestItem in theBests)
-            //    //{
-            //    //    PrintTheBest(theBestItem);
-            //    //}
-            //    //Console.WriteLine("The best fitness is {0}", theBests.Max(t => t.Fitness));
-
-            //    //dataObject = CreateTravelingSalesmanProblemInitData();
-            //    ////dataObject.RepeatCount = 200;
-            //    //dataObject.InitPopulation = new List<int[]>();
-            //    //dataObject.InitLengths = new List<int[]>();
-            //    //for (int i = 0; i < theBests.Count; i++)
-            //    //{
-            //    //    dataObject.InitPopulation.Add(theBests[i].Values);
-            //    //    dataObject.InitLengths.Add(theBests[i].Lengths);
-            //    //}
-            //    //@event.Reset();
-            //    //theBests.Clear();
-            //    //instancesCount = 1;
-            //    //completedInstances = 0;
-            //    //commandWorkflow.Start<VariableCrossoverGeneticCommand>(dataObject);
-            //    //@event.WaitOne(1000000);
-            //    //Console.WriteLine("The bests");
-            //    //foreach (var theBestItem in theBests)
-            //    //{
-            //    //    PrintTheBest(theBestItem);
-            //    //}
-            //}
 
         }
 
@@ -485,8 +406,8 @@ namespace MasterDataFlow.Trading.Ui
             var firstTime = result.Prices[0].Time;
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
-            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength;// - 1;
-            var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime);// - 1;
+            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength - 1;
+            var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime) - 1;
 
             foreach (var indicator in _indicators)
             {
