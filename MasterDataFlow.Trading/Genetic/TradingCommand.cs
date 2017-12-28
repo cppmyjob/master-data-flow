@@ -34,6 +34,7 @@ namespace MasterDataFlow.Trading.Genetic
     {
         public Bar[] Prices { get; set; }
         public LearningDataIndicator[] Indicators { get; set; }
+        public LearningDataIndicator Values { get; set; }
         public ZigZagValue[] ZigZags { get; set; }
     }
 
@@ -77,14 +78,14 @@ namespace MasterDataFlow.Trading.Genetic
             return result;
         }
 
-        public const int HISTORY_WINDOW_LENGTH = 48;
+        public const int HISTORY_WINDOW_LENGTH = 24;
 
         private static int[] NeuronsConfig = new int[] {
             HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER,
             1 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
             2 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
             1 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
-            2,
+            3,
         };
 
         public void Read(XElement root)
@@ -310,8 +311,8 @@ namespace MasterDataFlow.Trading.Genetic
             var dll = GetNeuronDll(item);
             double validationZigZagCount;
             var validationResult = GetProfit(dll, item, DataObject.ValidationData, out validationZigZagCount);
-            if (validationZigZagCount < 0)
-                return Double.MinValue;
+//            if (validationZigZagCount < 0)
+//                return Double.MinValue;
             item.ValidationTesterResult = validationResult;
 
             if (FilterBadResult(validationResult))
@@ -319,8 +320,8 @@ namespace MasterDataFlow.Trading.Genetic
 
             double trainingZigZagCount;
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData, out trainingZigZagCount);
-            if (trainingZigZagCount < 0)
-                return Double.MinValue;
+//            if (trainingZigZagCount < 0)
+//                return Double.MinValue;
             item.TrainingTesterResult = trainingResult;
 
 
@@ -348,32 +349,32 @@ namespace MasterDataFlow.Trading.Genetic
             //    return Double.MinValue;
 
 
-            //var m = 1m;
+            var m = 1m;
 
-            var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
-                     trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
-                    (validationResult.Orders.Count + trainingResult.Orders.Count);
+            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
+            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
+            //        (validationResult.Orders.Count + trainingResult.Orders.Count);
 
             var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
                            ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
 
-            var ecRation = 1;
+            //var ecRation = 1;
 
-            //var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
-            //            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
+            var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
+                        ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
 
-            return //(double)(validationResult.Profit + trainingResult.Profit)
+            return (double)(validationResult.Profit + trainingResult.Profit)
                    //* (double) (TradingItemInitData.MAX_STOPLOSS - item.StopLoss)
-                   //* (double)(trainingResult.OrderCount + validationResult.OrderCount)
-                   //* (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
-                   //* (double)pmRatio
-                   //* (double)ecRation
-                   //* (double)m
+                   * (double)(trainingResult.OrderCount + validationResult.OrderCount)
+                   * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
+                   * (double)pmRatio
+                   * (double)ecRation
+                   * (double)m
                    //* 
                     //(double)(validationResult.Profit + trainingResult.Profit)  
-                    (double)pmRatio
-                    * (double)m
-                    * (double)(validationZigZagCount + trainingZigZagCount) 
+                    //(double)pmRatio
+                    //* (double)m
+                    //* (double)(validationZigZagCount + trainingZigZagCount) 
                    ;
         }
 
@@ -397,25 +398,25 @@ namespace MasterDataFlow.Trading.Genetic
                     return true;
             }
 
-            //if (testerResult.MinusEquityCount > testerResult.PlusEquityCount)
-            //{
-            //    return true;
-            //}
+            if (testerResult.MinusEquityCount > testerResult.PlusEquityCount)
+            {
+                return true;
+            }
 
-            //if (testerResult.BuyCount > testerResult.SellCount)
-            //{
-            //    if (testerResult.BuyCount / (float)testerResult.SellCount > 2)
-            //    {
-            //        return true;
-            //    }
-            //}
-            //else
-            //{
-            //    if (testerResult.SellCount / (float)testerResult.BuyCount > 2)
-            //    {
-            //        return true;
-            //    }
-            //}
+            if (testerResult.BuyCount > testerResult.SellCount)
+            {
+                if (testerResult.BuyCount / (float)testerResult.SellCount > 2)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (testerResult.SellCount / (float)testerResult.BuyCount > 2)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 

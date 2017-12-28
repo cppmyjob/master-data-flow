@@ -61,45 +61,53 @@ namespace MasterDataFlow.Trading.Ui
 
                 using (var @event = new ManualResetEvent(false))
                 {
-                    _dataObject = await CreateDataObject();
-
-                    SetChartPrices();
-
-                    var tradingItem = LoadItem(_dataObject.ItemInitData);
-                    if (tradingItem != null)
+                    try
                     {
-                        _dataObject.InitPopulation = new List<float[]>();
-                        _dataObject.InitPopulation.Add(tradingItem.Values);
+                        _dataObject = await CreateDataObject();
+
+                        SetChartPrices();
+
+                        var tradingItem = LoadItem(_dataObject.ItemInitData);
+                        if (tradingItem != null)
+                        {
+                            _dataObject.InitPopulation = new List<float[]>();
+                            _dataObject.InitPopulation.Add(tradingItem.Values);
+                        }
+
+                        System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+
+                        commandWorkflow.MessageRecieved +=
+                            (key, message) =>
+                            {
+                                if (message is StopCommandMessage stopMessage)
+                                {
+                                    var best = (TradingItem) (stopMessage.Data as GeneticInfoDataObject).Best;
+                                    DisplayBest(best);
+                                    @event.Set();
+                                }
+
+                                if (message is GeneticEndCycleMessage endCycleMessage)
+                                {
+                                    ++_iteration;
+                                    SetText(tbIteration, (_iteration).ToString("D"));
+
+                                    sw.Stop();
+                                    SetText(tbSpeed, (sw.ElapsedMilliseconds).ToString("F10"));
+                                    sw = System.Diagnostics.Stopwatch.StartNew();
+
+                                    var best = (TradingItem) endCycleMessage.Data.Best;
+                                    DisplayBest(best);
+
+                                }
+                            };
+
+                        commandWorkflow.Start<TradingCommand>(_dataObject);
+                        @event.WaitOne(1000000);
                     }
-
-                    System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-
-                    commandWorkflow.MessageRecieved +=
-                        (key, message) => {
-                            if (message is StopCommandMessage stopMessage)
-                            {
-                                var best = (TradingItem)(stopMessage.Data as GeneticInfoDataObject).Best;
-                                DisplayBest(best);
-                                @event.Set();
-                            }
-
-                            if (message is GeneticEndCycleMessage endCycleMessage)
-                            {
-                                ++_iteration;
-                                SetText(tbIteration, (_iteration).ToString("D"));
-
-                                sw.Stop();
-                                SetText(tbSpeed, (sw.ElapsedMilliseconds).ToString("F10"));
-                                sw = System.Diagnostics.Stopwatch.StartNew();
-
-                                var best = (TradingItem)endCycleMessage.Data.Best;
-                                DisplayBest(best);
-
-                            }
-                        };
-
-                    commandWorkflow.Start<TradingCommand>(_dataObject);
-                    @event.WaitOne(1000000);
+                    catch (Exception ex)
+                    {
+                        
+                    }
 
                 }
 
@@ -328,7 +336,7 @@ namespace MasterDataFlow.Trading.Ui
             var psar = _candles.Sar(0.02M, 0.2M);
             AddIndicator("SAR", psar);
 
-            // EMA
+            //// EMA
             AddIndicator("EMA 3", _candles.Ema(3));
             AddIndicator("EMA 5", _candles.Ema(5));
             AddIndicator("EMA 10", _candles.Ema(10));
@@ -342,6 +350,10 @@ namespace MasterDataFlow.Trading.Ui
             AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
             AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
             AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+
+            AddIndicator("Volumes", _tradingBars.Select(t => (float) t.Volume / 10000).ToArray(),
+                _tradingBars.Select(t => t.Time).ToArray());
+
         }
 
         private void AddIndicator(string name, float[] values, DateTime[] times)
@@ -422,6 +434,7 @@ namespace MasterDataFlow.Trading.Ui
                 Array.Copy(indicator.Times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
                 indicators.Add(learningIndicator);
             }
+
             result.Indicators = indicators.ToArray();
 
             result.ZigZags = _zigZagLearningData

@@ -25,7 +25,9 @@ namespace MasterDataFlow.Trading.Trade
                     return ProcessDown();
                 case Direction.Up:
                     return ProcessUp();
-                case Direction.None:
+                case Direction.Hold:
+                    break;
+                case Direction.Close:
                     break;
             }
             return TickStatus.Ok;

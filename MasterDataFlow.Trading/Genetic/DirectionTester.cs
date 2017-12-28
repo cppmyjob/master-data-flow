@@ -90,40 +90,48 @@ namespace MasterDataFlow.Trading.Genetic
             var outputs = _dll.NetworkCompute(_inputs);
             var isBuy = outputs[0] > 0.5F;
             var isSell = outputs[1] > 0.5F;
-            if (isBuy && isSell)
+            var isHold = outputs[2] > 0.5F;
+
+            if (!isBuy && !isSell && isHold)
             {
-                if (zigzagValue == 0)
-                {
-                    ++_zigZagValidCloseCount;
-                }
-                return Direction.None;
+                return Direction.Hold;
             }
 
-            if (isBuy)
+            if (!isBuy && isSell && !isHold)
             {
-                if (zigzagValue == 1)
-                {
-                    ++_zigZagValidBuyCount;
-                }
-
-                return Direction.Up;
-            }
-
-            if (isSell)
-            {
-                if (zigzagValue == -1)
-                {
-                    ++_zigZagValidSellCount;
-                }
-
                 return Direction.Down;
             }
 
-            if (zigzagValue == 0)
+            if (isBuy && !isSell && !isHold)
             {
-                ++_zigZagValidCloseCount;
+                return Direction.Up;
             }
-            return Direction.None;
+
+            //if (isBuy)
+            //{
+            //    if (zigzagValue == 1)
+            //    {
+            //        ++_zigZagValidBuyCount;
+            //    }
+
+            //    return Direction.Up;
+            //}
+
+            //if (isSell)
+            //{
+            //    if (zigzagValue == -1)
+            //    {
+            //        ++_zigZagValidSellCount;
+            //    }
+
+            //    return Direction.Down;
+            //}
+
+            //if (zigzagValue == 0)
+            //{
+            //    ++_zigZagValidCloseCount;
+            //}
+            return Direction.Close;
         }
 
 

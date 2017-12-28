@@ -137,7 +137,7 @@ namespace MasterDataFlow.Trading.Tester
         }
     }
 
-    public enum Direction { None = 0, Down = 1, Up = 2 }
+    public enum Direction { Hold = 0, Close = 1, Down = 2, Up = 3 }
 
     public enum OrderType { Sell, Buy }
 
@@ -268,7 +268,9 @@ namespace MasterDataFlow.Trading.Tester
                     case Direction.Down:
                         _currentOrder = Sell();
                         break;
-                    case Direction.None:
+                    case Direction.Hold:
+                        break;
+                    case Direction.Close:
                         break;
                 }
             }
@@ -291,9 +293,11 @@ namespace MasterDataFlow.Trading.Tester
                             _currentOrder = Sell();
                         }
                         break;
-                    case Direction.None:
+                    case Direction.Close:
                         CloseOrder(_currentOrder.Ticket);
                         _currentOrder = null;
+                        break;
+                    case Direction.Hold:
                         break;
                 }
             }
