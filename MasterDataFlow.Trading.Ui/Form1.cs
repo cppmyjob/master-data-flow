@@ -691,9 +691,6 @@ namespace MasterDataFlow.Trading.Ui
         }
 
 
-        // https://stackoverflow.com/questions/5887292/asp-net-mvc-3-mschart-error-only-1-y-values-can-be-set-for-this-data-series
-        // https://msdn.microsoft.com/en-us/library/dd456730.aspx
-        //https://stackoverflow.com/questions/13584061/how-to-enable-zooming-in-microsoft-chart-control-by-using-mouse-wheel
         // google c.net chart zoom
         private async void button2_Click(object sender, EventArgs e)
         {

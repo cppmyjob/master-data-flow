@@ -16,5 +16,10 @@ namespace MasterDataFlow.Trading.Ui
         {
             InitializeComponent();
         }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

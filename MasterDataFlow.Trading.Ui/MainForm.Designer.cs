@@ -28,18 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.btnStart = new System.Windows.Forms.Button();
             this.nudPopulationFactor = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
             this.dtpStartTestDate = new System.Windows.Forms.DateTimePicker();
@@ -50,7 +49,7 @@
             this.label19 = new System.Windows.Forms.Label();
             this.cmbProcessors = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.btnStart = new System.Windows.Forms.Button();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tbIndicators = new System.Windows.Forms.TextBox();
             this.tbPredictionMinusCount = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -81,6 +80,7 @@
             this.tbFitness = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -88,8 +88,8 @@
             this.groupBox1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage3.SuspendLayout();
-            this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).BeginInit();
+            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -128,17 +128,17 @@
             // 
             // chart1
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(3, 16);
             this.chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.chart1.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(1166, 350);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -154,16 +154,6 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Parameters";
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1178, 629);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Test";
-            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // tabControl2
             // 
@@ -197,45 +187,15 @@
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Input";
             // 
-            // tabPage4
+            // btnStart
             // 
-            this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage4.Controls.Add(this.tbIndicators);
-            this.tabPage4.Controls.Add(this.tbPredictionMinusCount);
-            this.tabPage4.Controls.Add(this.label13);
-            this.tabPage4.Controls.Add(this.tbPredictionPlusCount);
-            this.tabPage4.Controls.Add(this.label14);
-            this.tabPage4.Controls.Add(this.tbStopLoss);
-            this.tabPage4.Controls.Add(this.label11);
-            this.tabPage4.Controls.Add(this.tbIteration);
-            this.tabPage4.Controls.Add(this.label10);
-            this.tabPage4.Controls.Add(this.tbTrainingMinusCount);
-            this.tabPage4.Controls.Add(this.label9);
-            this.tabPage4.Controls.Add(this.tbTrainingPlusCount);
-            this.tabPage4.Controls.Add(this.label8);
-            this.tabPage4.Controls.Add(this.tbPredictionOrderCount);
-            this.tabPage4.Controls.Add(this.label5);
-            this.tabPage4.Controls.Add(this.tbPredictionDiff);
-            this.tabPage4.Controls.Add(this.label6);
-            this.tabPage4.Controls.Add(this.tbPredictionProfit);
-            this.tabPage4.Controls.Add(this.label7);
-            this.tabPage4.Controls.Add(this.tbTrainingOrderCount);
-            this.tabPage4.Controls.Add(this.label4);
-            this.tabPage4.Controls.Add(this.tbTrainingDiff);
-            this.tabPage4.Controls.Add(this.label3);
-            this.tabPage4.Controls.Add(this.tbTrainingProfit);
-            this.tabPage4.Controls.Add(this.label2);
-            this.tabPage4.Controls.Add(this.tbSpeed);
-            this.tabPage4.Controls.Add(this.label1);
-            this.tabPage4.Controls.Add(this.tbFitness);
-            this.tabPage4.Controls.Add(this.label12);
-            this.tabPage4.Controls.Add(this.label22);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1158, 209);
-            this.tabPage4.TabIndex = 1;
-            this.tabPage4.Text = "Output";
+            this.btnStart.Location = new System.Drawing.Point(646, 36);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(112, 34);
+            this.btnStart.TabIndex = 56;
+            this.btnStart.Text = "Start";
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // nudPopulationFactor
             // 
@@ -333,14 +293,45 @@
             this.label15.TabIndex = 46;
             this.label15.Text = "Processors :";
             // 
-            // btnStart
+            // tabPage4
             // 
-            this.btnStart.Location = new System.Drawing.Point(646, 36);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(112, 34);
-            this.btnStart.TabIndex = 56;
-            this.btnStart.Text = "Start";
-            this.btnStart.UseVisualStyleBackColor = true;
+            this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage4.Controls.Add(this.tbIndicators);
+            this.tabPage4.Controls.Add(this.tbPredictionMinusCount);
+            this.tabPage4.Controls.Add(this.label13);
+            this.tabPage4.Controls.Add(this.tbPredictionPlusCount);
+            this.tabPage4.Controls.Add(this.label14);
+            this.tabPage4.Controls.Add(this.tbStopLoss);
+            this.tabPage4.Controls.Add(this.label11);
+            this.tabPage4.Controls.Add(this.tbIteration);
+            this.tabPage4.Controls.Add(this.label10);
+            this.tabPage4.Controls.Add(this.tbTrainingMinusCount);
+            this.tabPage4.Controls.Add(this.label9);
+            this.tabPage4.Controls.Add(this.tbTrainingPlusCount);
+            this.tabPage4.Controls.Add(this.label8);
+            this.tabPage4.Controls.Add(this.tbPredictionOrderCount);
+            this.tabPage4.Controls.Add(this.label5);
+            this.tabPage4.Controls.Add(this.tbPredictionDiff);
+            this.tabPage4.Controls.Add(this.label6);
+            this.tabPage4.Controls.Add(this.tbPredictionProfit);
+            this.tabPage4.Controls.Add(this.label7);
+            this.tabPage4.Controls.Add(this.tbTrainingOrderCount);
+            this.tabPage4.Controls.Add(this.label4);
+            this.tabPage4.Controls.Add(this.tbTrainingDiff);
+            this.tabPage4.Controls.Add(this.label3);
+            this.tabPage4.Controls.Add(this.tbTrainingProfit);
+            this.tabPage4.Controls.Add(this.label2);
+            this.tabPage4.Controls.Add(this.tbSpeed);
+            this.tabPage4.Controls.Add(this.label1);
+            this.tabPage4.Controls.Add(this.tbFitness);
+            this.tabPage4.Controls.Add(this.label12);
+            this.tabPage4.Controls.Add(this.label22);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(1158, 209);
+            this.tabPage4.TabIndex = 1;
+            this.tabPage4.Text = "Output";
             // 
             // tbIndicators
             // 
@@ -582,6 +573,16 @@
             this.label22.TabIndex = 108;
             this.label22.Text = "Indicators :";
             // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1178, 629);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Test";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -597,9 +598,9 @@
             this.groupBox1.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).EndInit();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).EndInit();
             this.ResumeLayout(false);
 
         }
