@@ -7,7 +7,7 @@ using MasterDataFlow.Trading.Data;
 
 namespace MasterDataFlow.Trading.Indicators
 {
-    public class ZigZag
+    public class ZigZagIndicator
     {
         public static List<int> Calculate(Bar[] quotes, int obsStart, int obsEnd, decimal minSwingPct)
         {

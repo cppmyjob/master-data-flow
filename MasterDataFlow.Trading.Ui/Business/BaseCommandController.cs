@@ -30,7 +30,7 @@ namespace MasterDataFlow.Trading.Ui.Business
         }
     }
 
-    public delegate void DisplayChartPricesHandler(DisplayChartPricesArgs args);
+    public delegate void DisplayChartPricesHandler(object sender, DisplayChartPricesArgs args);
 
 
     public class IterationEndArgs
@@ -45,7 +45,7 @@ namespace MasterDataFlow.Trading.Ui.Business
         public long ElapsedMilliseconds { get; private set; }
     }
 
-    public delegate void IterationEndHandler(IterationEndArgs args);
+    public delegate void IterationEndHandler(object sender, IterationEndArgs args);
 
 
 
@@ -59,7 +59,7 @@ namespace MasterDataFlow.Trading.Ui.Business
         public TradingItem NeuronItem { get; private set; }
     }
 
-    public delegate void DisplayBestHandler(DisplayBestArgs args);
+    public delegate void DisplayBestHandler(object sender, DisplayBestArgs args);
 
     public class PeriodChangedArgs
     {
@@ -76,7 +76,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
     }
 
-    public delegate void PeriodChangedHandler(PeriodChangedArgs args);
+    public delegate void PeriodChangedHandler(object sender, PeriodChangedArgs args);
 
     public class BaseCommandController
     {
@@ -103,6 +103,27 @@ namespace MasterDataFlow.Trading.Ui.Business
 
         #region Properties
         public int PopulationFactor { get; set; } = 1;
+
+        public TradingDataObject DataObject
+        {
+            get { return _dataObject; }
+        }
+
+        public LearningData TestData
+        {
+            get { return _testData; }
+        }
+
+        public Bar[] TradingBars
+        {
+            get { return _tradingBars; }
+        }
+
+        public int[] ZigZag
+        {
+            get { return _zigZag; }
+        }
+
         #endregion
 
         #region Events
@@ -279,7 +300,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             _validationData = CreateLearningData(itemInitData, startValidationDate, validationDays);
             _testData = CreateLearningData(itemInitData, startTestDate, testDays);
 
-            SetPeriodsEvent?.Invoke(new PeriodChangedArgs(startTrainingDate, startValidationDate, startTestDate));
+            SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(startTrainingDate, startValidationDate, startTestDate));
         }
 
         private LearningData CreateLearningData(TradingItemInitData itemInitData, DateTime startDate, double days)
@@ -322,7 +343,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
         private void CalculateZigZag()
         {
-            _zigZag = ZigZag.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m).ToArray();
+            _zigZag = ZigZagIndicator.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m).ToArray();
             _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue { Time = t.Time, Value = Int32.MinValue }).ToArray();
 
             var isHigh = _tradingBars[_zigZag[0]].High > _tradingBars[_zigZag[1]].Low;
@@ -466,7 +487,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             }
         }
 
-        public void WriteNew(TextWriter writer, List<LearningDataIndicator> indicators, TradingItem item)
+        private void WriteNew(TextWriter writer, List<LearningDataIndicator> indicators, TradingItem item)
         {
             XElement root = new XElement("genetic");
 
@@ -518,7 +539,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             }
         }
 
-        public TradingItem LoadItem(TradingItemInitData itemInitData)
+        private TradingItem LoadItem(TradingItemInitData itemInitData)
         {
             if (!File.Exists("genetic.save"))
                 return null;
@@ -540,7 +561,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             }
         }
 
-        public TradingItemInitData LoadItemInitData()
+        private TradingItemInitData LoadItemInitData()
         {
             if (!File.Exists("genetic.save"))
             {
@@ -602,26 +623,23 @@ namespace MasterDataFlow.Trading.Ui.Business
         }
 
 
-
-
-
         #endregion 
 
         // external 
 
         private void DisplayChartPrices()
         {
-            DisplayChartPricesEvent?.Invoke(new DisplayChartPricesArgs());
+            DisplayChartPricesEvent?.Invoke(this, new DisplayChartPricesArgs());
         }
 
         private void IterationEnd(int iteration, long elapsedMilliseconds)
         {
-            IterationEndEvent?.Invoke(new IterationEndArgs(iteration, elapsedMilliseconds));
+            IterationEndEvent?.Invoke(this, new IterationEndArgs(iteration, elapsedMilliseconds));
         }
 
         private void DisplayBest(TradingItem neuronItem, bool isSaveBest = true)
         {
-            DisplayBestEvent?.Invoke(new DisplayBestArgs(neuronItem));
+            DisplayBestEvent?.Invoke(this, new DisplayBestArgs(neuronItem));
 
             var dll = TradingCommand.CreateNeuronDll(_dataObject, neuronItem);
             var tester = new DirectionTester(dll, neuronItem, _testData);
