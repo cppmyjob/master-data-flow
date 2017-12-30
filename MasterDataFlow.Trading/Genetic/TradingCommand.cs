@@ -351,9 +351,8 @@ namespace MasterDataFlow.Trading.Genetic
 
             var m = 1m;
 
-            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
-            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit)) /
-            //        (validationResult.Orders.Count + trainingResult.Orders.Count);
+            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
+            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
 
             var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
                            ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );

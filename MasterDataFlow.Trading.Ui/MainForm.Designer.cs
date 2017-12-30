@@ -28,9 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -81,6 +84,10 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
+            this.btnOpenTestFile = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -90,6 +97,9 @@
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).BeginInit();
             this.tabPage4.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -128,17 +138,17 @@
             // 
             // tradingChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.tradingChart.ChartAreas.Add(chartArea1);
+            chartArea4.Name = "ChartArea1";
+            this.tradingChart.ChartAreas.Add(chartArea4);
             this.tradingChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.tradingChart.Legends.Add(legend1);
+            legend4.Name = "Legend1";
+            this.tradingChart.Legends.Add(legend4);
             this.tradingChart.Location = new System.Drawing.Point(3, 16);
             this.tradingChart.Name = "tradingChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.tradingChart.Series.Add(series1);
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            this.tradingChart.Series.Add(series4);
             this.tradingChart.Size = new System.Drawing.Size(1166, 350);
             this.tradingChart.TabIndex = 0;
             this.tradingChart.Text = "chart1";
@@ -575,6 +585,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.chart1);
+            this.tabPage2.Controls.Add(this.groupBox3);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -582,6 +594,48 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Test";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.btnOpenTestFile);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.groupBox3.Location = new System.Drawing.Point(3, 474);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(1172, 152);
+            this.groupBox3.TabIndex = 0;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Parameters";
+            // 
+            // chart1
+            // 
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
+            this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend3.Name = "Legend1";
+            this.chart1.Legends.Add(legend3);
+            this.chart1.Location = new System.Drawing.Point(3, 3);
+            this.chart1.Name = "chart1";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chart1.Series.Add(series3);
+            this.chart1.Size = new System.Drawing.Size(1172, 471);
+            this.chart1.TabIndex = 1;
+            this.chart1.Text = "chart1";
+            // 
+            // ofdOpenTestFile
+            // 
+            this.ofdOpenTestFile.FileName = "openFileDialog1";
+            // 
+            // btnOpenTestFile
+            // 
+            this.btnOpenTestFile.Location = new System.Drawing.Point(215, 33);
+            this.btnOpenTestFile.Name = "btnOpenTestFile";
+            this.btnOpenTestFile.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenTestFile.TabIndex = 0;
+            this.btnOpenTestFile.Text = "Open File";
+            this.btnOpenTestFile.UseVisualStyleBackColor = true;
+            this.btnOpenTestFile.Click += new System.EventHandler(this.btnOpenTestFile_Click);
             // 
             // MainForm
             // 
@@ -601,6 +655,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).EndInit();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -657,5 +714,9 @@
         private System.Windows.Forms.TextBox tbFitness;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.Button btnOpenTestFile;
+        private System.Windows.Forms.OpenFileDialog ofdOpenTestFile;
     }
 }

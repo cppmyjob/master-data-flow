@@ -27,9 +27,12 @@ namespace MasterDataFlow.Trading.Ui
             _tradingChart = new TradingChart(tradingChart);
         }
 
+        #region Explorer
 
         private async void btnStart_Click(object sender, EventArgs e)
         {
+            btnStart.Enabled = false;
+
             var controller = new TradingCommandController();
             controller.DisplayBestEvent += ControllerOnDisplayBestEvent;
             controller.DisplayChartPricesEvent += ControllerOnDisplayChartPricesEvent;
@@ -115,6 +118,21 @@ namespace MasterDataFlow.Trading.Ui
             return string.Join(",", names);
         }
 
+        #endregion
+
+        #region Tester
+
+        private void btnOpenTestFile_Click(object sender, EventArgs e)
+        {
+            if (ofdOpenTestFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                // ofdOpenTestFile.FileName
+            }
+
+        }
+
+        #endregion
+
 
         // -----------------------------------------------------------------
 
@@ -179,5 +197,6 @@ namespace MasterDataFlow.Trading.Ui
                 textBox.Text = text;
             }
         }
+
     }
 }
