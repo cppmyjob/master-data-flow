@@ -122,13 +122,13 @@ namespace Examples.Intelligence.MultiGenetic
     {
         public VariableCrossoverGeneticItem(GeneticItemInitData initData) : base(initData)
         {
-            _values = Enumerable.Repeat<int>(-1, initData.Count).ToArray();
-            Lengths = new int[initData.Count];
+            _values = Enumerable.Repeat<int>(-1, initData.ValuesNumber).ToArray();
+            Lengths = new int[initData.ValuesNumber];
         }
 
         public override int CreateValue(IRandom random)
         {
-            return (int)(random.NextDouble() * InitData.Count);
+            return (int)(random.NextDouble() * InitData.ValuesNumber);
         }
 
         public int[] Lengths { get; set; }
@@ -286,13 +286,13 @@ namespace Examples.Intelligence.MultiGenetic
 
         private void AddLengths(VariableCrossoverGeneticItem item)
         {
-            for (int i = 0; i < DataObject.ItemInitData.Count; i++)
+            for (int i = 0; i < DataObject.ItemInitData.ValuesNumber; i++)
             {
-                var length = Random.Next(DataObject.ItemInitData.Count) / 3 + 1;
+                var length = Random.Next(DataObject.ItemInitData.ValuesNumber) / 3 + 1;
                 //var length = 3;
-                if (i + length > DataObject.ItemInitData.Count)
+                if (i + length > DataObject.ItemInitData.ValuesNumber)
                 {
-                    length = DataObject.ItemInitData.Count - i;
+                    length = DataObject.ItemInitData.ValuesNumber - i;
                 }
                 item.Lengths[i] = length;
             }

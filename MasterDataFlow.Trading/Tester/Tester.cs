@@ -228,7 +228,7 @@ namespace MasterDataFlow.Trading.Tester
 
     public abstract class DirectionTester : AbstractTester
     {
-        private Order _currentOrder;
+        protected Order _currentOrder;
 
         public DirectionTester(decimal deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)

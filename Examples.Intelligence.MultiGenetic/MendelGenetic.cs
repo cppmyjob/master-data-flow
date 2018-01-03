@@ -128,8 +128,8 @@ namespace Examples.Intelligence.MultiGenetic
             var result = new GeneAllele
             {
                 IsDominante = random.Next(100) > 50,
-                Value = random.Next(InitData.Count),
-                Mutation = random.Next(InitData.Count * 2) - InitData.Count
+                Value = random.Next(InitData.ValuesNumber),
+                Mutation = random.Next(InitData.ValuesNumber * 2) - InitData.ValuesNumber
             };
             return result;
         }
@@ -197,9 +197,9 @@ namespace Examples.Intelligence.MultiGenetic
                     }
 
                     var newValue = item.Values[i].Value + item.Values[i].Mutation;
-                    if (newValue >= DataObject.ItemInitData.Count)
+                    if (newValue >= DataObject.ItemInitData.ValuesNumber)
                     {
-                        item.Values[i].Value = DataObject.ItemInitData.Count - 1;
+                        item.Values[i].Value = DataObject.ItemInitData.ValuesNumber - 1;
                     }
                     else
                     {

@@ -11,6 +11,8 @@ namespace MasterDataFlow.Trading.Genetic
 {
     public class DirectionTester : Tester.DirectionTester
     {
+        public const int OUTPUT_NUMBER = 3;
+
         private readonly GeneticNeuronDLL1 _dll;
         private readonly TradingItem _tradingItem;
         private readonly LearningData _learningData;
@@ -25,6 +27,10 @@ namespace MasterDataFlow.Trading.Genetic
         private int _zigZagCloseCount = 0;
         private int _zigZagValidCloseCount = 0;
 
+        private int _zigZagFitness = 0;
+
+        private float[] previuosOutput = new float[OUTPUT_NUMBER];
+
         public DirectionTester(GeneticNeuronDLL1 dll, TradingItem tradingItem, LearningData learningData) 
             : base(START_DEPOSIT, learningData.Prices, 0, learningData.Prices.Length)
         {
@@ -37,12 +43,15 @@ namespace MasterDataFlow.Trading.Genetic
 
         public double ZigZagCount
         {
-            get { 
-                if (_zigZagValidBuyCount <= 0 || _zigZagValidSellCount <= 0 || _zigZagValidCloseCount <= 0)
-                      return Double.MinValue;
-                var br = (double) _zigZagValidBuyCount / _zigZagBuyCount;
-                var sr = (double) _zigZagValidSellCount / _zigZagSellCount;
-                var cr = (double)_zigZagValidCloseCount / _zigZagCloseCount;
+            get
+            {
+
+                return _zigZagFitness;
+                //if (_zigZagValidBuyCount <= 0 || _zigZagValidSellCount <= 0 || _zigZagValidCloseCount <= 0)
+                //      return Double.MinValue;
+                //var br = (double) _zigZagValidBuyCount / _zigZagBuyCount;
+                //var sr = (double) _zigZagValidSellCount / _zigZagSellCount;
+                //var cr = (double)_zigZagValidCloseCount / _zigZagCloseCount;
                 //if (br > sr && br / sr > 2)
                 //    return Double.MinValue + 1;
                 //if (sr > br && sr / br > 2)
@@ -55,7 +64,7 @@ namespace MasterDataFlow.Trading.Genetic
 
                 //return 1 / otkl; 
 
-                return br * sr * cr;
+                //return br * sr * cr;
             }
         }
 
@@ -63,14 +72,20 @@ namespace MasterDataFlow.Trading.Genetic
         {
             if (_inputs == null)
             {
-              _inputs = new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.IndicatorNumber];
+              _inputs = new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber + (TradingItemInitData.IS_RECURRENT ? OUTPUT_NUMBER : 0)];
             }
 
-            for (int i = 0; i < _tradingItem.InitData.IndicatorNumber; i++)
+            for (int i = 0; i < _tradingItem.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var indicatorIndex = (int)_tradingItem.GetIndicatorIndex(i);
                 var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
                 Array.Copy(indicatorValues, index, _inputs, _tradingItem.InitData.HistoryWidowLength * i, _tradingItem.InitData.HistoryWidowLength);
+            }
+
+            if (TradingItemInitData.IS_RECURRENT)
+            {
+                Array.Copy(previuosOutput, 0, _inputs,
+                    _tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber, OUTPUT_NUMBER);
             }
 
             var zigzagValue = _learningData.ZigZags[index].Value;
@@ -88,22 +103,45 @@ namespace MasterDataFlow.Trading.Genetic
             }
 
             var outputs = _dll.NetworkCompute(_inputs);
+
+            if (TradingItemInitData.IS_RECURRENT)
+            {
+                Array.Copy(outputs, previuosOutput, OUTPUT_NUMBER);
+            }
+
             var isBuy = outputs[0] > 0.5F;
             var isSell = outputs[1] > 0.5F;
             var isHold = outputs[2] > 0.5F;
 
             if (!isBuy && !isSell && isHold)
             {
+                if (_currentOrder != null)
+                {
+                    ++_zigZagFitness;
+                }
+                else
+                {
+                    --_zigZagFitness;
+                }
                 return Direction.Hold;
             }
 
             if (!isBuy && isSell && !isHold)
             {
+                if (zigzagValue == -1)
+                    ++_zigZagFitness;
+                else
+                    --_zigZagFitness;
+
                 return Direction.Down;
             }
 
             if (isBuy && !isSell && !isHold)
             {
+                if (zigzagValue == 1)
+                    ++_zigZagFitness;
+                else
+                    --_zigZagFitness;
                 return Direction.Up;
             }
 
@@ -131,6 +169,12 @@ namespace MasterDataFlow.Trading.Genetic
             //{
             //    ++_zigZagValidCloseCount;
             //}
+
+            if (zigzagValue == 0)
+                ++_zigZagFitness;
+            else
+                --_zigZagFitness;
+
             return Direction.Close;
         }
 

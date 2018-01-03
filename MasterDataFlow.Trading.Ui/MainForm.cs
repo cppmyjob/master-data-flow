@@ -109,7 +109,7 @@ namespace MasterDataFlow.Trading.Ui
         private string GetIndicators(BaseCommandController controller, TradingItem neuronItem)
         {
             var names = new List<string>();
-            for (int i = 0; i < neuronItem.InitData.IndicatorNumber; i++)
+            for (int i = 0; i < neuronItem.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var indicatorIndex = (int)neuronItem.GetIndicatorIndex(i);
                 var name = controller.TestData.Indicators[indicatorIndex].Name;

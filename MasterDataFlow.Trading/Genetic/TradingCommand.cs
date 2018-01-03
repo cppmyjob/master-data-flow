@@ -15,11 +15,49 @@ namespace MasterDataFlow.Trading.Genetic
 {
 
     [Serializable]
-    public class LearningDataIndicator
+    public class LearningDataIndicator :  IComparable
     {
+        public class IndicaorSearch
+        {
+            private string _s;
+
+            public IndicaorSearch(string s)
+            {
+                _s = s;
+            }
+
+            public bool Match(LearningDataIndicator e)
+            {
+                return e.Name == _s;
+            }
+        }
+
         public string Name { get; set; }
         public float[] Values { get; set; }
         public DateTime[] Times { get; set; }
+
+        public void Normalize()
+        {
+            var min = Values.Min();
+            var max = Values.Max();
+            var diff = max - min;
+            var offset = diff * 20 / 100;
+            min = min - offset;
+            max = max + offset;
+
+            diff = max - min;
+
+            Values = Values.Select(t => (t - min) / diff ).ToArray();
+
+        }
+
+        public int CompareTo(object o)
+        {
+            if (!(o is LearningDataIndicator indicator))
+                throw new ArgumentException("o is not an LearningDataIndicator object.");
+
+            return String.Compare(Name, indicator.Name, StringComparison.Ordinal);
+        }
     }
 
     [Serializable]
@@ -34,7 +72,7 @@ namespace MasterDataFlow.Trading.Genetic
     {
         public Bar[] Prices { get; set; }
         public LearningDataIndicator[] Indicators { get; set; }
-        public LearningDataIndicator Values { get; set; }
+        //public LearningDataIndicator Values { get; set; }
         public ZigZagValue[] ZigZags { get; set; }
     }
 
@@ -44,11 +82,69 @@ namespace MasterDataFlow.Trading.Genetic
         public int Length { get; set; }
     }
 
+    [Serializable]
+    public class Indicators
+    {
+        public const int INDICATOR_NUMBER = 5;
+
+        public bool IsNormalizeValues { get; private set; } = true;
+        public int IndicatorNumber { get; private set; } = INDICATOR_NUMBER;
+        public string PredefinedNames { get; private set; } = String.Empty;
+
+        public void Read(XElement root)
+        {
+            var eIndicators = root.Element("indicators");
+            if (eIndicators == null)
+                return;
+            IndicatorNumber = Convert.ToInt32(eIndicators.Element("indicatorNumber").Value);
+            IsNormalizeValues = Convert.ToBoolean(eIndicators.Element("isNormalizeValues").Value);
+
+            var ePredefinedNames = eIndicators.Element("predefinedNames");
+            if (ePredefinedNames != null)
+            {
+                PredefinedNames = ePredefinedNames.Value;
+            }
+        }
+
+        public void Write(XElement root)
+        {
+            var eIndicators = new XElement("indicators");
+            root.Add(eIndicators);
+
+            eIndicators.Add(new XElement("indicatorNumber", IndicatorNumber.ToString(CultureInfo.InvariantCulture)));
+            eIndicators.Add(new XElement("isNormalizeValues", IndicatorNumber.ToString(CultureInfo.InvariantCulture)));
+            eIndicators.Add(new XElement("predefinedNames", PredefinedNames));
+        }
+
+    }
+
+    [Serializable]
+    public class InputData
+    {
+        public Indicators Indicators { get; } = new Indicators();
+
+        public void Read(XElement root)
+        {
+            var eInputData = root.Element("inputData");
+            if (eInputData == null)
+                return;
+            Indicators.Read(eInputData);
+        }
+
+        public void Write(XElement root)
+        {
+            var eInputData = new XElement("inputData");
+            root.Add(eInputData);
+            Indicators.Write(eInputData);
+        }
+    }
 
     [Serializable]
     public class NeuronNetwork
     {
-        public NeuronNetworkLevel[] Layers { get; set; }
+        public NeuronNetworkLevel[] Layers { get; private set; }
+
+        public float WeigthMultiplier { get; private set; } = 2.0F;
 
         public NeuronNetwork()
         {
@@ -81,11 +177,9 @@ namespace MasterDataFlow.Trading.Genetic
         public const int HISTORY_WINDOW_LENGTH = 24;
 
         private static int[] NeuronsConfig = new int[] {
-            HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER,
-            1 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
-            2 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
-            1 * (HISTORY_WINDOW_LENGTH * TradingItemInitData.INDICATOR_NUMBER),
-            3,
+            HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? DirectionTester.OUTPUT_NUMBER : 0),
+            1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? DirectionTester.OUTPUT_NUMBER : 0),
+            DirectionTester.OUTPUT_NUMBER,
         };
 
         public void Read(XElement root)
@@ -99,6 +193,9 @@ namespace MasterDataFlow.Trading.Genetic
             {
                 networkLayers.Add(new NeuronNetworkLevel { Length = Convert.ToInt32(eValue.Value) });
             }
+
+            var eWeigthMultiplier = networkElement.Element("weigthMultiplier");
+            WeigthMultiplier = (float)Convert.ToDouble(eWeigthMultiplier.Value);
 
             Layers = networkLayers.ToArray();
         }
@@ -116,15 +213,15 @@ namespace MasterDataFlow.Trading.Genetic
             {
                 levels.Add(new XElement("level", neuronConfig[i].ToString()));
             }
+
+            neuronNetwork.Add(new XElement("weigthMultiplier", WeigthMultiplier.ToString(CultureInfo.InvariantCulture)));
         }
-
     }
-
 
     [Serializable]
     public class TradingItemInitData : GeneticItemInitData
     {
-        public const int INDICATOR_NUMBER = 5;
+        public const bool IS_RECURRENT = true;
 
         private NeuronNetwork _neuronNetwork;
         private int _historyWidowLength;
@@ -132,32 +229,34 @@ namespace MasterDataFlow.Trading.Genetic
         private double _indicatorMutation = 0.999;
         private double _valuesMutation = 0.999;
         private double _otherValuesMutation = 0.999;
-        private int _indicatorNumber = INDICATOR_NUMBER;
+
 
         public const int MAX_STOPLOSS = 100;
-
-        public const int OFFSET_INDICATOR = 0;
+        private const int OFFSET = 0;
+        public const int NUMBER_PARAMETERS = 2;
 
         public int OFFSET_ALPHA
         {
-            get { return OFFSET_INDICATOR + _indicatorNumber; }
+            get { return OFFSET + InputData.Indicators.IndicatorNumber; }
         }
 
         public int OFFSET_STOPLOSS
         {
-            get { return OFFSET_INDICATOR + _indicatorNumber + 1; }
+            get { return OFFSET + InputData.Indicators.IndicatorNumber + 1; }
         }
 
         public int OFFSET_VALUES
         {
-            get { return OFFSET_INDICATOR + _indicatorNumber + 2; }
+            get { return OFFSET + InputData.Indicators.IndicatorNumber + 2; }
         }
+
+        public InputData InputData { get; } = new InputData();
 
         public TradingItemInitData() : this(new NeuronNetwork())
         {
         }
 
-        protected TradingItemInitData(NeuronNetwork neuronNetwork) : base(neuronNetwork.GetWeightsCount() + INDICATOR_NUMBER + 2, false)
+        protected TradingItemInitData(NeuronNetwork neuronNetwork) : base(Indicators.INDICATOR_NUMBER + NUMBER_PARAMETERS + neuronNetwork.GetWeightsCount(), false)
         {
             _neuronNetwork = neuronNetwork;
             _historyWidowLength = NeuronNetwork.HISTORY_WINDOW_LENGTH;
@@ -188,11 +287,6 @@ namespace MasterDataFlow.Trading.Genetic
             get { return _otherValuesMutation; }
         }
 
-        public int IndicatorNumber
-        {
-            get { return _indicatorNumber; }
-        }
-
         public void Read(XElement root)
         {
             var eItemInitData = root.Element("itemInitData");
@@ -200,7 +294,7 @@ namespace MasterDataFlow.Trading.Genetic
             _neuronNetwork = new NeuronNetwork();
             _neuronNetwork.Read(eItemInitData);
 
-            _indicatorNumber = int.Parse(eItemInitData.Element("indicatorNumber").Value);
+            InputData.Read(eItemInitData);
 
             var eHistoryWidowLength = eItemInitData.Element("historyWidowLength");
             _historyWidowLength = int.Parse(eHistoryWidowLength.Value);
@@ -209,7 +303,7 @@ namespace MasterDataFlow.Trading.Genetic
             _otherValuesMutation = double.Parse(eItemInitData.Element("otherValuesMutation").Value);
             _valuesMutation = double.Parse(eItemInitData.Element("valuesMutation").Value);
 
-            _count = _neuronNetwork.GetWeightsCount() + OFFSET_VALUES;
+            _valuesNumber = _neuronNetwork.GetWeightsCount() + OFFSET_VALUES;
         }
 
         public void Write(XElement root)
@@ -218,7 +312,7 @@ namespace MasterDataFlow.Trading.Genetic
             root.Add(itemInitDataElement);
             _neuronNetwork.Write(itemInitDataElement);
 
-            itemInitDataElement.Add(new XElement("indicatorNumber", _indicatorNumber.ToString(CultureInfo.InvariantCulture)));
+            InputData.Write(itemInitDataElement);
 
             itemInitDataElement.Add(new XElement("historyWidowLength", _historyWidowLength.ToString(CultureInfo.InvariantCulture)));
 
@@ -294,7 +388,7 @@ namespace MasterDataFlow.Trading.Genetic
         public override double CalculateFitness(TradingItem item, int processor)
         {
             bool[] oldValues = new bool[DataObject.TrainingData.Indicators.Length];
-            for (int i = 0; i < item.InitData.IndicatorNumber; i++)
+            for (int i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var index = (int)item.Values[i];
                 if (oldValues[index])
@@ -303,77 +397,65 @@ namespace MasterDataFlow.Trading.Genetic
             }
 
 
-            //if (item.StopLoss < 30 || item.StopLoss > 100000)
-            //{
-            //    return Double.MinValue;
-            //}
-
             var dll = GetNeuronDll(item);
             double validationZigZagCount;
             var validationResult = GetProfit(dll, item, DataObject.ValidationData, out validationZigZagCount);
-//            if (validationZigZagCount < 0)
-//                return Double.MinValue;
             item.ValidationTesterResult = validationResult;
 
-            if (FilterBadResult(validationResult))
-                return Double.MinValue;
+//            if (FilterBadResult(validationResult))
+//                return Double.MinValue;
 
             double trainingZigZagCount;
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData, out trainingZigZagCount);
-//            if (trainingZigZagCount < 0)
-//                return Double.MinValue;
             item.TrainingTesterResult = trainingResult;
 
 
-            if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
+            //if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
+            //{
+            //    if (((float)validationResult.PlusCount / validationResult.MinusCount) <
+            //        ((float)trainingResult.PlusCount / trainingResult.MinusCount))
+            //    {
+            //        return Double.MinValue;
+            //    }
+            //}
+
+            if (validationResult.Profit <= 0 || trainingResult.Profit <= 0)
             {
-                if (((float)validationResult.PlusCount / validationResult.MinusCount) <
-                    ((float)trainingResult.PlusCount / trainingResult.MinusCount))
-                {
-                    return Double.MinValue;
-                }
+                return Double.MinValue;
             }
 
-            //if (trainingResult.MinusEquityCount > trainingResult.PlusEquityCount)
+            //if (FilterBadResultBuySell(trainingResult))
             //{
             //    return Double.MinValue;
             //}
 
-            if (trainingResult.Profit <= 0)
-            {
-                return Double.MinValue;
-            }
 
-
-            //if (validationResult.MinusCount == 0 || trainingResult.MinusCount == 0)
-            //    return Double.MinValue;
-
-
-            var m = 1m;
+            //var m = 1m;
 
             //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
             //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
 
-            var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
-                           ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
+            //var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
+            //               ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
 
-            //var ecRation = 1;
+            ////var ecRation = 1;
 
-            var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
-                        ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
+            //var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
+            //            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
 
             return (double)(validationResult.Profit + trainingResult.Profit)
-                   //* (double) (TradingItemInitData.MAX_STOPLOSS - item.StopLoss)
-                   * (double)(trainingResult.OrderCount + validationResult.OrderCount)
-                   * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
-                   * (double)pmRatio
-                   * (double)ecRation
-                   * (double)m
+            //       //* (double) (TradingItemInitData.MAX_STOPLOSS - item.StopLoss)
+            //       * (double)(trainingResult.OrderCount + validationResult.OrderCount)
+            //       * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
+            //       * (double)pmRatio
+            //       * (double)ecRation
+            //       * (double)m
                    //* 
                     //(double)(validationResult.Profit + trainingResult.Profit)  
                     //(double)pmRatio
                     //* (double)m
-                    //* (double)(validationZigZagCount + trainingZigZagCount) 
+                    * 
+                    (double)(validationZigZagCount + trainingZigZagCount) 
                    ;
         }
 
@@ -397,11 +479,20 @@ namespace MasterDataFlow.Trading.Genetic
                     return true;
             }
 
-            if (testerResult.MinusEquityCount > testerResult.PlusEquityCount)
-            {
-                return true;
-            }
+            //if (testerResult.MinusEquityCount > testerResult.PlusEquityCount)
+            //{
+            //    return true;
+            //}
 
+            if (FilterBadResultBuySell(testerResult))
+                return true;
+
+            return false;
+        }
+
+
+        public bool FilterBadResultBuySell(TesterResult testerResult)
+        {
             if (testerResult.BuyCount > testerResult.SellCount)
             {
                 if (testerResult.BuyCount / (float)testerResult.SellCount > 2)
@@ -466,13 +557,14 @@ namespace MasterDataFlow.Trading.Genetic
             var weights = dll.GetWeigths();
             var values = item.Values;
 
-            //Parallel.For(0, weights.Length, i => weights[i] = values[i + TradingItem.OFFSET_VALUES] * 100.0F - 50.0F);
-
             var offset = item.InitData.OFFSET_VALUES;
+
+            var v2 = item.InitData.NeuronNetwork.WeigthMultiplier;
+            var v1 = v2 / 2F;
+
             for (int i = 0; i < weights.Length; i++)
             {
-                weights[i] = values[offset] * 2000.0F - 1000.0F;
-                //weights[i] = values[offset] * 2.0F - 1.0F;
+                weights[i] = values[offset] * v2 - v1;
                 ++offset;
             }
         }
@@ -481,12 +573,12 @@ namespace MasterDataFlow.Trading.Genetic
         {
             var values = item.Values;
             var allIndexes = GetUniqueIndicatorIndexes();
-            for (int i = 0; i < item.InitData.IndicatorNumber; i++)
+            for (int i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 values[i] = allIndexes[i];
             }
 
-            for (int j = item.InitData.OFFSET_ALPHA; j < DataObject.ItemInitData.Count; j++)
+            for (int j = item.InitData.OFFSET_ALPHA; j < DataObject.ItemInitData.ValuesNumber; j++)
             {
                 var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
@@ -495,12 +587,15 @@ namespace MasterDataFlow.Trading.Genetic
 
         protected override void Mutation(TradingItem item)
         {
-            if (Random.NextDouble() > item.InitData.IndicatorMutation)
+            if (string.IsNullOrEmpty(item.InitData.InputData.Indicators.PredefinedNames))
             {
-                var allIndexes = GetUniqueIndicatorIndexes();
-                for (int i = 0; i < item.InitData.IndicatorNumber; i++)
+                if (Random.NextDouble() > item.InitData.IndicatorMutation)
                 {
-                    item.Values[i] = allIndexes[i];
+                    var allIndexes = GetUniqueIndicatorIndexes();
+                    for (int i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
+                    {
+                        item.Values[i] = allIndexes[i];
+                    }
                 }
             }
 
@@ -561,10 +656,42 @@ namespace MasterDataFlow.Trading.Genetic
             return child;
         }
 
+        private volatile object _syncPredefinedIndicatorsIndexes = new object();
+        private int[] _predefinedIndicatorsIndexes = null;
 
         private int[] GetUniqueIndicatorIndexes()
         {
             var result = new int[DataObject.TrainingData.Indicators.Length];
+
+            if (!string.IsNullOrEmpty(DataObject.ItemInitData.InputData.Indicators.PredefinedNames))
+            {
+                lock (_syncPredefinedIndicatorsIndexes)
+                {
+                    if (_predefinedIndicatorsIndexes == null)
+                    {
+                        var names = DataObject.ItemInitData.InputData.Indicators.PredefinedNames.Split(new[] {','},
+                            StringSplitOptions.RemoveEmptyEntries);
+
+                        if (names.Length != DataObject.ItemInitData.InputData.Indicators.IndicatorNumber)
+                            throw new Exception("Invalid PredefinedNames " +
+                                                DataObject.ItemInitData.InputData.Indicators.PredefinedNames);
+
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            var name = names[i];
+                            var search = new LearningDataIndicator.IndicaorSearch(name);
+                            var index = DataObject.TrainingData.Indicators.ToList().FindIndex(search.Match);
+                            if (index < 0)
+                                throw new Exception("Invalid indicator name:" + name);
+                            result[i] = index;
+                        }
+                        _predefinedIndicatorsIndexes = result;
+                    }
+                    return _predefinedIndicatorsIndexes;
+                }
+            }
+
+
             for (int i = 0; i < result.Length; i++)
             {
                 result[i] = i;

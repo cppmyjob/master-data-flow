@@ -28,7 +28,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             Assert.AreEqual(100, newValue.CommandInitData.ItemsCount);
             Assert.AreEqual(30, newValue.CommandInitData.SurviveCount);
             Assert.AreEqual(10, newValue.CommandInitData.RepeatCount);
-            Assert.AreEqual(50, newValue.ItemInitData.Count);
+            Assert.AreEqual(50, newValue.ItemInitData.ValuesNumber);
         }
     }
 }

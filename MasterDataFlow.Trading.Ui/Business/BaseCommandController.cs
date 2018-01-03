@@ -143,7 +143,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
                     DisplayChartPrices();
 
-                    var tradingItem = LoadItem(_dataObject.ItemInitData);
+                    var tradingItem = LoadItem(_dataObject.ItemInitData, _dataObject.TrainingData);
                     if (tradingItem != null)
                     {
                         _dataObject.InitPopulation = new List<float[]>();
@@ -254,6 +254,9 @@ namespace MasterDataFlow.Trading.Ui.Business
             AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
             AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
             AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
+
+            AddIndicator("Volumes", _tradingBars.Select(t => (float)t.Volume).ToArray(),
+                _tradingBars.Select(t => t.Time).ToArray());
         }
 
         private void AddIndicator(string name, float[] values, DateTime[] times)
@@ -331,6 +334,8 @@ namespace MasterDataFlow.Trading.Ui.Business
                 Array.Copy(indicator.Values, firstIndicatorIndex, learningIndicator.Values, 0, learningIndicator.Values.Length);
                 Array.Copy(indicator.Times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
                 indicators.Add(learningIndicator);
+                if (itemInitData.InputData.Indicators.IsNormalizeValues)
+                    learningIndicator.Normalize();
             }
             result.Indicators = indicators.ToArray();
 
@@ -384,41 +389,45 @@ namespace MasterDataFlow.Trading.Ui.Business
 
         private void SaveBest(TradingItem item, TesterResult futureResult)
         {
-            if (item.TrainingTesterResult == null || item.ValidationTesterResult == null)
-                return;
-
-            if (lastGuid != null && lastGuid.ToString() == item.Guid.ToString())
-                return;
-
-
-            using (StreamWriter writer = new StreamWriter("genetic.save"))
+            lock (this)
             {
-                WriteNew(writer, _indicators, item);
-            }
 
-            if (!(
-                item.TrainingTesterResult.Profit > 0 && item.ValidationTesterResult.Profit > 0
-                && futureResult.Profit > 0)
+                if (item.TrainingTesterResult == null || item.ValidationTesterResult == null)
+                    return;
+
+                if (lastGuid != null && lastGuid.ToString() == item.Guid.ToString())
+                    return;
+
+
+                using (StreamWriter writer = new StreamWriter("genetic.save"))
+                {
+                    WriteNew(writer, _indicators, item);
+                }
+
+                if (!(
+                    item.TrainingTesterResult.Profit > 0 && item.ValidationTesterResult.Profit > 0
+                    && futureResult.Profit > 0)
                 ) return;
 
 
-            lastGuid = item.Guid;
+                lastGuid = item.Guid;
 
-            if (!Directory.Exists("Best"))
-            {
-                Directory.CreateDirectory("Best");
+                if (!Directory.Exists("Best"))
+                {
+                    Directory.CreateDirectory("Best");
+                }
+                string fileName = "Best/best.csv";
+
+                bool isNoFile = !File.Exists(fileName);
+
+                using (StreamWriter writer = new StreamWriter(fileName, true))
+                {
+                    if (isNoFile)
+                        AddHeader(writer);
+                    AddItemToFile(writer, item, futureResult);
+                }
+                SaveBestItem(item);
             }
-            string fileName = "Best/best.csv";
-
-            bool isNoFile = !File.Exists(fileName);
-
-            using (StreamWriter writer = new StreamWriter(fileName, true))
-            {
-                if (isNoFile)
-                    AddHeader(writer);
-                AddItemToFile(writer, item, futureResult);
-            }
-            SaveBestItem(item);
         }
 
         private void AddHeader(StreamWriter writer)
@@ -513,7 +522,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             var namedValues = new XElement("namedValues");
             itemElement.Add(namedValues);
 
-            for (var i = 0; i < item.InitData.IndicatorNumber; i++)
+            for (var i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var value = item.Values[i];
                 var v = new XElement("v", value.ToString(CultureInfo.InvariantCulture));
@@ -539,7 +548,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             }
         }
 
-        private TradingItem LoadItem(TradingItemInitData itemInitData)
+        private TradingItem LoadItem(TradingItemInitData itemInitData, LearningData learningData)
         {
             if (!File.Exists("genetic.save"))
                 return null;
@@ -550,7 +559,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
                 XElement root = XElement.Load(reader, LoadOptions.None);
                 var item = CreateItem(root, itemInitData);
-                ReadItemValues(root, item);
+                ReadItemValues(root, item, learningData);
 
                 DisplayBest(item);
                 return item;
@@ -583,7 +592,7 @@ namespace MasterDataFlow.Trading.Ui.Business
         }
 
 
-        private void ReadItemValues(XElement root, TradingItem item)
+        private void ReadItemValues(XElement root, TradingItem item, LearningData learningData)
         {
             XElement itemElement = root.Element("item");
 
@@ -597,20 +606,38 @@ namespace MasterDataFlow.Trading.Ui.Business
             int offset = 0;
             foreach (XElement eValue in eValues.Elements("v"))
             {
-                item.Values[offset] = ParseStringValue(eValue.Value);
+                var attributes = eValue.Attributes().ToArray();
+                if (attributes.Any(t => t.Name.LocalName == "type" && t.Value == "indicator"))
+                {
+                    var name = attributes.Single(t => t.Name.LocalName == "name");
+                    item.Values[offset] = GetIndicatorIndex(learningData, name.Value);
+                }
+                else
+                {
+                    item.Values[offset] = ParseFloat(eValue.Value);
+                }
                 ++offset;
             }
 
             eValues = itemElement.Element("values");
             foreach (XElement eValue in eValues.Elements("v"))
             {
-                item.Values[offset] = ParseStringValue(eValue.Value);
+                item.Values[offset] = ParseFloat(eValue.Value);
                 ++offset;
             }
 
         }
 
-        private float ParseStringValue(string value)
+        private float GetIndicatorIndex(LearningData learningData, string name)
+        {
+            var search = new LearningDataIndicator.IndicaorSearch(name);
+            var index = learningData.Indicators.ToList().FindIndex(search.Match);
+            if (index < 0)
+                throw new Exception("Invalid indicator name:" + name);
+            return index;
+        }
+
+        private float ParseFloat(string value)
         {
             var result = Convert.ToDouble(value);
             return (float)result;

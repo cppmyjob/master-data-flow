@@ -13,18 +13,18 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
         }
 
-        public GeneticItemInitData(int count, bool isAddHistory = false)
+        public GeneticItemInitData(int valuesNumber, bool isAddHistory = false)
         {
-            _count = count;
+            _valuesNumber = valuesNumber;
             _isAddHistory = isAddHistory;
         }
 
-        protected int _count;
+        protected int _valuesNumber;
         private readonly bool _isAddHistory;
 
-        public int Count
+        public int ValuesNumber
         {
-            get { return _count; }
+            get { return _valuesNumber; }
         }
 
         public bool IsAddHistory

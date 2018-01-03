@@ -17,7 +17,7 @@ namespace MasterDataFlow.Common.Tests.Genetic
 
         public override double CreateValue(IRandom random)
         {
-            return Math.Floor(random.NextDouble() * InitData.Count);
+            return Math.Floor(random.NextDouble() * InitData.ValuesNumber);
         }
     }
 

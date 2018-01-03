@@ -63,7 +63,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             Assert.IsNotNull(OrderCommand.StaticDataObject);
             Assert.AreEqual(1000, OrderCommand.StaticDataObject.CommandInitData.ItemsCount);
             Assert.AreEqual(300, OrderCommand.StaticDataObject.CommandInitData.SurviveCount);
-            Assert.AreEqual(5, OrderCommand.StaticDataObject.ItemInitData.Count);
+            Assert.AreEqual(5, OrderCommand.StaticDataObject.ItemInitData.ValuesNumber);
 
             Assert.IsNotNull(stopMessage);
             Assert.AreEqual(10, ((GeneticItem<GeneticItemInitData, double>)(stopMessage.Data as GeneticInfoDataObject).Best).Fitness);

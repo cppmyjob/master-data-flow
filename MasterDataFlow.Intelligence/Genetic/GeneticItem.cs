@@ -23,7 +23,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         protected GeneticItem(TGeneticItemInitData initData)
         {
             _initData = initData;
-            _values = new TValue[initData.Count];
+            _values = new TValue[initData.ValuesNumber];
             if (initData.IsAddHistory)
                 _history = new GeneticHistory<GeneticItem<TGeneticItemInitData, TValue>, TValue, TGeneticItemInitData>();
         }
@@ -54,7 +54,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
             var result = (GeneticItem<TGeneticItemInitData, TValue>)Activator.CreateInstance(this.GetType());
             var isCloneInterface = typeof(TValue).IsAssignableFrom(typeof(IValueClone<TValue>));
-            result._values = new TValue[_initData.Count];
+            result._values = new TValue[_initData.ValuesNumber];
             for (int i = 0; i < result._values.Length; i++)
             {
                 if (!isCloneInterface)

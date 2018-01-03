@@ -14,7 +14,7 @@ namespace Examples.Intelligence.MultiGenetic
 
         public override double CreateValue(IRandom random)
         {
-            return Math.Floor(random.NextDouble() * InitData.Count);
+            return Math.Floor(random.NextDouble() * InitData.ValuesNumber);
         }
     }
 

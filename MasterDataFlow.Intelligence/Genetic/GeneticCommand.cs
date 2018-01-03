@@ -177,7 +177,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         protected virtual void FillValues(TGeneticItem item)
         {
             TValue[] values = item.Values;
-            for (int j = 0; j < DataObject.ItemInitData.Count; j++)
+            for (int j = 0; j < DataObject.ItemInitData.ValuesNumber; j++)
             {
                 var valueValue = item.CreateValue(Random);
                 values[j] = valueValue;
@@ -320,8 +320,8 @@ namespace MasterDataFlow.Intelligence.Genetic
         {
             var child = InternalCreateItem();
             // Определяем количество частей для обмена
-            int partCount = Random.Next(DataObject.ItemInitData.Count) + 1;
-            float coeff = (partCount / (float)DataObject.ItemInitData.Count);
+            int partCount = Random.Next(DataObject.ItemInitData.ValuesNumber) + 1;
+            float coeff = (partCount / (float)DataObject.ItemInitData.ValuesNumber);
             // Признак того, кто будет первым при копировании 1 или 2 предок
             bool isFirst = Random.Next(10) < 5;
             int lastPartIndex = 0;
@@ -333,9 +333,9 @@ namespace MasterDataFlow.Intelligence.Genetic
             int secondOffset = 0;
             if (Random.NextDouble() > 0.999)
                 //if (_random.NextDouble() > 0.9)
-                secondOffset = Random.Next(DataObject.ItemInitData.Count) + 1;
+                secondOffset = Random.Next(DataObject.ItemInitData.ValuesNumber) + 1;
             // 
-            for (int i = 0; i < DataObject.ItemInitData.Count; i++)
+            for (int i = 0; i < DataObject.ItemInitData.ValuesNumber; i++)
             {
                 TValue value;
                 if (secondOffset == 0)
@@ -348,7 +348,7 @@ namespace MasterDataFlow.Intelligence.Genetic
                     }
                     else
                     {
-                        if (secondOffset + i < DataObject.ItemInitData.Count)
+                        if (secondOffset + i < DataObject.ItemInitData.ValuesNumber)
                             value = secondValues[secondOffset + i];
                         else
                         {

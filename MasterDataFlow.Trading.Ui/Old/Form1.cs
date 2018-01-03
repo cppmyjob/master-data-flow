@@ -161,7 +161,7 @@ namespace MasterDataFlow.Trading.Ui
         private string GetIndicators(TradingItem neuronItem)
         {
             var names = new List<string>();
-            for (int i = 0; i < neuronItem.InitData.IndicatorNumber; i++)
+            for (int i = 0; i < neuronItem.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var indicatorIndex = (int)neuronItem.GetIndicatorIndex(i);
                 var name = _testData.Indicators[indicatorIndex].Name;
@@ -581,7 +581,7 @@ namespace MasterDataFlow.Trading.Ui
             var namedValues = new XElement("namedValues");
             itemElement.Add(namedValues);
 
-            for (var i = 0; i < item.InitData.IndicatorNumber; i++)
+            for (var i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var value = item.Values[i];
                 var v = new XElement("v", value.ToString(CultureInfo.InvariantCulture));
