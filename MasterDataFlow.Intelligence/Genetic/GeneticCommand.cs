@@ -37,12 +37,14 @@ namespace MasterDataFlow.Intelligence.Genetic
         private readonly int _itemsCount;
         private readonly int _surviveCount;
         private readonly int _repeatCount;
+        private readonly int _processorsCount;
 
-        public GeneticCommandInitData(int itemsCount, int surviveCount, int repeatCount)
+        public GeneticCommandInitData(int itemsCount, int surviveCount, int repeatCount, int processorsCount)
         {
             _itemsCount = itemsCount;
             _surviveCount = surviveCount;
             _repeatCount = repeatCount;
+            _processorsCount = processorsCount;
 
             if (_surviveCount > _itemsCount)
                 throw new Exception("Число выживших > число особей");
@@ -55,7 +57,7 @@ namespace MasterDataFlow.Intelligence.Genetic
         public int ItemsCount { get { return _itemsCount; } }
         public int SurviveCount { get { return _surviveCount; } }
         public int RepeatCount { get { return _repeatCount; } }
-
+        public int ProcessorsCount { get { return _processorsCount; } }
     }
 
     [Serializable]
@@ -172,7 +174,7 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         protected abstract TGeneticItem CreateItem(TGeneticItemInitData initData);
 
-        public abstract double CalculateFitness(TGeneticItem item, int processor);
+        public abstract double CalculateFitness(TGeneticItem item);
 
         protected virtual void FillValues(TGeneticItem item)
         {
@@ -229,33 +231,41 @@ namespace MasterDataFlow.Intelligence.Genetic
 
         private void CalculateWithOneProcessor()
         {
-            //for (var i = 0; i < DataObject.CommandInitData.ItemsCount; i++)
-            //{
-            //    var item = _itemsArray[i];
-            //    if (item.Fitness > 0.0)
-            //        continue;
-            //    item.Fitness = InternalCalculateFitness(item, 0);
-            //}
-
-            var o = new ParallelOptions();
-            //o.MaxDegreeOfParallelism = 2;
-            Parallel.For(0, DataObject.CommandInitData.ItemsCount, (i) => {
+            Parallel.For(0, DataObject.CommandInitData.ItemsCount, GetParallelOptions(), (i) => {
                 var item = _itemsArray[i];
                 if (item.Fitness < 0.0 || item.Fitness > 0.0)
                     return;
-                item.Fitness = InternalCalculateFitness(item, 0);
+                item.Fitness = InternalCalculateFitness(item);
             });
         }
 
-        protected virtual double InternalCalculateFitness(TGeneticItem item, int processor)
+        protected virtual double InternalCalculateFitness(TGeneticItem item)
         {
-            return CalculateFitness(item, processor);
+            return CalculateFitness(item);
+        }
+
+        private ParallelOptions GetParallelOptions()
+        {
+            var parallelOption = new ParallelOptions();
+
+            if (DataObject.CommandInitData.ProcessorsCount >= 1)
+            {
+                parallelOption.MaxDegreeOfParallelism = DataObject.CommandInitData.ProcessorsCount;
+            }
+            else
+            {
+                parallelOption.MaxDegreeOfParallelism = -1;
+            }
+            return parallelOption;
         }
 
         private void Reproduction()
         {
             var gSurveyI = -1;
+
+
             Parallel.For(0, DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount,
+                GetParallelOptions(),
                 (i) =>
                 {
                     var surveyI = Interlocked.Increment(ref gSurveyI) % DataObject.CommandInitData.SurviveCount;
@@ -278,30 +288,6 @@ namespace MasterDataFlow.Intelligence.Genetic
 
 
                 });
-
-            //int surveyI = 0;
-            //for (int i = 0; i < DataObject.CommandInitData.ItemsCount - DataObject.CommandInitData.SurviveCount; i++)
-            //{
-            //    var firstParent = _itemsArray[surveyI];
-            //    //var secondParentIndex = Random.Next(DataObject.CellInitData.SurviveCount);
-            //    var secondParentIndex = Random.Next(DataObject.CommandInitData.ItemsCount);
-            //    var secondParent = _itemsArray[secondParentIndex];
-            //    var child = CreateChild(firstParent, secondParent);
-            //    if (child != null)
-            //    {
-            //        Mutation(child);
-            //    }
-            //    else
-            //    {
-            //        child = InternalCreateItem();
-            //        FillValues(child);
-            //    }
-            //    _itemsArray[i + DataObject.CommandInitData.SurviveCount] = child;
-
-            //    ++surveyI;
-            //    if (surveyI >= DataObject.CommandInitData.SurviveCount)
-            //        surveyI = 0;
-            //}
         }
 
         protected virtual void Mutation(TGeneticItem item)

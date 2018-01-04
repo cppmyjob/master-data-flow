@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Neuron;
+using MasterDataFlow.Trading.Configs;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Tester;
 
@@ -112,7 +113,7 @@ namespace MasterDataFlow.Trading.Genetic
             root.Add(eIndicators);
 
             eIndicators.Add(new XElement("indicatorNumber", IndicatorNumber.ToString(CultureInfo.InvariantCulture)));
-            eIndicators.Add(new XElement("isNormalizeValues", IndicatorNumber.ToString(CultureInfo.InvariantCulture)));
+            eIndicators.Add(new XElement("isNormalizeValues", IsNormalizeValues.ToString(CultureInfo.InvariantCulture)));
             eIndicators.Add(new XElement("predefinedNames", PredefinedNames));
         }
 
@@ -137,6 +138,126 @@ namespace MasterDataFlow.Trading.Genetic
             root.Add(eInputData);
             Indicators.Write(eInputData);
         }
+    }
+
+    [Serializable]
+    public class ValidationOptimizer
+    {
+        public bool IsFilterBadResult { get; private set; } = true;
+
+        public void Read(XElement root)
+        {
+            var eValidation = root.Element("validation");
+            if (eValidation == null)
+                return;
+
+            IsFilterBadResult = Convert.ToBoolean(eValidation.Element("isFilterBadResult").Value);
+
+        }
+
+        public void Write(XElement root)
+        {
+            var eValidation = new XElement("validation");
+            root.Add(eValidation);
+
+            eValidation.Add(new XElement("isNormalizeValues", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
+        }
+
+    }
+
+    [Serializable]
+    public class TrainingOptimizer
+    {
+        public bool IsFilterBadResult { get; private set; } = true;
+        public bool IsFilterBadResultBuySell { get; set; } = false;
+
+        public void Read(XElement root)
+        {
+            var eValidation = root.Element("validation");
+            if (eValidation == null)
+                return;
+
+            IsFilterBadResult = Convert.ToBoolean(eValidation.Element("isFilterBadResult").Value);
+            IsFilterBadResultBuySell = Convert.ToBoolean(eValidation.Element("isFilterBadResultBuySell").Value);
+
+        }
+
+        public void Write(XElement root)
+        {
+            var eValidation = new XElement("validation");
+            root.Add(eValidation);
+
+            eValidation.Add(new XElement("isNormalizeValues", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("isFilterBadResultBuySell", IsFilterBadResultBuySell.ToString(CultureInfo.InvariantCulture)));
+        }
+    }
+
+    [Serializable]
+    public class FintessOptimizer
+    {
+        public bool IsExpectedValue { get; private set; } = true;
+        public bool IsPlusMinusOrdersRatio { get; private set; } = true;
+        public bool IsPlusMinusEquityRatio { get; private set; } = false;
+        public bool IsProfit { get; private set; } = true;
+        public bool IsZigZag { get; private set; } = true;
+
+
+        public void Read(XElement root)
+        {
+            var eValidation = root.Element("validation");
+            if (eValidation == null)
+                return;
+
+            IsExpectedValue = Convert.ToBoolean(eValidation.Element("isExpectedValue").Value);
+            IsPlusMinusOrdersRatio = Convert.ToBoolean(eValidation.Element("isPlusMinusOrdersRatio").Value);
+            IsPlusMinusEquityRatio = Convert.ToBoolean(eValidation.Element("isPlusMinusEquityRatio").Value);
+            IsProfit = Convert.ToBoolean(eValidation.Element("isProfit").Value);
+            IsZigZag = Convert.ToBoolean(eValidation.Element("isZigZag").Value);
+        }
+
+        public void Write(XElement root)
+        {
+            var eValidation = new XElement("validation");
+            root.Add(eValidation);
+
+            eValidation.Add(new XElement("isExpectedValue", IsExpectedValue.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("isPlusMinusOrdersRatio", IsPlusMinusOrdersRatio.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("isPlusMinusEquityRatio", IsPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("isProfit", IsProfit.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("IsZigZag", IsZigZag.ToString(CultureInfo.InvariantCulture)));
+        }
+    }
+
+    [Serializable]
+    public class Optimizer {
+
+        public ValidationOptimizer Validation { get; } = new ValidationOptimizer();
+        public TrainingOptimizer Training { get; } = new TrainingOptimizer();
+        public FintessOptimizer Fitness { get; } = new FintessOptimizer();
+
+        public bool IsValidationPlusMinusRatioLessTraining { get; private set; } = true;
+
+        public void Read(XElement root)
+        {
+            var eOptimizer = root.Element("optimizer");
+            if (eOptimizer == null)
+                return;
+
+            Validation.Read(eOptimizer);
+            Training.Read(eOptimizer);
+            Fitness.Read(eOptimizer);
+        }
+
+        public void Write(XElement root)
+        {
+            var eOptimizer = new XElement("optimizer");
+            root.Add(eOptimizer);
+
+            Validation.Write(eOptimizer);
+            Training.Write(eOptimizer);
+            Fitness.Write(eOptimizer);
+        }
+
     }
 
     [Serializable]
@@ -174,7 +295,7 @@ namespace MasterDataFlow.Trading.Genetic
             return result;
         }
 
-        public const int HISTORY_WINDOW_LENGTH = 24;
+        public const int HISTORY_WINDOW_LENGTH = 27;
 
         private static int[] NeuronsConfig = new int[] {
             HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? DirectionTester.OUTPUT_NUMBER : 0),
@@ -251,6 +372,7 @@ namespace MasterDataFlow.Trading.Genetic
         }
 
         public InputData InputData { get; } = new InputData();
+        public Optimizer Optimizer { get; } = new Optimizer();
 
         public TradingItemInitData() : this(new NeuronNetwork())
         {
@@ -260,6 +382,12 @@ namespace MasterDataFlow.Trading.Genetic
         {
             _neuronNetwork = neuronNetwork;
             _historyWidowLength = NeuronNetwork.HISTORY_WINDOW_LENGTH;
+
+            var configSection = ItemInitDataConfigSection.GetConfig();
+            if (configSection != null)
+            {
+                
+            }
         }
 
         public int HistoryWidowLength
@@ -331,12 +459,12 @@ namespace MasterDataFlow.Trading.Genetic
         public LearningData ValidationData { get; }
 
         public TradingDataObject(TradingItemInitData itemInitData, LearningData trainingData, LearningData validationData,
-            int itemsCount, int surviveCount)
+            int itemsCount, int surviveCount, int processorsCount)
         {
             TrainingData = trainingData;
             ValidationData = validationData;
             ItemInitData = itemInitData;
-            CommandInitData = new GeneticCommandInitData(itemsCount, surviveCount, 3000000);
+            CommandInitData = new GeneticCommandInitData(itemsCount, surviveCount, 3000000, processorsCount);
         }
     }
 
@@ -385,7 +513,7 @@ namespace MasterDataFlow.Trading.Genetic
             return new TradingItem(initData);
         }
 
-        public override double CalculateFitness(TradingItem item, int processor)
+        public override double CalculateFitness(TradingItem item)
         {
             bool[] oldValues = new bool[DataObject.TrainingData.Indicators.Length];
             for (int i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
@@ -402,61 +530,83 @@ namespace MasterDataFlow.Trading.Genetic
             var validationResult = GetProfit(dll, item, DataObject.ValidationData, out validationZigZagCount);
             item.ValidationTesterResult = validationResult;
 
-//            if (FilterBadResult(validationResult))
-//                return Double.MinValue;
+            if (DataObject.ItemInitData.Optimizer.Validation.IsFilterBadResult && FilterBadResult(validationResult))
+                return Double.MinValue;
 
             double trainingZigZagCount;
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData, out trainingZigZagCount);
             item.TrainingTesterResult = trainingResult;
 
-
-            //if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
-            //{
-            //    if (((float)validationResult.PlusCount / validationResult.MinusCount) <
-            //        ((float)trainingResult.PlusCount / trainingResult.MinusCount))
-            //    {
-            //        return Double.MinValue;
-            //    }
-            //}
+            if (DataObject.ItemInitData.Optimizer.IsValidationPlusMinusRatioLessTraining)
+            {
+                if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
+                {
+                    if (((float) validationResult.PlusCount / validationResult.MinusCount) <
+                        ((float) trainingResult.PlusCount / trainingResult.MinusCount))
+                    {
+                        return Double.MinValue;
+                    }
+                }
+            }
 
             if (validationResult.Profit <= 0 || trainingResult.Profit <= 0)
             {
                 return Double.MinValue;
             }
 
-            //if (FilterBadResultBuySell(trainingResult))
-            //{
-            //    return Double.MinValue;
-            //}
+            if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResult && FilterBadResultBuySell(trainingResult))
+            {
+                return Double.MinValue;
+            }
+
+            if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResultBuySell && FilterBadResultBuySell(trainingResult))
+            {
+                return Double.MinValue;
+            }
+
+            
 
 
-            //var m = 1m;
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsZigZag)
+            {
+                if (validationZigZagCount + trainingZigZagCount < 0)
+                {
+                    return validationZigZagCount + trainingZigZagCount;
+                }
+            }
 
-            //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
-            //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
+            var fitness = 1.0;
 
-            //var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
-            //               ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsProfit)
+            {
+                fitness *= (double) (validationResult.Profit + trainingResult.Profit);
+            }
 
-            ////var ecRation = 1;
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsZigZag)
+            {
+                fitness *= (double) (validationZigZagCount + trainingZigZagCount);
+            }
 
-            //var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
-            //            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsExpectedValue)
+            {
+                var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
+                         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
+                fitness *= (double)m;
+            }
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsPlusMinusOrdersRatio)
+            {
+                var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
+                               ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
+                fitness *= (double)pmRatio;
+            }
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsPlusMinusEquityRatio)
+            {
+                var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
+                            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
+                fitness *= (double)ecRation;
+            }
 
-            return (double)(validationResult.Profit + trainingResult.Profit)
-            //       //* (double) (TradingItemInitData.MAX_STOPLOSS - item.StopLoss)
-            //       * (double)(trainingResult.OrderCount + validationResult.OrderCount)
-            //       * (double)(trainingResult.PlusCount - trainingResult.MinusCount + validationResult.PlusCount - validationResult.MinusCount)
-            //       * (double)pmRatio
-            //       * (double)ecRation
-            //       * (double)m
-                   //* 
-                    //(double)(validationResult.Profit + trainingResult.Profit)  
-                    //(double)pmRatio
-                    //* (double)m
-                    * 
-                    (double)(validationZigZagCount + trainingZigZagCount) 
-                   ;
+            return fitness;
         }
 
         private bool FilterBadResult(TesterResult testerResult)
@@ -568,6 +718,22 @@ namespace MasterDataFlow.Trading.Genetic
                 ++offset;
             }
         }
+
+
+        //protected override void SortFitness()
+        //{
+        //    var list = (from item in _itemsArray
+        //        orderby item.Fitness descending
+        //        where item.Fitness > Double.MinValue
+        //        select item).ToList();
+        //    while (list.Count < DataObject.CommandInitData.ItemsCount)
+        //    {
+        //        var item = InternalCreateItem();
+        //        FillValues(item);
+        //        list.Add(item);
+        //    }
+        //    _itemsArray = list.ToArray();
+        //}
 
         protected override void FillValues(TradingItem item)
         {

@@ -11,7 +11,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
         {
             // ASSERT
             var initItemData = new GeneticItemInitData(50);
-            var initData = new GeneticCommandInitData(100, 30, 10);
+            var initData = new GeneticCommandInitData(100, 30, 10, 1);
             var value = new GeneticDataObject<GeneticItemInitData, GeneticDoubleItem, double>
             {
                 ItemInitData = initItemData,

@@ -80,6 +80,13 @@ namespace MasterDataFlow.Trading.Ui.Business
 
     public class BaseCommandController
     {
+        private readonly int _processorCount;
+
+        public BaseCommandController(int processorCount)
+        {
+            _processorCount = processorCount;
+        }
+
         public async Task Execute()
         {
             using (var remote = new RemoteEnvironment())
@@ -190,7 +197,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             await LoadInputData(itemInitData);
 
             var result = new TradingDataObject(itemInitData, _trainingData, _validationData,
-                100 * PopulationFactor, 33 * PopulationFactor);
+                100 * PopulationFactor, 33 * PopulationFactor, _processorCount);
 
             return result;
         }
@@ -348,7 +355,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
         private void CalculateZigZag()
         {
-            _zigZag = ZigZagIndicator.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 2m).ToArray();
+            _zigZag = ZigZagIndicator.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 3.5m).ToArray();
             _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue { Time = t.Time, Value = Int32.MinValue }).ToArray();
 
             var isHigh = _tradingBars[_zigZag[0]].High > _tradingBars[_zigZag[1]].Low;

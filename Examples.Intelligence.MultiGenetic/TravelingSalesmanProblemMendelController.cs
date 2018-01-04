@@ -76,7 +76,7 @@ namespace Examples.Intelligence.MultiGenetic
         private static TravelingSalesmanProblemMendelInitData CreateTravelingSalesmanProblemInitData(int repeatCount)
         {
             var initItemData = new GeneticItemInitData(10, true);
-            var initData = new GeneticCommandInitData(1000, 380, repeatCount);
+            var initData = new GeneticCommandInitData(1000, 380, repeatCount, 1);
             var dataObject = new TravelingSalesmanProblemMendelInitData
             {
                 ItemInitData = initItemData,

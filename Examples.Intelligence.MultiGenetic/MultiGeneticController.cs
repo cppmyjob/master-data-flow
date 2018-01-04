@@ -126,7 +126,7 @@ namespace Examples.Intelligence.MultiGenetic
         private static TravelingSalesmanProblemInitData CreateTravelingSalesmanProblemInitData()
         {
             var initItemData = new GeneticItemInitData(20);
-            var initData = new GeneticCommandInitData(1000, 330, 10000);
+            var initData = new GeneticCommandInitData(1000, 330, 10000, 1);
             var dataObject = new TravelingSalesmanProblemInitData
                              {
                                  ItemInitData = initItemData,

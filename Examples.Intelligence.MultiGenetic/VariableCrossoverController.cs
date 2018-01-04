@@ -80,7 +80,7 @@ namespace Examples.Intelligence.MultiGenetic
         private static VariableCrossoverGeneticInitData CreateTravelingSalesmanProblemInitData()
         {
             var initItemData = new GeneticItemInitData(30);
-            var initData = new GeneticCommandInitData(1000, 700, 20000);
+            var initData = new GeneticCommandInitData(1000, 700, 20000, 1);
             var dataObject = new VariableCrossoverGeneticInitData
             {
                                  ItemInitData = initItemData,
@@ -163,7 +163,7 @@ namespace Examples.Intelligence.MultiGenetic
             return new VariableCrossoverGeneticItem(initData);
         }
 
-        public override double CalculateFitness(VariableCrossoverGeneticItem item, int processor)
+        public override double CalculateFitness(VariableCrossoverGeneticItem item)
         {
             var fitness = 0.0;
             //bool[] oldValues = new bool[item.Values.Length];

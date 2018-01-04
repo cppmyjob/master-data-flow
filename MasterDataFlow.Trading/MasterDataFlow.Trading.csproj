@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configs\CommandInitDataConfigSection.cs" />
+    <Compile Include="Configs\ItemInitDataConfigSection.cs" />
     <Compile Include="Data\Bar.cs" />
     <Compile Include="Genetic\DirectionTester.cs" />
     <Compile Include="Genetic\GeneticTestTrading.cs" />

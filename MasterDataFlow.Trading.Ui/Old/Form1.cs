@@ -255,7 +255,7 @@ namespace MasterDataFlow.Trading.Ui
             await LoadInputData(itemInitData);
 
             var result = new TradingDataObject(itemInitData, _trainingData, _validationData, 
-                100 * (int)nudPopulationFactor.Value, 33 * (int)nudPopulationFactor.Value);
+                100 * (int)nudPopulationFactor.Value, 33 * (int)nudPopulationFactor.Value, 1);
 
             return result;
         }

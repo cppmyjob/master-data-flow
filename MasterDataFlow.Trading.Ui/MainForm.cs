@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using MasterDataFlow.Trading.Configs;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Tester;
@@ -33,7 +34,8 @@ namespace MasterDataFlow.Trading.Ui
         {
             btnStart.Enabled = false;
 
-            var controller = new TradingCommandController();
+            var processorCount = ((KeyValuePair<int, string>)cmbProcessors.SelectedItem).Key;
+            var controller = new TradingCommandController(processorCount);
             controller.DisplayBestEvent += ControllerOnDisplayBestEvent;
             controller.DisplayChartPricesEvent += ControllerOnDisplayChartPricesEvent;
             controller.IterationEndEvent += ControllerOnIterationEndEvent;
@@ -198,5 +200,38 @@ namespace MasterDataFlow.Trading.Ui
             }
         }
 
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            //cmbProcessors.Add
+            var data = new Dictionary<int, string>
+                       {
+                           {-1, "No restrctions"}
+                       };
+
+            for (var i = 0; i < Environment.ProcessorCount; i++)
+            {
+                data.Add(i + 1, (i+1).ToString());
+            }
+
+            cmbProcessors.DataSource = new BindingSource(data, null);
+            cmbProcessors.DisplayMember = "Value";
+            cmbProcessors.ValueMember = "Key";
+
+            var commandInitDataConfig = CommandInitDataConfigSection.GetConfig();
+            cmbProcessors.SelectedIndex = 0;
+            if (commandInitDataConfig != null)
+            {
+                for (int i = 0; i < cmbProcessors.Items.Count; i++)
+                {
+                    var item = (KeyValuePair<int, string>)cmbProcessors.Items[i];
+                    if (item.Key == commandInitDataConfig.ProcessorCount)
+                    {
+                        cmbProcessors.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+        }
     }
 }

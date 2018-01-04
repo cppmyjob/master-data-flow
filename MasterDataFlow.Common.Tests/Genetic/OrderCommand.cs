@@ -42,7 +42,7 @@ namespace MasterDataFlow.Common.Tests.Genetic
             return new OrderGeneticItem(initData);
         }
 
-        public override double CalculateFitness(OrderGeneticItem item, int processor)
+        public override double CalculateFitness(OrderGeneticItem item)
         {
             var result = 1;
             var lastValue = item.Values[0];

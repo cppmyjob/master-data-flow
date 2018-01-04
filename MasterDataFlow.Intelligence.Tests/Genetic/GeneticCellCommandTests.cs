@@ -50,7 +50,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             };
 
             var initItemData = new GeneticItemInitData(5);
-            var initData = new GeneticCommandInitData(1000, 300, 200);
+            var initData = new GeneticCommandInitData(1000, 300, 200, 1);
             var dataObject = new OrderDataObject
             {
                 ItemInitData = initItemData,
@@ -85,7 +85,7 @@ namespace MasterDataFlow.Intelligence.Tests.Genetic
             };
 
             var initItemData = new GeneticItemInitData(5);
-            var initData = new GeneticCommandInitData(1000, 300, 200);
+            var initData = new GeneticCommandInitData(1000, 300, 200, 1);
             var dataObject = new OrderDataObject
             {
                 ItemInitData = initItemData,

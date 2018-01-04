@@ -49,7 +49,7 @@ namespace Examples.Intelligence.MultiGenetic
             return new TravelingSalesmanProblemMendelGeneticItem(initData, Random);
         }
 
-        public override double CalculateFitness(MendelGeneticItem item, int processor)
+        public override double CalculateFitness(MendelGeneticItem item)
         {
             var fitness = 0.0;
             var oldValues = new bool[item.Values.Length];

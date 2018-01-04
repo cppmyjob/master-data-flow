@@ -56,7 +56,7 @@ namespace Examples.Intelligence.MultiGenetic
             return new TravelingSalesmanProblemGeneticItem(initData);
         }
 
-        public override double CalculateFitness(TravelingSalesmanProblemGeneticItem item, int processor)
+        public override double CalculateFitness(TravelingSalesmanProblemGeneticItem item)
         {
             var fitness = 0.0;
             bool[] oldValues = new bool[item.Values.Length];

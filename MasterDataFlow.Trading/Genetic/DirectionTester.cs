@@ -47,26 +47,21 @@ namespace MasterDataFlow.Trading.Genetic
             {
 
                 return _zigZagFitness;
-                //if (_zigZagValidBuyCount <= 0 || _zigZagValidSellCount <= 0 || _zigZagValidCloseCount <= 0)
-                //      return Double.MinValue;
-                //var br = (double) _zigZagValidBuyCount / _zigZagBuyCount;
-                //var sr = (double) _zigZagValidSellCount / _zigZagSellCount;
-                //var cr = (double)_zigZagValidCloseCount / _zigZagCloseCount;
-                //if (br > sr && br / sr > 2)
-                //    return Double.MinValue + 1;
-                //if (sr > br && sr / br > 2)
-                //    return Double.MinValue + 1;
-
-                //var avg = (_zigZagBuyCount + _zigZagSellCount) / 2;
-
-                //var otkl = Math.Sqrt((_zigZagValidBuyCount - avg) * (_zigZagValidBuyCount - avg) +
-                //                     (_zigZagValidSellCount - avg) * (_zigZagValidSellCount - avg));
-
-                //return 1 / otkl; 
-
-                //return br * sr * cr;
             }
         }
+
+
+        private enum OrderStatus
+        {
+            Initial,
+            Buy,
+            Sell
+        }
+
+        private int _penalty = 0;
+        private OrderStatus _orderStatus = OrderStatus.Initial;
+        private Order _previousOrder;
+
 
         protected override Direction GetDirection(int index)
         {
@@ -89,18 +84,6 @@ namespace MasterDataFlow.Trading.Genetic
             }
 
             var zigzagValue = _learningData.ZigZags[index].Value;
-            switch (zigzagValue)
-            {
-                case -1:
-                    ++_zigZagSellCount;
-                    break;
-                case 0:
-                    ++_zigZagCloseCount;
-                    break;
-                case 1:
-                    ++_zigZagBuyCount;
-                    break;
-            }
 
             var outputs = _dll.NetworkCompute(_inputs);
 
@@ -109,12 +92,98 @@ namespace MasterDataFlow.Trading.Genetic
                 Array.Copy(outputs, previuosOutput, OUTPUT_NUMBER);
             }
 
-            var isBuy = outputs[0] > 0.5F;
-            var isSell = outputs[1] > 0.5F;
-            var isHold = outputs[2] > 0.5F;
+            var isBuySignal = outputs[0] > 0.5F;
+            var isSellSignal = outputs[1] > 0.5F;
+            var isHoldSignal = outputs[2] > 0.5F;
 
-            if (!isBuy && !isSell && isHold)
+
+            var isHold = !isBuySignal && !isSellSignal && isHoldSignal;
+            var isBuy = isBuySignal && !isSellSignal && !isHoldSignal;
+            var isSell = !isBuySignal && isSellSignal && !isHoldSignal;
+            var isClose = !(isHold || isBuy || isSell);
+
+
+            switch (_orderStatus)
             {
+                case OrderStatus.Initial:
+                    _penalty = 0;
+                    if (isBuy) _orderStatus = OrderStatus.Buy;
+                    if (isSell) _orderStatus = OrderStatus.Sell;
+                    break;
+                case OrderStatus.Buy:
+                    if (isSell)
+                    {
+                        _previousOrder = _currentOrder;
+                        _penalty = 0;
+                        _orderStatus = OrderStatus.Sell;
+                    }
+                    if (isClose)
+                    {
+                        _previousOrder = _currentOrder;
+                    }
+                    if (isBuy || isHold)
+                    {
+                        switch (zigzagValue)
+                        {
+                            case 1:
+                                if (_previousOrder != null && _previousOrder.Type == OrderType.Buy)
+                                {
+                                    ++_penalty;
+                                    _previousOrder = null;
+                                }
+                                break;
+                            case -1:
+                                break;
+                            case 0:
+                                ++_penalty;
+                                break;
+                        }
+
+                    }
+
+                    break;
+
+                case OrderStatus.Sell:
+                    if (isBuy)
+                    {
+                        _previousOrder = _currentOrder;
+                        _penalty = 0;
+                        _orderStatus = OrderStatus.Buy;
+                    }
+                    if (isClose)
+                    {
+                        _previousOrder = _currentOrder;
+                    }
+                    if (isSell || isHold)
+                    {
+                        switch (zigzagValue)
+                        {
+                            case -1:
+                                if (_previousOrder != null && _previousOrder.Type == OrderType.Sell)
+                                {
+                                    ++_penalty;
+                                    _previousOrder = null;
+                                }
+                                break;
+                            case 1:
+                                break;
+                            case 0:
+                                ++_penalty;
+                                break;
+                        }
+
+                    }
+                    break;
+            }
+            return DefaultSignalsProcess(isHold, isSell, zigzagValue, isBuy);
+        }
+
+        private Direction DefaultSignalsProcess(bool isHold, bool isSell, int zigzagValue, bool isBuy)
+        {
+            if (isHold)
+            {
+                if (_penalty > 0)
+                    _zigZagFitness -= _penalty;
                 if (_currentOrder != null)
                 {
                     ++_zigZagFitness;
@@ -126,8 +195,10 @@ namespace MasterDataFlow.Trading.Genetic
                 return Direction.Hold;
             }
 
-            if (!isBuy && isSell && !isHold)
+            if (isSell)
             {
+                if (_penalty > 0)
+                    _zigZagFitness -= _penalty;
                 if (zigzagValue == -1)
                     ++_zigZagFitness;
                 else
@@ -136,8 +207,10 @@ namespace MasterDataFlow.Trading.Genetic
                 return Direction.Down;
             }
 
-            if (isBuy && !isSell && !isHold)
+            if (isBuy)
             {
+                if (_penalty > 0)
+                    _zigZagFitness -= _penalty;
                 if (zigzagValue == 1)
                     ++_zigZagFitness;
                 else
@@ -145,37 +218,20 @@ namespace MasterDataFlow.Trading.Genetic
                 return Direction.Up;
             }
 
-            //if (isBuy)
-            //{
-            //    if (zigzagValue == 1)
-            //    {
-            //        ++_zigZagValidBuyCount;
-            //    }
-
-            //    return Direction.Up;
-            //}
-
-            //if (isSell)
-            //{
-            //    if (zigzagValue == -1)
-            //    {
-            //        ++_zigZagValidSellCount;
-            //    }
-
-            //    return Direction.Down;
-            //}
-
-            //if (zigzagValue == 0)
-            //{
-            //    ++_zigZagValidCloseCount;
-            //}
-
             if (zigzagValue == 0)
                 ++_zigZagFitness;
             else
                 --_zigZagFitness;
 
             return Direction.Close;
+        }
+
+        private void SetDefaultBuyZigZagFitness(int zigzagValue)
+        {
+            if (zigzagValue == 1)
+                ++_zigZagFitness;
+            else
+                --_zigZagFitness;
         }
 
 
