@@ -143,6 +143,16 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class ValidationOptimizer
     {
+        public ValidationOptimizer()
+        {
+            var configSection = ItemInitDataConfigSection.GetConfig();
+            if (configSection != null)
+            {
+                IsFilterBadResult = configSection.Optimizer.Training.IsFilterBadResult;
+            }
+        }
+
+
         public bool IsFilterBadResult { get; private set; } = true;
 
         public void Read(XElement root)
@@ -160,7 +170,7 @@ namespace MasterDataFlow.Trading.Genetic
             var eValidation = new XElement("validation");
             root.Add(eValidation);
 
-            eValidation.Add(new XElement("isNormalizeValues", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
+            eValidation.Add(new XElement("isFilterBadResult", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
         }
 
     }
@@ -168,74 +178,109 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class TrainingOptimizer
     {
+        public TrainingOptimizer()
+        {
+            var configSection = ItemInitDataConfigSection.GetConfig();
+            if (configSection != null)
+            {
+                IsFilterBadResult = configSection.Optimizer.Training.IsFilterBadResult;
+                IsFilterBadResultBuySell = configSection.Optimizer.Training.IsFilterBadResultBuySell;
+            }
+        }
+
+
         public bool IsFilterBadResult { get; private set; } = true;
         public bool IsFilterBadResultBuySell { get; set; } = false;
 
         public void Read(XElement root)
         {
-            var eValidation = root.Element("validation");
-            if (eValidation == null)
+            var eTraining = root.Element("training");
+            if (eTraining == null)
                 return;
 
-            IsFilterBadResult = Convert.ToBoolean(eValidation.Element("isFilterBadResult").Value);
-            IsFilterBadResultBuySell = Convert.ToBoolean(eValidation.Element("isFilterBadResultBuySell").Value);
+            IsFilterBadResult = Convert.ToBoolean(eTraining.Element("isFilterBadResult").Value);
+            IsFilterBadResultBuySell = Convert.ToBoolean(eTraining.Element("isFilterBadResultBuySell").Value);
 
         }
 
         public void Write(XElement root)
         {
-            var eValidation = new XElement("validation");
-            root.Add(eValidation);
+            var eTraining = new XElement("training");
+            root.Add(eTraining);
 
-            eValidation.Add(new XElement("isNormalizeValues", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
-            eValidation.Add(new XElement("isFilterBadResultBuySell", IsFilterBadResultBuySell.ToString(CultureInfo.InvariantCulture)));
+            eTraining.Add(new XElement("isFilterBadResult", IsFilterBadResult.ToString(CultureInfo.InvariantCulture)));
+            eTraining.Add(new XElement("isFilterBadResultBuySell", IsFilterBadResultBuySell.ToString(CultureInfo.InvariantCulture)));
         }
     }
 
     [Serializable]
-    public class FintessOptimizer
+    public class FitnessOptimizer
     {
-        public bool IsExpectedValue { get; private set; } = true;
-        public bool IsPlusMinusOrdersRatio { get; private set; } = true;
+        public FitnessOptimizer()
+        {
+            var configSection = ItemInitDataConfigSection.GetConfig();
+            if (configSection != null)
+            {
+                IsExpectedValue = configSection.Optimizer.Fitness.IsExpectedValue;
+                IsPlusMinusOrdersRatio = configSection.Optimizer.Fitness.IsPlusMinusOrdersRatio;
+                IsPlusMinusEquityRatio = configSection.Optimizer.Fitness.IsPlusMinusEquityRatio;
+                IsProfit = configSection.Optimizer.Fitness.IsProfit;
+                IsZigZag = configSection.Optimizer.Fitness.IsZigZag;
+            }
+        }
+
+
+        public bool IsExpectedValue { get; private set; } = false;
+        public bool IsPlusMinusOrdersRatio { get; private set; } = false;
         public bool IsPlusMinusEquityRatio { get; private set; } = false;
-        public bool IsProfit { get; private set; } = true;
+        public bool IsProfit { get; private set; } = false;
         public bool IsZigZag { get; private set; } = true;
 
 
         public void Read(XElement root)
         {
-            var eValidation = root.Element("validation");
-            if (eValidation == null)
+            var eFitness = root.Element("fitness");
+            if (eFitness == null)
                 return;
 
-            IsExpectedValue = Convert.ToBoolean(eValidation.Element("isExpectedValue").Value);
-            IsPlusMinusOrdersRatio = Convert.ToBoolean(eValidation.Element("isPlusMinusOrdersRatio").Value);
-            IsPlusMinusEquityRatio = Convert.ToBoolean(eValidation.Element("isPlusMinusEquityRatio").Value);
-            IsProfit = Convert.ToBoolean(eValidation.Element("isProfit").Value);
-            IsZigZag = Convert.ToBoolean(eValidation.Element("isZigZag").Value);
+            IsExpectedValue = Convert.ToBoolean(eFitness.Element("isExpectedValue").Value);
+            IsPlusMinusOrdersRatio = Convert.ToBoolean(eFitness.Element("isPlusMinusOrdersRatio").Value);
+            IsPlusMinusEquityRatio = Convert.ToBoolean(eFitness.Element("isPlusMinusEquityRatio").Value);
+            IsProfit = Convert.ToBoolean(eFitness.Element("isProfit").Value);
+            IsZigZag = Convert.ToBoolean(eFitness.Element("isZigZag").Value);
         }
 
         public void Write(XElement root)
         {
-            var eValidation = new XElement("validation");
-            root.Add(eValidation);
+            var eFitness = new XElement("fitness");
+            root.Add(eFitness);
 
-            eValidation.Add(new XElement("isExpectedValue", IsExpectedValue.ToString(CultureInfo.InvariantCulture)));
-            eValidation.Add(new XElement("isPlusMinusOrdersRatio", IsPlusMinusOrdersRatio.ToString(CultureInfo.InvariantCulture)));
-            eValidation.Add(new XElement("isPlusMinusEquityRatio", IsPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
-            eValidation.Add(new XElement("isProfit", IsProfit.ToString(CultureInfo.InvariantCulture)));
-            eValidation.Add(new XElement("IsZigZag", IsZigZag.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isExpectedValue", IsExpectedValue.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isPlusMinusOrdersRatio", IsPlusMinusOrdersRatio.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isPlusMinusEquityRatio", IsPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isProfit", IsProfit.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isZigZag", IsZigZag.ToString(CultureInfo.InvariantCulture)));
         }
     }
 
     [Serializable]
     public class Optimizer {
 
+        public Optimizer()
+        {
+            var configSection = ItemInitDataConfigSection.GetConfig();
+            if (configSection != null)
+            {
+                IsValidationPlusMinusRatioLessTraining = configSection.Optimizer.IsValidationPlusMinusRatioLessTraining;
+            }
+        }
+
         public ValidationOptimizer Validation { get; } = new ValidationOptimizer();
         public TrainingOptimizer Training { get; } = new TrainingOptimizer();
-        public FintessOptimizer Fitness { get; } = new FintessOptimizer();
+        public FitnessOptimizer Fitness { get; } = new FitnessOptimizer();
 
-        public bool IsValidationPlusMinusRatioLessTraining { get; private set; } = true;
+        public bool IsValidationPlusMinusRatioLessTraining { get; set; } = true;
+
 
         public void Read(XElement root)
         {
@@ -382,12 +427,6 @@ namespace MasterDataFlow.Trading.Genetic
         {
             _neuronNetwork = neuronNetwork;
             _historyWidowLength = NeuronNetwork.HISTORY_WINDOW_LENGTH;
-
-            var configSection = ItemInitDataConfigSection.GetConfig();
-            if (configSection != null)
-            {
-                
-            }
         }
 
         public int HistoryWidowLength
@@ -423,6 +462,7 @@ namespace MasterDataFlow.Trading.Genetic
             _neuronNetwork.Read(eItemInitData);
 
             InputData.Read(eItemInitData);
+            Optimizer.Read(eItemInitData);
 
             var eHistoryWidowLength = eItemInitData.Element("historyWidowLength");
             _historyWidowLength = int.Parse(eHistoryWidowLength.Value);
@@ -441,6 +481,7 @@ namespace MasterDataFlow.Trading.Genetic
             _neuronNetwork.Write(itemInitDataElement);
 
             InputData.Write(itemInitDataElement);
+            Optimizer.Write(itemInitDataElement);
 
             itemInitDataElement.Add(new XElement("historyWidowLength", _historyWidowLength.ToString(CultureInfo.InvariantCulture)));
 

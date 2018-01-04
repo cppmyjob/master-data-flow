@@ -146,44 +146,52 @@ namespace MasterDataFlow.Trading.Ui.Business
 
                 using (var @event = new ManualResetEvent(false))
                 {
-                    _dataObject = await CreateDataObject();
-
-                    DisplayChartPrices();
-
-                    var tradingItem = LoadItem(_dataObject.ItemInitData, _dataObject.TrainingData);
-                    if (tradingItem != null)
+                    try
                     {
-                        _dataObject.InitPopulation = new List<float[]>();
-                        _dataObject.InitPopulation.Add(tradingItem.Values);
+
+                        _dataObject = await CreateDataObject();
+
+                        DisplayChartPrices();
+
+                        var tradingItem = LoadItem(_dataObject.ItemInitData, _dataObject.TrainingData);
+                        if (tradingItem != null)
+                        {
+                            _dataObject.InitPopulation = new List<float[]>();
+                            _dataObject.InitPopulation.Add(tradingItem.Values);
+                        }
+
+                        System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+
+                        commandWorkflow.MessageRecieved +=
+                            (key, message) => {
+                                if (message is StopCommandMessage stopMessage)
+                                {
+                                    var best = (TradingItem)(stopMessage.Data as GeneticInfoDataObject).Best;
+                                    DisplayBest(best);
+                                    @event.Set();
+                                }
+
+                                if (message is GeneticEndCycleMessage endCycleMessage)
+                                {
+                                    ++_iteration;
+
+                                    sw.Stop();
+                                    IterationEnd(_iteration, sw.ElapsedMilliseconds);
+                                    sw = System.Diagnostics.Stopwatch.StartNew();
+
+                                    var best = (TradingItem)endCycleMessage.Data.Best;
+                                    DisplayBest(best);
+
+                                }
+                            };
+
+                        commandWorkflow.Start<TradingCommand>(_dataObject);
+                        @event.WaitOne(1000000);
                     }
-
-                    System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-
-                    commandWorkflow.MessageRecieved +=
-                        (key, message) => {
-                            if (message is StopCommandMessage stopMessage)
-                            {
-                                var best = (TradingItem)(stopMessage.Data as GeneticInfoDataObject).Best;
-                                DisplayBest(best);
-                                @event.Set();
-                            }
-
-                            if (message is GeneticEndCycleMessage endCycleMessage)
-                            {
-                                ++_iteration;
-
-                                sw.Stop();
-                                IterationEnd(_iteration, sw.ElapsedMilliseconds);
-                                sw = System.Diagnostics.Stopwatch.StartNew();
-
-                                var best = (TradingItem)endCycleMessage.Data.Best;
-                                DisplayBest(best);
-
-                            }
-                        };
-
-                    commandWorkflow.Start<TradingCommand>(_dataObject);
-                    @event.WaitOne(1000000);
+                    catch (Exception e)
+                    {
+                        throw;
+                    }
 
                 }
 
