@@ -18,15 +18,6 @@ namespace MasterDataFlow.Trading.Genetic
         private readonly LearningData _learningData;
         private const decimal START_DEPOSIT = 100000;
 
-        private int _zigZagSellCount = 0;
-        private int _zigZagValidSellCount = 0;
-
-        private int _zigZagBuyCount = 0;
-        private int _zigZagValidBuyCount = 0;
-
-        private int _zigZagCloseCount = 0;
-        private int _zigZagValidCloseCount = 0;
-
         private int _zigZagFitness = 0;
 
         private float[] previuosOutput = new float[OUTPUT_NUMBER];
@@ -55,7 +46,7 @@ namespace MasterDataFlow.Trading.Genetic
         {
             Initial,
             Buy,
-            Sell
+            Sell,
         }
 
         private int _penalty = 0;
@@ -119,7 +110,8 @@ namespace MasterDataFlow.Trading.Genetic
                     }
                     if (isClose)
                     {
-                        _previousOrder = _currentOrder;
+                        if (_currentOrder != null)
+                            _previousOrder = _currentOrder;
                     }
                     if (isBuy || isHold)
                     {
@@ -152,7 +144,8 @@ namespace MasterDataFlow.Trading.Genetic
                     }
                     if (isClose)
                     {
-                        _previousOrder = _currentOrder;
+                        if (_currentOrder != null)
+                            _previousOrder = _currentOrder;
                     }
                     if (isSell || isHold)
                     {
@@ -186,7 +179,8 @@ namespace MasterDataFlow.Trading.Genetic
                     _zigZagFitness -= _penalty;
                 if (_currentOrder != null)
                 {
-                    ++_zigZagFitness;
+                    if (_penalty == 0)
+                        ++_zigZagFitness;
                 }
                 else
                 {
@@ -200,7 +194,10 @@ namespace MasterDataFlow.Trading.Genetic
                 if (_penalty > 0)
                     _zigZagFitness -= _penalty;
                 if (zigzagValue == -1)
-                    ++_zigZagFitness;
+                {
+                    if (_penalty == 0)
+                        ++_zigZagFitness;
+                }
                 else
                     --_zigZagFitness;
 
@@ -212,7 +209,10 @@ namespace MasterDataFlow.Trading.Genetic
                 if (_penalty > 0)
                     _zigZagFitness -= _penalty;
                 if (zigzagValue == 1)
-                    ++_zigZagFitness;
+                {
+                    if (_penalty == 0)
+                        ++_zigZagFitness;
+                }
                 else
                     --_zigZagFitness;
                 return Direction.Up;
