@@ -16,7 +16,7 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
             // ARRANGE
             var dna = CreateSimpleDna();
 
-            var network = new NetworkInstance(dna);
+            var network = new Intelligence.Neuron.NetworkInstance(dna);
             network.Build();
 
             // ACT
@@ -32,7 +32,7 @@ namespace MasterDataFlow.Intelligence.Tests.Neuron
             // ARRANGE
             var dna = CreateSimpleDna();
 
-            var network = new NetworkInstance(dna);
+            var network = new Intelligence.Neuron.NetworkInstance(dna);
             network.Build();
 
             // ACT

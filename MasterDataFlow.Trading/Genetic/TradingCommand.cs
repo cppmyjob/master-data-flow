@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using MasterDataFlow.Intelligence.Genetic;
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Neuron;
+using MasterDataFlow.Intelligence.Neuron.SimpleNeuron;
 using MasterDataFlow.Trading.Configs;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Tester;
@@ -382,6 +383,41 @@ namespace MasterDataFlow.Trading.Genetic
 
             neuronNetwork.Add(new XElement("weigthMultiplier", WeigthMultiplier.ToString(CultureInfo.InvariantCulture)));
         }
+
+        public static Neuron CreateNeuronDll(NeuronNetwork neuronNetwork, TradingItem item)
+        {
+            var dll = CreateNeuronDll(neuronNetwork);
+            dll.SetAlpha(item.Alpha);
+            SetWeigths(dll, item);
+            return dll;
+        }
+
+        public static Neuron CreateNeuronDll(NeuronNetwork neuronNetwork)
+        {
+            Neuron dll = new Neuron();
+            float alpha = 1.5F;
+            dll.NetworkCreate(alpha, neuronNetwork.GetNeuronsConfig());
+            dll.CreateWeigths(neuronNetwork.GetWeightsCount());
+            return dll;
+        }
+
+        public  static void SetWeigths(ISimpleNeuron neuron, TradingItem item)
+        {
+            var weights = neuron.GetWeigths();
+            var values = item.Values;
+
+            var offset = item.InitData.OFFSET_VALUES;
+
+            var v2 = item.InitData.NeuronNetwork.WeigthMultiplier;
+            var v1 = v2 / 2F;
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                weights[i] = values[offset] * v2 - v1;
+                ++offset;
+            }
+        }
+
     }
 
     [Serializable]
@@ -547,7 +583,7 @@ namespace MasterDataFlow.Trading.Genetic
 
     public class TradingCommand : GeneticFloatCommand<TradingDataObject, TradingItemInitData, TradingItem>
     {
-        private Dictionary<int, GeneticNeuronDLL1> _dlls = new Dictionary<int, GeneticNeuronDLL1>();
+        private Dictionary<int, ISimpleNeuron> _neurons = new Dictionary<int, ISimpleNeuron>();
 
         protected override TradingItem CreateItem(TradingItemInitData initData)
         {
@@ -701,63 +737,29 @@ namespace MasterDataFlow.Trading.Genetic
             return false;
         }
 
-        private TesterResult GetProfit(GeneticNeuronDLL1 dll, TradingItem item, LearningData learningData, out double zigZagCount)
+        private TesterResult GetProfit(ISimpleNeuron neuron, TradingItem item, LearningData learningData, out double zigZagCount)
         {
-            var tester = new DirectionTester(dll, item, learningData);
+            var tester = new DirectionTester(neuron, item, learningData);
             TesterResult result = tester.Run();
             zigZagCount = tester.ZigZagCount;
             return result;
         }
 
-        private GeneticNeuronDLL1 GetNeuronDll(TradingItem item)
+        private ISimpleNeuron GetNeuronDll(TradingItem item)
         {
             var threadId = Thread.CurrentThread.ManagedThreadId;
-            GeneticNeuronDLL1 dll;
-            lock (_dlls) // TODO improve
+            ISimpleNeuron neuron;
+            lock (_neurons) // TODO improve
             {
-                if (!_dlls.TryGetValue(threadId, out dll))
+                if (!_neurons.TryGetValue(threadId, out neuron))
                 {
-                    dll = CreateNeuronDll(DataObject);
-                    _dlls.Add(threadId, dll);
+                    neuron = NeuronNetwork.CreateNeuronDll(DataObject.ItemInitData.NeuronNetwork);
+                    _neurons.Add(threadId, neuron);
                 }
             }
-            dll.SetAlpha(item.Alpha);
-            SetWeigths(dll, item);
-            return dll;
-        }
-
-        public static GeneticNeuronDLL1 CreateNeuronDll(TradingDataObject dataObject, TradingItem item)
-        {
-            var dll = CreateNeuronDll(dataObject);
-            dll.SetAlpha(item.Alpha);
-            SetWeigths(dll, item);
-            return dll;
-        }
-
-        private static GeneticNeuronDLL1 CreateNeuronDll(TradingDataObject dataObject)
-        {
-            GeneticNeuronDLL1 dll = new GeneticNeuronDLL1();
-            float alpha = 1.5F;
-            dll.NetworkCreate(alpha, dataObject.ItemInitData.NeuronNetwork.GetNeuronsConfig());
-            dll.CreateWeigths(dataObject.ItemInitData.NeuronNetwork.GetWeightsCount());
-            return dll;
-        }
-
-        private static void SetWeigths(GeneticNeuronDLL1 dll, TradingItem item)
-        {
-            var weights = dll.GetWeigths();
-            var values = item.Values;
-
-            var offset = item.InitData.OFFSET_VALUES;
-
-            var v2 = item.InitData.NeuronNetwork.WeigthMultiplier;
-            var v1 = v2 / 2F;
-
-            for (int i = 0; i < weights.Length; i++)
-            {
-                weights[i] = values[offset] * v2 - v1;
-                ++offset;
-            }
+            neuron.SetAlpha(item.Alpha);
+            NeuronNetwork.SetWeigths(neuron, item);
+            return neuron;
         }
 
 

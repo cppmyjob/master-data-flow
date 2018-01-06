@@ -233,19 +233,14 @@ namespace MasterDataFlow.Trading.Tester
         public DirectionTester(decimal deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)
         {
+            _currentOrder = null;
+            _lastBarNumber = -1;
         }
 
         protected abstract Direction GetDirection(int index);
         protected abstract decimal GetStopLoss();
 
         private int _lastBarNumber = -1;
-
-        public override void Reset()
-        {
-            base.Reset();
-            _currentOrder = null;
-            _lastBarNumber = -1;
-        }
 
         protected override void OnTick()
         {
@@ -395,7 +390,7 @@ namespace MasterDataFlow.Trading.Tester
             get { return _from; }
         }
 
-        public virtual void Reset()
+        private void Reset()
         {
             _orders = new Dictionary<int, Order>();
             _history = new List<HistoryItem>();

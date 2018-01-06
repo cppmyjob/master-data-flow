@@ -140,7 +140,7 @@ namespace MasterDataFlow.Trading.Ui
                 stories.AddRange(neuronItem.ValidationTesterResult.Stories);
             }
 
-            var dll = TradingCommand.CreateNeuronDll(_dataObject, neuronItem);
+            var dll = NeuronNetwork.CreateNeuronDll(_dataObject.ItemInitData.NeuronNetwork, neuronItem);
             var tester = new DirectionTester(dll, neuronItem, _testData);
             TesterResult testResult = tester.Run();
             SetText(tbPredictionProfit, (testResult.Profit).ToString("F10"));

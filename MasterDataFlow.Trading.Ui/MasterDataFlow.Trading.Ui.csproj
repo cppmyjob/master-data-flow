@@ -189,6 +189,7 @@
   <ItemGroup>
     <Compile Include="Business\BaseCommandController.cs" />
     <Compile Include="Business\RemoteEnvironment.cs" />
+    <Compile Include="Business\NeuralNetworkAdvisorTester.cs" />
     <Compile Include="Old\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -94,8 +94,8 @@ namespace MasterDataFlow.Trading.Ui
                 stories.AddRange(neuronItem.ValidationTesterResult.Stories);
             }
 
-            var dll = TradingCommand.CreateNeuronDll(controller.DataObject, neuronItem);
-            var tester = new MasterDataFlow.Trading.Genetic.DirectionTester(dll, neuronItem, controller.TestData);
+            var neuron = NeuronNetwork.CreateNeuronDll(controller.DataObject.ItemInitData.NeuronNetwork, neuronItem);
+            var tester = new MasterDataFlow.Trading.Genetic.DirectionTester(neuron, neuronItem, controller.TestData);
             TesterResult testResult = tester.Run();
             SetText(tbPredictionProfit, (testResult.Profit).ToString("F10"));
             SetText(tbPredictionOrderCount, (testResult.OrderCount).ToString("D"));

@@ -54,8 +54,8 @@ namespace MasterDataFlow.Trading.Importer
 
             var manualResetEvent = new ManualResetEvent(false);
 
-            //var id = GetIdfi(client, "SBER");
-            var id = GetIdfi(client, "AFLT");
+            var id = GetIdfi(client, "SBER");
+            //var id = GetIdfi(client, "AFLT");
 
             var archiveIndex = Int32.MinValue;
 
@@ -69,11 +69,14 @@ namespace MasterDataFlow.Trading.Importer
                                                      
                                                 };
 
-            archiveIndex = client.Archive.RequestChartArchive(CandleType.Standard, id, DateTime.Today,
-                BaseTimeFrame.Hour, (int)(365 * 1.95));
+            //archiveIndex = client.Archive.RequestChartArchive(CandleType.Standard, id, DateTime.Today,
+            //    BaseTimeFrame.Hour, (int)(365 * 1.95));
+
+            archiveIndex = client.Archive.RequestChartArchive(CandleType.Standard, id, DateTime.Today.AddDays(-30),
+                BaseTimeFrame.Minute, (int)(30));
 
 
-            if (!manualResetEvent.WaitOne(new TimeSpan(0, 0, 60)))
+            if (!manualResetEvent.WaitOne(new TimeSpan(0,5, 0)))
             {
                 Console.Error.WriteLine("Can't load data");
             }
@@ -86,7 +89,7 @@ namespace MasterDataFlow.Trading.Importer
 
         private static void CreateCsvFile(ChartArchiveEntity[] entities)
         {
-            var filename = "output.csv";
+            var filename = "outputMinutes.csv";
             if (File.Exists(filename))
                 File.Delete(filename);
             using (var writer = new StreamWriter(filename))

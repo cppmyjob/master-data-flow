@@ -683,7 +683,7 @@ namespace MasterDataFlow.Trading.Ui.Business
         {
             DisplayBestEvent?.Invoke(this, new DisplayBestArgs(neuronItem));
 
-            var dll = TradingCommand.CreateNeuronDll(_dataObject, neuronItem);
+            var dll = NeuronNetwork.CreateNeuronDll(_dataObject.ItemInitData.NeuronNetwork, neuronItem);
             var tester = new DirectionTester(dll, neuronItem, _testData);
             var testResult = tester.Run();
 

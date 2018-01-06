@@ -1,80 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using MasterDataFlow.Intelligence.Interfaces;
 
-namespace MasterDataFlow.Intelligence.Test
+namespace MasterDataFlow.Intelligence.Neuron.SimpleNeuron
 {
-    public class GeneiticNeuron1
+    public class GeneiticNeuron
     {
         public int WeightsLength;
         public int WeightsOffset;
         public int layerIndex;
-        public double[] Inputs;
-        public double[] Outputs;
+        public float[] Inputs;
+        public float[] Outputs;
     }
 
-    public class GeneticNetwork1
+    public class GeneticNetwork
     {
-        public GeneticLayer1[] Layers;
+        public GeneticLayer[] Layers;
     }
 
-    public class GeneticLayer1
+    public class GeneticLayer
     {
-        public GeneiticNeuron1[] Neurons;
-        public double[] Outputs;
+        public GeneiticNeuron[] Neurons;
+        public float[] Outputs;
     }
 
-    public class GeneticQueue1
+    public class GeneticQueue
     {
-        public GeneiticNeuron1[] Neurons;
+        public GeneiticNeuron[] Neurons;
     }
 
-    public class GeneticNeuronDLL1// : INeuronDLL
+    public class Neuron : ISimpleNeuron
     {
-        private GeneticNetwork1 _network;
-        private GeneticQueue1 _queue;
-        private double[] _weights;
-        private double _alpha;
+        private GeneticNetwork _network;
+        private GeneticQueue _queue;
+        private float[] _weights;
+        private float _alpha;
 
-        private GeneticQueue1 QueueCreateFromNetwork(GeneticNetwork1 network)
+        private GeneticQueue QueueCreateFromNetwork(GeneticNetwork network)
         {
-            List<GeneiticNeuron1> list = new List<GeneiticNeuron1>();
+            List<GeneiticNeuron> list = new List<GeneiticNeuron>();
             for (int i = 1; i < network.Layers.Length; i++)
             {
-                GeneticLayer1 layer = network.Layers[i];
+                GeneticLayer layer = network.Layers[i];
                 for (int j = 0; j < layer.Neurons.Length; j++)
                 {
                     list.Add(layer.Neurons[j]);
                 }
             }
-            GeneticQueue1 queue = new GeneticQueue1();
+            GeneticQueue queue = new GeneticQueue();
             queue.Neurons = list.ToArray();
             return queue;
         }
 
 
-        public void NetworkCreate(double alpha, int[] neuronCount)
+        public void NetworkCreate(float alpha, int[] neuronCount)
         {
             _alpha = alpha;
-            _network = new GeneticNetwork1();
+            _network = new GeneticNetwork();
             if (neuronCount == null || neuronCount.Length < 2)
                 throw new Exception("Должно быть как минимум 2 элемента массива для количества нейронов входа и выхода");
 
             int weigthsOffset = 0;
-            List<GeneticLayer1> layersList = new List<GeneticLayer1>();
+            List<GeneticLayer> layersList = new List<GeneticLayer>();
             for (int i = 0; i < neuronCount.Length; i++)
             {
-                GeneticLayer1 layer = new GeneticLayer1();
+                GeneticLayer layer = new GeneticLayer();
                 layersList.Add(layer);
-                layer.Outputs = new double[neuronCount[i]];
+                layer.Outputs = new float[neuronCount[i]];
                 // 1-ый слой - только входа
                 if (i != 0)
                 {
-                    List<GeneiticNeuron1> layerNeuronsList = new List<GeneiticNeuron1>();
+                    List<GeneiticNeuron> layerNeuronsList = new List<GeneiticNeuron>();
                     for (int j = 0; j < neuronCount[i]; j++)
                     {
-                        GeneiticNeuron1 neuron = new GeneiticNeuron1();
+                        GeneiticNeuron neuron = new GeneiticNeuron();
                         neuron.WeightsLength = neuronCount[i - 1];
                         neuron.WeightsOffset = weigthsOffset;
                         weigthsOffset += neuron.WeightsLength;
@@ -93,12 +92,12 @@ namespace MasterDataFlow.Intelligence.Test
         }
 
 
-        public double[] NetworkCompute(double[] inputs)
+        public float[] NetworkCompute(float[] inputs)
         {
             if (inputs.Length != _network.Layers[0].Outputs.Length)
                 throw new Exception("Несовпадает количество входов сети в количеством входных значений");
             // Заполняет входные данные сети
-            GeneticLayer1 firstLayer = _network.Layers[0];
+            GeneticLayer firstLayer = _network.Layers[0];
             for (int i = 0; i < inputs.Length; i++)
             {
                 firstLayer.Outputs[i] = inputs[i];
@@ -109,12 +108,12 @@ namespace MasterDataFlow.Intelligence.Test
         }
 
 
-        private static void NeuronCalculate(GeneiticNeuron1 neuron, double[] weights, double alpha)
+        private static void NeuronCalculate(GeneiticNeuron neuron, float[] weights, float alpha)
         {
-            //double[] inputs = neuron.Inputs;
+            //float[] inputs = neuron.Inputs;
             //int neuronNeuronsLength = inputs.Length;
             //int offset = neuron.WeightsOffset;
-            //double sum = 0.0;
+            //float sum = 0.0;
             //for (int i = 0; i < neuronNeuronsLength; i++)
             //{
             //    sum += inputs[i] * weights[offset + i];
@@ -122,28 +121,27 @@ namespace MasterDataFlow.Intelligence.Test
             //neuron.Outputs[neuron.layerIndex] = 1.0 / (1.0 + Math.Exp(-(alpha * sum)));
 
 
-            double sum = 0.0;
+            float sum = 0.0F;
             for (int i = 0; i < neuron.WeightsLength; i++)
             {
                 sum += neuron.Inputs[i] * weights[neuron.WeightsOffset + i];
             }
-            neuron.Outputs[neuron.layerIndex] = 1.0 / (1.0 + System.Math.Exp(-(alpha * sum)));
-
+            neuron.Outputs[neuron.layerIndex] = (float)(1.0 / (1.0 + global::System.Math.Exp(-(alpha * sum))));
         }
 
-        private void QueueProcess(GeneticQueue1 queue)
+        private void QueueProcess(GeneticQueue queue)
         {
             int queueNeuronsLength = queue.Neurons.Length;
             for (int i = 0; i < queueNeuronsLength; i++)
             {
-                GeneiticNeuron1 neuron = queue.Neurons[i];
+                GeneiticNeuron neuron = queue.Neurons[i];
                 NeuronCalculate(neuron, _weights, _alpha);
             }
         }
 
 
 
-        //private static void QueueProcess(GeneticQueue queue, double[] weights, double alpha)
+        //private static void QueueProcess(GeneticQueue queue, float[] weights, float alpha)
         //{
         //    int queueNeuronsLength = queue.Neurons.Length;
         //    for (int i = 0; i < queueNeuronsLength; i++)
@@ -152,10 +150,10 @@ namespace MasterDataFlow.Intelligence.Test
         //        int neuronNeuronsLength = neuron.Neurons.Length;
         //        GeneiticNeuron[] neurons = neuron.Neurons;
         //        int offset = neuron.WeightsOffset;
-        //        double sum = 0.0;
+        //        float sum = 0.0;
         //        for (int j = 0; j < neuronNeuronsLength; j++)
         //        {
-        //            double input = neurons[j].Output;
+        //            float input = neurons[j].Output;
         //            sum = sum + input * weights[offset + j];
         //        }
         //        neuron.Output = 1.0 / (1.0 + Math.Exp(-(alpha * sum)));
@@ -166,18 +164,18 @@ namespace MasterDataFlow.Intelligence.Test
 
         // Function
 
-        //private static double MathSigmoid(double value)
+        //private static float MathSigmoid(float value)
         //{
-        //    //return 1.0 / (1.0 + (double)Math.Exp(-value));
+        //    //return 1.0 / (1.0 + (float)Math.Exp(-value));
         //    return 1.0 / (1.0 + Math.Exp(-value));
         //}
 
-        public void SetAlpha(double alpha)
+        public void SetAlpha(float alpha)
         {
             _alpha = alpha;
         }
 
-        //public void SetWeigths(double[] weights, int offset)
+        //public void SetWeigths(float[] weights, int offset)
         //{
         //    for (int i = 0; i < _queue.Neurons.Length; i++)
         //    {
@@ -188,14 +186,14 @@ namespace MasterDataFlow.Intelligence.Test
         //    }
         //}
 
-        public double[] GetWeigths()
+        public float[] GetWeigths()
         {
             return _weights;
         }
 
         public void CreateWeigths(int length)
         {
-            _weights = new double[length];
+            _weights = new float[length];
             //            int offset = 0;
             //            for (int i = 0; i < _queue.Neurons.Length; i++)
             //            {

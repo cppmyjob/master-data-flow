@@ -42,16 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advisors\BaseAdvisor.cs" />
     <Compile Include="Configs\CommandInitDataConfigSection.cs" />
     <Compile Include="Configs\ItemInitDataConfigSection.cs" />
     <Compile Include="Data\Bar.cs" />
     <Compile Include="Genetic\DirectionTester.cs" />
-    <Compile Include="Genetic\GeneticTestTrading.cs" />
     <Compile Include="Genetic\TradingCommand.cs" />
     <Compile Include="Indicators\ZigZagIndicator.cs" />
+    <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\ITrader.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Trade\BaseTrading.cs" />
+    <Compile Include="Advisors\NeuralNetworkAdvisor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">

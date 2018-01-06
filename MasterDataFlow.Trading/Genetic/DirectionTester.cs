@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Neuron;
+using MasterDataFlow.Intelligence.Neuron.SimpleNeuron;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Tester;
 
@@ -13,7 +15,7 @@ namespace MasterDataFlow.Trading.Genetic
     {
         public const int OUTPUT_NUMBER = 3;
 
-        private readonly GeneticNeuronDLL1 _dll;
+        private readonly ISimpleNeuron _neuron;
         private readonly TradingItem _tradingItem;
         private readonly LearningData _learningData;
         private const decimal START_DEPOSIT = 100000;
@@ -22,10 +24,10 @@ namespace MasterDataFlow.Trading.Genetic
 
         private float[] previuosOutput = new float[OUTPUT_NUMBER];
 
-        public DirectionTester(GeneticNeuronDLL1 dll, TradingItem tradingItem, LearningData learningData) 
+        public DirectionTester(ISimpleNeuron neuron, TradingItem tradingItem, LearningData learningData) 
             : base(START_DEPOSIT, learningData.Prices, 0, learningData.Prices.Length)
         {
-            _dll = dll;
+            _neuron = neuron;
             _tradingItem = tradingItem;
             _learningData = learningData;
         }
@@ -76,7 +78,7 @@ namespace MasterDataFlow.Trading.Genetic
 
             var zigzagValue = _learningData.ZigZags[index].Value;
 
-            var outputs = _dll.NetworkCompute(_inputs);
+            var outputs = _neuron.NetworkCompute(_inputs);
 
             if (TradingItemInitData.IS_RECURRENT)
             {
