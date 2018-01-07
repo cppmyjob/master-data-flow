@@ -306,8 +306,8 @@ namespace MasterDataFlow.Trading.Ui.Business
             var days = (endTestDate - startTrainingDate).TotalDays;
 
             var trainingDays = days * 60 / 100;
-            var validationDays = days * 20 / 100;
-            var testDays = days * 20 / 100;
+            var validationDays = days * 35 / 100;
+            var testDays = days * 5 / 100;
 
             var startValidationDate = startTrainingDate.AddDays(trainingDays);
             var startTestDate = startValidationDate.AddDays(validationDays);

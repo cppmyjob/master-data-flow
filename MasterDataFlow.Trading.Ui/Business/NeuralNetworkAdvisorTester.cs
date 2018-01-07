@@ -15,13 +15,13 @@ namespace MasterDataFlow.Trading.Ui.Business
 {
     public class NeuralNetworkAdvisorTester : AbstractTester, ITrader
     {
-        private NeuralNetworkAdvisor _advisor;
+        private readonly NeuralNetworkAdvisor _advisor;
 
-        public NeuralNetworkAdvisorTester(TradingItem tradingItem, NeuronNetwork neuronNetwork, 
+        public NeuralNetworkAdvisorTester(IAdvisorInfo advisorInfo, ILogger logger, TradingItem tradingItem, NeuronNetwork neuronNetwork, 
             decimal deposit, Bar[] prices, int @from, int length) : base(deposit, prices, @from, length)
         {
             var neuron = NeuronNetwork.CreateNeuronDll(neuronNetwork, tradingItem);
-            _advisor = new NeuralNetworkAdvisor(this, neuron);
+            _advisor = new NeuralNetworkAdvisor(advisorInfo, this, logger, neuron, tradingItem);
         }
 
         #region AbstractTester
@@ -38,7 +38,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             throw new NotImplementedException();
         }
 
-        public TickStatus CloseSellOrder()
+        public Operationtatus CloseSellOrder()
         {
             throw new NotImplementedException();
         }
@@ -48,17 +48,17 @@ namespace MasterDataFlow.Trading.Ui.Business
             throw new NotImplementedException();
         }
 
-        public TickStatus BuyOrder()
+        public Operationtatus BuyOrder()
         {
             throw new NotImplementedException();
         }
 
-        public TickStatus CloseBuyOrder()
+        public Operationtatus CloseBuyOrder()
         {
             throw new NotImplementedException();
         }
 
-        public TickStatus SellOrder()
+        public Operationtatus SellOrder()
         {
             throw new NotImplementedException();
         }

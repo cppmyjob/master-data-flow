@@ -13,8 +13,6 @@ namespace MasterDataFlow.Trading.Genetic
 {
     public class DirectionTester : Tester.DirectionTester
     {
-        public const int OUTPUT_NUMBER = 3;
-
         private readonly ISimpleNeuron _neuron;
         private readonly TradingItem _tradingItem;
         private readonly LearningData _learningData;
@@ -22,7 +20,7 @@ namespace MasterDataFlow.Trading.Genetic
 
         private int _zigZagFitness = 0;
 
-        private float[] previuosOutput = new float[OUTPUT_NUMBER];
+        private float[] previuosOutput = new float[TradingItemInitData.OUTPUT_NUMBER];
 
         public DirectionTester(ISimpleNeuron neuron, TradingItem tradingItem, LearningData learningData) 
             : base(START_DEPOSIT, learningData.Prices, 0, learningData.Prices.Length)
@@ -60,7 +58,7 @@ namespace MasterDataFlow.Trading.Genetic
         {
             if (_inputs == null)
             {
-              _inputs = new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber + (TradingItemInitData.IS_RECURRENT ? OUTPUT_NUMBER : 0)];
+              _inputs = new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)];
             }
 
             for (int i = 0; i < _tradingItem.InitData.InputData.Indicators.IndicatorNumber; i++)
@@ -73,7 +71,7 @@ namespace MasterDataFlow.Trading.Genetic
             if (TradingItemInitData.IS_RECURRENT)
             {
                 Array.Copy(previuosOutput, 0, _inputs,
-                    _tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber, OUTPUT_NUMBER);
+                    _tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber, TradingItemInitData.OUTPUT_NUMBER);
             }
 
             var zigzagValue = _learningData.ZigZags[index].Value;
@@ -82,7 +80,7 @@ namespace MasterDataFlow.Trading.Genetic
 
             if (TradingItemInitData.IS_RECURRENT)
             {
-                Array.Copy(outputs, previuosOutput, OUTPUT_NUMBER);
+                Array.Copy(outputs, previuosOutput, TradingItemInitData.OUTPUT_NUMBER);
             }
 
             var isBuySignal = outputs[0] > 0.5F;

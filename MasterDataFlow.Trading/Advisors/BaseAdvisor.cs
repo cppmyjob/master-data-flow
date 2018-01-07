@@ -8,78 +8,154 @@ using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Advisors
 {
-    public enum TickStatus
+    public enum Operationtatus
     {
         Ok,
         Repeat,
         Error,
     }
 
-    public enum AdvisorAction
+    public enum AdvisorStatus
     {
-        Nothing,
-        Hold = 0,
-        Close = 1,
-        Down = 2,
-        Up = 3
+        Init,
+    }
+
+    public enum AdvisorSignal
+    {
+        Skip = 0,
+        Hold = 1,
+        Close = 2,
+        Sell = 3,
+        Buy = 4
+    }
+
+
+    public interface IAdvisorInfo
+    {
+        bool IsLoaded { get; }
+
+        AdvisorStatus Status { get; }
+        DateTime? LastSignalTime { get; }
+        AdvisorSignal? LastSignal { get; }
+
+        void SetLastSignal(AdvisorSignal signal, DateTime time);
+        void SetStatus(AdvisorStatus status);
+
+        void Load();
+    }
+
+    public class AdvisorInfo : IAdvisorInfo
+    {
+        public AdvisorInfo()
+        {
+            Status = AdvisorStatus.Init;
+            IsLoaded = false;
+        }
+
+        public bool IsLoaded { get; internal set; }
+
+        public AdvisorStatus Status { get; private set; }
+
+        public DateTime? LastSignalTime { get; private set; }
+
+        public AdvisorSignal? LastSignal { get; private set; }
+
+        public void SetLastSignal(AdvisorSignal signal, DateTime time)
+        {
+            LastSignalTime = time;
+            LastSignal = signal;
+            Save();
+        }
+
+        public void SetStatus(AdvisorStatus status)
+        {
+            Status = status;
+            Save();
+        }
+
+        public void Load()
+        {
+            IsLoaded = true;
+        }
+
+        private void Save()
+        {
+            
+        }
     }
 
 
     public abstract class BaseAdvisor
     {
+        private readonly IAdvisorInfo _advisorInfo;
+        private readonly ILogger _logger;
         private readonly ITrader _trader;
 
-        protected BaseAdvisor(ITrader trader)
+        protected BaseAdvisor(IAdvisorInfo advisorInfo, ITrader trader, ILogger logger)
         {
+            _advisorInfo = advisorInfo;
+            _logger = logger;
             _trader = trader;
         }
 
-        public TickStatus Tick(DateTime time, decimal price)
+        public IAdvisorInfo Info
         {
-            var action = GetAction(time, price);
+            get { return _advisorInfo; }
+        }
+
+        public void Tick(DateTime time, decimal price)
+        {
+            if (_advisorInfo.Status == AdvisorStatus.Init)
+            {
+                if (!_advisorInfo.IsLoaded)
+                    _advisorInfo.Load();
+            }
+
+            var action = GetSignal(time, price);
             switch (action)
             {
-                case AdvisorAction.Down:
-                    return ProcessDown();
-                case AdvisorAction.Up:
-                    return ProcessUp();
-                case AdvisorAction.Hold:
+                case AdvisorSignal.Sell:
+                    _advisorInfo.SetLastSignal(action, DateTime.Now);
+                    ProcessSell();
                     break;
-                case AdvisorAction.Close:
+                case AdvisorSignal.Buy:
+                    _advisorInfo.SetLastSignal(action, DateTime.Now);
+                    ProcessBuy();
+                    break;
+                case AdvisorSignal.Hold:
+                    _advisorInfo.SetLastSignal(action, DateTime.Now);
+                    break;
+                case AdvisorSignal.Close:
+                    _advisorInfo.SetLastSignal(action, DateTime.Now);
+                    break;
+                case AdvisorSignal.Skip:
                     break;
             }
-            return TickStatus.Ok;
+            
         }
 
-        private TickStatus ProcessUp()
+        private void ProcessBuy()
         {
-            if (_trader.IsSellOrderExists())
-            {
-                var closeOrderStatus = _trader.CloseSellOrder();
-                if (closeOrderStatus != TickStatus.Ok)
-                    return closeOrderStatus;
-            }
-            if (_trader.IsBuyOrderExists())
-                return TickStatus.Ok;
+            //if (_trader.IsSellOrderExists())
+            //{
+            //    _info
 
-            return _trader.BuyOrder();
+            //    var closeOrderStatus = _trader.CloseSellOrder();
+            //    if (closeOrderStatus != Operationtatus.Ok)
+            //        return closeOrderStatus;
+            //}
+            //if (_trader.IsBuyOrderExists())
+            //    return Operationtatus.Ok;
+
+            //return _trader.BuyOrder();
         }
 
-        private TickStatus ProcessDown()
+        private void ProcessSell()
         {
-            if (_trader.IsBuyOrderExists())
-            {
-                var closeOrderStatus = _trader.CloseBuyOrder();
-                if (closeOrderStatus != TickStatus.Ok)
-                    return closeOrderStatus;
-            }
-            if (_trader.IsSellOrderExists())
-                return TickStatus.Ok;
 
-            return _trader.SellOrder();
         }
 
-        protected abstract AdvisorAction GetAction(DateTime time, decimal price);
+        protected abstract AdvisorSignal GetSignal(DateTime time, decimal price);
 
     }
 

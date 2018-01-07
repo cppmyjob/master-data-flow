@@ -10,10 +10,10 @@ namespace MasterDataFlow.Trading.Interfaces
     public interface ITrader
     {
         bool IsSellOrderExists();
-        TickStatus CloseSellOrder();
+        Operationtatus CloseSellOrder();
         bool IsBuyOrderExists();
-        TickStatus BuyOrder();
-        TickStatus CloseBuyOrder();
-        TickStatus SellOrder();
+        Operationtatus BuyOrder();
+        Operationtatus CloseBuyOrder();
+        Operationtatus SellOrder();
     }
 }

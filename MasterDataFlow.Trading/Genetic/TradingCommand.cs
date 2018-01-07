@@ -344,9 +344,9 @@ namespace MasterDataFlow.Trading.Genetic
         public const int HISTORY_WINDOW_LENGTH = 27;
 
         private static int[] NeuronsConfig = new int[] {
-            HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? DirectionTester.OUTPUT_NUMBER : 0),
-            1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? DirectionTester.OUTPUT_NUMBER : 0),
-            DirectionTester.OUTPUT_NUMBER,
+            HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
+            1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
+            TradingItemInitData.OUTPUT_NUMBER,
         };
 
         public void Read(XElement root)
@@ -424,6 +424,8 @@ namespace MasterDataFlow.Trading.Genetic
     public class TradingItemInitData : GeneticItemInitData
     {
         public const bool IS_RECURRENT = true;
+        public const int OUTPUT_NUMBER = 3;
+
 
         private NeuronNetwork _neuronNetwork;
         private int _historyWidowLength;

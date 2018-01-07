@@ -2,73 +2,68 @@
 using MasterDataFlow.Intelligence.Interfaces;
 using MasterDataFlow.Intelligence.Neuron;
 using MasterDataFlow.Intelligence.Neuron.SimpleNeuron;
+using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Advisors
 {
-    public enum NeuralNetworkAdvisorStatus
-    {
-        Init,
-
-    } 
-
-    public class NeuralNetworkAdvisorInfo
-    {
-        public NeuralNetworkAdvisorInfo()
-        {
-            Status = NeuralNetworkAdvisorStatus.Init;
-            IsLoaded = false;
-        }
-
-        internal bool IsLoaded { get; set; }
-
-        public NeuralNetworkAdvisorStatus Status { get; set; }
-
-        public void Load()
-        {
-
-            IsLoaded = true;
-        }
-    }
-
 
     public  class NeuralNetworkAdvisor : BaseAdvisor
     {
-        private readonly ISimpleNeuron _neuronNetwork;
-        private readonly NeuralNetworkAdvisorInfo _info = new NeuralNetworkAdvisorInfo();
+        private readonly ILogger _logger;
+        private readonly ISimpleNeuron _neuron;
+        private readonly TradingItem _tradingItem;
 
-        public NeuralNetworkAdvisor(ITrader trader, ISimpleNeuron neuronNetwork) : base(trader)
+        public NeuralNetworkAdvisor(IAdvisorInfo advisorInfo, 
+            ITrader trader, ILogger logger, ISimpleNeuron neuron, TradingItem tradingItem) : base(advisorInfo, trader, logger)
         {
-            _neuronNetwork = neuronNetwork;
+            _logger = logger;
+            _neuron = neuron;
+            _tradingItem = tradingItem;
         }
 
-        protected override AdvisorAction GetAction(DateTime time, decimal price)
+        protected override AdvisorSignal GetSignal(DateTime time, decimal price)
         {
-            switch (_info.Status)
+            if (!Info.LastSignalTime.HasValue || IsDifferentHour(Info.LastSignalTime.Value))
+                return CalculateSignal();
+            return AdvisorSignal.Skip;
+        }
+
+        private bool IsDifferentHour(DateTime last)
+        {
+            var currentTime = DateTime.Now;
+            if (currentTime - last >= new TimeSpan(1, 0, 0))
             {
-                case NeuralNetworkAdvisorStatus.Init:
-                    return ProcessInit(time, price);
-                    
+                return true;
             }
-
-            return AdvisorAction.Nothing;
+            return currentTime.Hour != last.Hour;
         }
 
-        private AdvisorAction ProcessInit(DateTime time, decimal price)
+        private AdvisorSignal CalculateSignal()
         {
-            if (!_info.IsLoaded)
-            {
-                _info.Load();
-                return GetAction(time, price);
-            }
+            var inputs =
+                new float[_tradingItem.InitData.HistoryWidowLength *
+                          _tradingItem.InitData.InputData.Indicators.IndicatorNumber +
+                          (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)];
+            var outputs = _neuron.NetworkCompute(inputs);
+            var isBuySignal = outputs[0] > 0.5F;
+            var isSellSignal = outputs[1] > 0.5F;
+            var isHoldSignal = outputs[2] > 0.5F;
 
-            return CheckSignal(time, price);
-        }
+            var isHold = !isBuySignal && !isSellSignal && isHoldSignal;
+            var isBuy = isBuySignal && !isSellSignal && !isHoldSignal;
+            var isSell = !isBuySignal && isSellSignal && !isHoldSignal;
+            var isClose = !(isHold || isBuy || isSell);
 
-        private AdvisorAction CheckSignal(DateTime time, decimal price)
-        {
-            throw new NotImplementedException();
+            if (isHold)
+                return AdvisorSignal.Hold;
+            if (isBuy)
+                return AdvisorSignal.Buy;
+            if (isSell)
+                return AdvisorSignal.Sell;
+
+            return AdvisorSignal.Close;
         }
     }
 
