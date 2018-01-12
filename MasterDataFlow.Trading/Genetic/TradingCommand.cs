@@ -19,11 +19,11 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class LearningDataIndicator :  IComparable
     {
-        public class IndicaorSearch
+        public class IndicatorSearch
         {
             private string _s;
 
-            public IndicaorSearch(string s)
+            public IndicatorSearch(string s)
             {
                 _s = s;
             }
@@ -890,7 +890,7 @@ namespace MasterDataFlow.Trading.Genetic
                         for (int i = 0; i < names.Length; i++)
                         {
                             var name = names[i];
-                            var search = new LearningDataIndicator.IndicaorSearch(name);
+                            var search = new LearningDataIndicator.IndicatorSearch(name);
                             var index = DataObject.TrainingData.Indicators.ToList().FindIndex(search.Match);
                             if (index < 0)
                                 throw new Exception("Invalid indicator name:" + name);

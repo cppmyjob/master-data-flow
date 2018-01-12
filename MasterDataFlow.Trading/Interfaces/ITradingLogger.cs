@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MasterDataFlow.Trading.Interfaces
 {
-    public interface ILogger
+    public interface ITradingLogger
     {
         void Info(string message);
         void Warn(string message);

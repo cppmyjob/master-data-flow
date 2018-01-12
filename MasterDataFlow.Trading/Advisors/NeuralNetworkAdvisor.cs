@@ -11,12 +11,12 @@ namespace MasterDataFlow.Trading.Advisors
 
     public  class NeuralNetworkAdvisor : BaseAdvisor
     {
-        private readonly ILogger _logger;
+        private readonly ITradingLogger _logger;
         private readonly ISimpleNeuron _neuron;
         private readonly TradingItem _tradingItem;
 
         public NeuralNetworkAdvisor(IAdvisorInfo advisorInfo, 
-            ITrader trader, ILogger logger, ISimpleNeuron neuron, TradingItem tradingItem) : base(advisorInfo, trader, logger)
+            ITrader trader, ITradingLogger logger, ISimpleNeuron neuron, TradingItem tradingItem) : base(advisorInfo, trader, logger)
         {
             _logger = logger;
             _neuron = neuron;

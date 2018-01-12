@@ -13,6 +13,7 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Tester;
 using MasterDataFlow.Trading.Ui.Business;
+using MasterDataFlow.Trading.Ui.Business.Teacher;
 using DirectionTester = MasterDataFlow.Trading.Tester.DirectionTester;
 
 namespace MasterDataFlow.Trading.Ui
@@ -232,6 +233,11 @@ namespace MasterDataFlow.Trading.Ui
                 }
             }
             
+        }
+
+        private void btnTesterStart_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

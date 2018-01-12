@@ -49,7 +49,7 @@
     <Compile Include="Genetic\DirectionTester.cs" />
     <Compile Include="Genetic\TradingCommand.cs" />
     <Compile Include="Indicators\ZigZagIndicator.cs" />
-    <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Interfaces\ITradingLogger.cs" />
     <Compile Include="Interfaces\ITrader.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

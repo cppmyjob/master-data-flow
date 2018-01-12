@@ -21,7 +21,7 @@ using Trady.Core.Infrastructure;
 using Trady.Importer.Csv;
 using DirectionTester = MasterDataFlow.Trading.Genetic.DirectionTester;
 
-namespace MasterDataFlow.Trading.Ui.Business
+namespace MasterDataFlow.Trading.Ui.Business.Teacher
 {
     public class DisplayChartPricesArgs
     {
@@ -217,7 +217,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             var csvImporter = new CsvImporter(@"Data\SBER.csv", new CultureInfo("en-US"));
             _candles = await csvImporter.ImportAsync("fb");
 
-            _tradingBars = CandlesToBars(_candles);
+            _tradingBars = Helper.CandlesToBars(_candles);
 
             CreateIndicatorsValues();
 
@@ -226,19 +226,7 @@ namespace MasterDataFlow.Trading.Ui.Business
             SetDataBoundaris(itemInitData);
         }
 
-        private Bar[] CandlesToBars(IEnumerable<IOhlcv> candles)
-        {
-            var result = candles.Select(t => new Bar
-            {
-                Close = t.Close,
-                High = t.High,
-                Low = t.Low,
-                Open = t.Open,
-                Volume = t.Volume,
-                Time = t.DateTime.DateTime,
-            }).ToArray();
-            return result;
-        }
+
 
         private void CreateIndicatorsValues()
         {
@@ -645,7 +633,7 @@ namespace MasterDataFlow.Trading.Ui.Business
 
         private float GetIndicatorIndex(LearningData learningData, string name)
         {
-            var search = new LearningDataIndicator.IndicaorSearch(name);
+            var search = new LearningDataIndicator.IndicatorSearch(name);
             var index = learningData.Indicators.ToList().FindIndex(search.Match);
             if (index < 0)
                 throw new Exception("Invalid indicator name:" + name);

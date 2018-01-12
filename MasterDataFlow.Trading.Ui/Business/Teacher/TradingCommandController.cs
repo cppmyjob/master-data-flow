@@ -1,4 +1,4 @@
-﻿namespace MasterDataFlow.Trading.Ui.Business
+﻿namespace MasterDataFlow.Trading.Ui.Business.Teacher
 {
     public class TradingCommandController : BaseCommandController
     {

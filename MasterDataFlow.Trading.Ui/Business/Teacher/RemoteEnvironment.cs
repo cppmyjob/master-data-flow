@@ -4,7 +4,7 @@ using MasterDataFlow.Keys;
 using MasterDataFlow.Network;
 using MasterDataFlow.Network.Packets;
 
-namespace MasterDataFlow.Trading.Ui.Business
+namespace MasterDataFlow.Trading.Ui.Business.Teacher
 {
     public class RemoteEnvironment : IDisposable
     {

@@ -11,14 +11,14 @@ using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Tester;
 
-namespace MasterDataFlow.Trading.Ui.Business
+namespace MasterDataFlow.Trading.Ui.Business.Advisor
 {
     public class NeuralNetworkAdvisorTester : SignleOrderTester, ITrader
     {
         private readonly TradingItem _tradingItem;
         private readonly NeuralNetworkAdvisor _advisor;
 
-        public NeuralNetworkAdvisorTester(IAdvisorInfo advisorInfo, ILogger logger, TradingItem tradingItem, NeuronNetwork neuronNetwork, 
+        public NeuralNetworkAdvisorTester(IAdvisorInfo advisorInfo, ITradingLogger logger, TradingItem tradingItem, NeuronNetwork neuronNetwork, 
             decimal deposit, Bar[] prices, int @from, int length) : base(deposit, prices, @from, length)
         {
             _tradingItem = tradingItem;

@@ -88,6 +88,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.btnOpenTestFile = new System.Windows.Forms.Button();
             this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
+            this.btnTesterStart = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -614,6 +615,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnTesterStart);
             this.groupBox3.Controls.Add(this.btnOpenTestFile);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBox3.Location = new System.Drawing.Point(3, 474);
@@ -636,6 +638,16 @@
             // ofdOpenTestFile
             // 
             this.ofdOpenTestFile.FileName = "openFileDialog1";
+            // 
+            // btnTesterStart
+            // 
+            this.btnTesterStart.Location = new System.Drawing.Point(472, 47);
+            this.btnTesterStart.Name = "btnTesterStart";
+            this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
+            this.btnTesterStart.TabIndex = 57;
+            this.btnTesterStart.Text = "Start";
+            this.btnTesterStart.UseVisualStyleBackColor = true;
+            this.btnTesterStart.Click += new System.EventHandler(this.btnTesterStart_Click);
             // 
             // MainForm
             // 
@@ -719,5 +731,6 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Button btnOpenTestFile;
         private System.Windows.Forms.OpenFileDialog ofdOpenTestFile;
+        private System.Windows.Forms.Button btnTesterStart;
     }
 }

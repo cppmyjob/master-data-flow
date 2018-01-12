@@ -44,54 +44,13 @@ namespace MasterDataFlow.Trading.Advisors
         void Load();
     }
 
-    public class AdvisorInfo : IAdvisorInfo
-    {
-        public AdvisorInfo()
-        {
-            Status = AdvisorStatus.Init;
-            IsLoaded = false;
-        }
-
-        public bool IsLoaded { get; internal set; }
-
-        public AdvisorStatus Status { get; private set; }
-
-        public DateTime? LastSignalTime { get; private set; }
-
-        public AdvisorSignal? LastSignal { get; private set; }
-
-        public void SetLastSignal(AdvisorSignal signal, DateTime time)
-        {
-            LastSignalTime = time;
-            LastSignal = signal;
-            Save();
-        }
-
-        public void SetStatus(AdvisorStatus status)
-        {
-            Status = status;
-            Save();
-        }
-
-        public void Load()
-        {
-            IsLoaded = true;
-        }
-
-        private void Save()
-        {
-            
-        }
-    }
-
-
     public abstract class BaseAdvisor
     {
         private readonly IAdvisorInfo _advisorInfo;
-        private readonly ILogger _logger;
+        private readonly ITradingLogger _logger;
         private readonly ITrader _trader;
 
-        protected BaseAdvisor(IAdvisorInfo advisorInfo, ITrader trader, ILogger logger)
+        protected BaseAdvisor(IAdvisorInfo advisorInfo, ITrader trader, ITradingLogger logger)
         {
             _advisorInfo = advisorInfo;
             _logger = logger;
