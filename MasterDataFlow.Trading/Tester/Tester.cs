@@ -226,19 +226,16 @@ namespace MasterDataFlow.Trading.Tester
 
     }
 
-    public abstract class DirectionTester : AbstractTester
+    public abstract class DirectionTester : SignleOrderTester
     {
-        protected Order _currentOrder;
 
         public DirectionTester(decimal deposit, Bar[] prices, int from, int length) :
             base(deposit, prices, from, length)
         {
-            _currentOrder = null;
             _lastBarNumber = -1;
         }
 
         protected abstract Direction GetDirection(int index);
-        protected abstract decimal GetStopLoss();
 
         private int _lastBarNumber = -1;
 
@@ -299,7 +296,24 @@ namespace MasterDataFlow.Trading.Tester
 
         }
 
-        private Order Buy()
+
+    }
+
+    public abstract class SignleOrderTester : AbstractTester
+    {
+        protected Order _currentOrder;
+
+        protected SignleOrderTester(decimal deposit, Bar[] prices, int from, int length) :
+            base(deposit, prices, from, length)
+        {
+            _currentOrder = null;
+
+        }
+
+        protected abstract decimal GetStopLoss();
+
+
+        protected Order Buy()
         {
             decimal stopLossValue = GetStopLoss();
             decimal stopLoss = 0.0m;
@@ -312,7 +326,7 @@ namespace MasterDataFlow.Trading.Tester
             return order;
         }
 
-        private Order Sell()
+        protected Order Sell()
         {
             decimal stopLossValue = GetStopLoss();
             decimal stopLoss = 0.0m;
@@ -325,6 +339,7 @@ namespace MasterDataFlow.Trading.Tester
             return order;
         }
     }
+
 
     public abstract class AbstractTester
     {

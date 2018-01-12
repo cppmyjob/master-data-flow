@@ -136,18 +136,14 @@ namespace MasterDataFlow.Trading.Advisors
 
         private void ProcessBuy()
         {
-            //if (_trader.IsSellOrderExists())
-            //{
-            //    _info
-
-            //    var closeOrderStatus = _trader.CloseSellOrder();
-            //    if (closeOrderStatus != Operationtatus.Ok)
-            //        return closeOrderStatus;
-            //}
-            //if (_trader.IsBuyOrderExists())
-            //    return Operationtatus.Ok;
-
-            //return _trader.BuyOrder();
+            if (_trader.IsSellOrderExists())
+            {
+                _trader.CloseSellOrder();
+            }
+            if (!_trader.IsBuyOrderExists())
+            {
+                _trader.BuyOrder();
+            }
         }
 
         private void ProcessSell()

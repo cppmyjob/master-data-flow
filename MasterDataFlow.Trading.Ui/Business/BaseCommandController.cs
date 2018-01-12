@@ -419,10 +419,10 @@ namespace MasterDataFlow.Trading.Ui.Business
                     WriteNew(writer, _indicators, item);
                 }
 
-                if (!(
-                    item.TrainingTesterResult.Profit > 0 && item.ValidationTesterResult.Profit > 0
-                    && futureResult.Profit > 0)
-                ) return;
+                //if (!(
+                //    item.TrainingTesterResult.Profit > 0 && item.ValidationTesterResult.Profit > 0
+                //    && futureResult.Profit > 0)
+                //) return;
 
 
                 lastGuid = item.Guid;

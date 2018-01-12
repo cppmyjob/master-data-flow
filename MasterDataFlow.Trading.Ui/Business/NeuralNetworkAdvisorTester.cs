@@ -13,13 +13,15 @@ using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Ui.Business
 {
-    public class NeuralNetworkAdvisorTester : AbstractTester, ITrader
+    public class NeuralNetworkAdvisorTester : SignleOrderTester, ITrader
     {
+        private readonly TradingItem _tradingItem;
         private readonly NeuralNetworkAdvisor _advisor;
 
         public NeuralNetworkAdvisorTester(IAdvisorInfo advisorInfo, ILogger logger, TradingItem tradingItem, NeuronNetwork neuronNetwork, 
             decimal deposit, Bar[] prices, int @from, int length) : base(deposit, prices, @from, length)
         {
+            _tradingItem = tradingItem;
             var neuron = NeuronNetwork.CreateNeuronDll(neuronNetwork, tradingItem);
             _advisor = new NeuralNetworkAdvisor(advisorInfo, this, logger, neuron, tradingItem);
         }
@@ -30,37 +32,55 @@ namespace MasterDataFlow.Trading.Ui.Business
         {
             _advisor.Tick(CurrentTime, CurrentPrice);
         }
+
+        protected override decimal GetStopLoss()
+        {
+            return (decimal)_tradingItem.StopLoss;
+        }
+
         #endregion
 
         #region ITrader
         public bool IsSellOrderExists()
         {
-            throw new NotImplementedException();
+            return _currentOrder?.Type == OrderType.Sell;
         }
 
         public Operationtatus CloseSellOrder()
         {
-            throw new NotImplementedException();
+            if (_currentOrder.Type == OrderType.Sell)
+            {
+                CloseOrder(_currentOrder.Ticket);
+                _currentOrder = null;
+            }
+            return Operationtatus.Ok;
         }
 
         public bool IsBuyOrderExists()
         {
-            throw new NotImplementedException();
+            return _currentOrder?.Type == OrderType.Buy;
         }
 
         public Operationtatus BuyOrder()
         {
-            throw new NotImplementedException();
+            Buy();
+            return Operationtatus.Ok;
         }
 
         public Operationtatus CloseBuyOrder()
         {
-            throw new NotImplementedException();
+            if (_currentOrder.Type == OrderType.Buy)
+            {
+                CloseOrder(_currentOrder.Ticket);
+                _currentOrder = null;
+            }
+            return Operationtatus.Ok;
         }
 
         public Operationtatus SellOrder()
         {
-            throw new NotImplementedException();
+            Sell();
+            return Operationtatus.Ok;
         }
 
         #endregion
