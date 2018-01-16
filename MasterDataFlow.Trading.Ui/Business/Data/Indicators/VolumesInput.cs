@@ -4,23 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MasterDataFlow.Trading.Data;
+using Trady.Analysis;
 using Trady.Analysis.Extension;
+using Trady.Core.Infrastructure;
 
 namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
 {
-    public class MacdSignalLineIndicatorInput : BaseInput
+    public class VolumesInput : BaseInput
     {
-        public MacdSignalLineIndicatorInput() : base("MACD SignalLine")
+        public VolumesInput() : base("Volumes")
         {
         }
 
         public override InputValues GetValues(Bar[] bars)
         {
-            var candles = Helper.BarsToCandles(bars);
-            var macds = candles.Macd(12, 26, 9);
-            var values = macds.Select(t => new InputValue(t.DateTime.Value.DateTime, (float) t.Tick.SignalLine)).ToArray();
+            var values = bars.Select(t => new InputValue(t.Time, (float)t.Volume)).ToArray();
             var result = new InputValues(Name, values);
             return result;
+
         }
     }
+
+
+
 }

@@ -14,11 +14,12 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
         {
         }
 
-        public override InputValue[] GetValues(Bar[] bars)
+        public override InputValues GetValues(Bar[] bars)
         {
             var candles = Helper.BarsToCandles(bars);
             var macds = candles.Macd(12, 26, 9);
-            var result = macds.Select(t => new InputValue(t.DateTime.Value.DateTime, (float) t.Tick.MacdHistogram)).ToArray();
+            var values = macds.Select(t => new InputValue(t.DateTime.Value.DateTime, (float) t.Tick.MacdHistogram)).ToArray();
+            var result = new InputValues(Name, values);
             return result;
         }
     }

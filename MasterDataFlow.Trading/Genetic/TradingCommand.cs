@@ -17,7 +17,7 @@ namespace MasterDataFlow.Trading.Genetic
 {
 
     [Serializable]
-    public class LearningDataIndicator :  IComparable
+    public class LearningInputData :  IComparable
     {
         public class IndicatorSearch
         {
@@ -28,7 +28,7 @@ namespace MasterDataFlow.Trading.Genetic
                 _s = s;
             }
 
-            public bool Match(LearningDataIndicator e)
+            public bool Match(LearningInputData e)
             {
                 return e.Name == _s;
             }
@@ -38,24 +38,24 @@ namespace MasterDataFlow.Trading.Genetic
         public float[] Values { get; set; }
         public DateTime[] Times { get; set; }
 
-        public void Normalize()
-        {
-            var min = Values.Min();
-            var max = Values.Max();
-            var diff = max - min;
-            var offset = diff * 20 / 100;
-            min = min - offset;
-            max = max + offset;
+        //public void Normalize()
+        //{
+        //    var min = Values.Min();
+        //    var max = Values.Max();
+        //    var diff = max - min;
+        //    var offset = diff * 20 / 100;
+        //    min = min - offset;
+        //    max = max + offset;
 
-            diff = max - min;
+        //    diff = max - min;
 
-            Values = Values.Select(t => (t - min) / diff ).ToArray();
+        //    Values = Values.Select(t => (t - min) / diff ).ToArray();
 
-        }
+        //}
 
         public int CompareTo(object o)
         {
-            if (!(o is LearningDataIndicator indicator))
+            if (!(o is LearningInputData indicator))
                 throw new ArgumentException("o is not an LearningDataIndicator object.");
 
             return String.Compare(Name, indicator.Name, StringComparison.Ordinal);
@@ -73,7 +73,7 @@ namespace MasterDataFlow.Trading.Genetic
     public class LearningData
     {
         public Bar[] Prices { get; set; }
-        public LearningDataIndicator[] Indicators { get; set; }
+        public LearningInputData[] Indicators { get; set; }
         //public LearningDataIndicator Values { get; set; }
         public ZigZagValue[] ZigZags { get; set; }
     }
@@ -121,7 +121,7 @@ namespace MasterDataFlow.Trading.Genetic
     }
 
     [Serializable]
-    public class InputData
+    public class InputDataSection
     {
         public Indicators Indicators { get; } = new Indicators();
 
@@ -454,7 +454,7 @@ namespace MasterDataFlow.Trading.Genetic
             get { return OFFSET + InputData.Indicators.IndicatorNumber + 2; }
         }
 
-        public InputData InputData { get; } = new InputData();
+        public InputDataSection InputData { get; } = new InputDataSection();
         public Optimizer Optimizer { get; } = new Optimizer();
 
         public TradingItemInitData() : this(new NeuronNetwork())
@@ -890,7 +890,7 @@ namespace MasterDataFlow.Trading.Genetic
                         for (int i = 0; i < names.Length; i++)
                         {
                             var name = names[i];
-                            var search = new LearningDataIndicator.IndicatorSearch(name);
+                            var search = new LearningInputData.IndicatorSearch(name);
                             var index = DataObject.TrainingData.Indicators.ToList().FindIndex(search.Match);
                             if (index < 0)
                                 throw new Exception("Invalid indicator name:" + name);

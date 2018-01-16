@@ -14,6 +14,7 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Indicators;
 using MasterDataFlow.Trading.Tester;
+using MasterDataFlow.Trading.Ui.Business.Data;
 using Microsoft.CodeAnalysis.CSharp;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
@@ -101,7 +102,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private Bar[] _tradingBars = null;
         private int[] _zigZag = null;
         private ZigZagValue[] _zigZagLearningData = null;
-        private List<LearningDataIndicator> _indicators = null;
+        private InputData _inputData = new InputData();
         private LearningData _trainingData = null;
         private LearningData _validationData = null;
         private LearningData _testData = null;
@@ -219,72 +220,10 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
             _tradingBars = Helper.CandlesToBars(_candles);
 
-            CreateIndicatorsValues();
-
             CalculateZigZag();
 
             SetDataBoundaris(itemInitData);
         }
-
-
-
-        private void CreateIndicatorsValues()
-        {
-            _indicators = new List<LearningDataIndicator>();
-
-            // RSI
-            AddIndicator("RSI 3", _candles.Rsi(3));
-            AddIndicator("RSI 7", _candles.Rsi(7));
-            AddIndicator("RSI 14", _candles.Rsi(14));
-            AddIndicator("RSI 21", _candles.Rsi(21));
-            AddIndicator("RSI 28", _candles.Rsi(28));
-
-            // Parabolic SAR
-            var psar = _candles.Sar(0.02M, 0.2M);
-            AddIndicator("SAR", psar);
-
-            // EMA
-            AddIndicator("EMA 3", _candles.Ema(3));
-            AddIndicator("EMA 5", _candles.Ema(5));
-            AddIndicator("EMA 10", _candles.Ema(10));
-            AddIndicator("EMA 15", _candles.Ema(15));
-            AddIndicator("EMA 20", _candles.Ema(20));
-            AddIndicator("EMA 25", _candles.Ema(25));
-
-            // MACD
-            var macds = _candles.Macd(12, 26, 9);
-
-            AddIndicator("MACD Histogram", macds.Select(t => (float)t.Tick.MacdHistogram).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            AddIndicator("MACD SignalLine", macds.Select(t => (float)t.Tick.SignalLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-            AddIndicator("MACD Line", macds.Select(t => (float)t.Tick.MacdLine).ToArray(), macds.Select(t => t.DateTime.Value.DateTime).ToArray());
-
-            AddIndicator("Volumes", _tradingBars.Select(t => (float)t.Volume).ToArray(),
-                _tradingBars.Select(t => t.Time).ToArray());
-        }
-
-        private void AddIndicator(string name, float[] values, DateTime[] times)
-        {
-            var indicator = new LearningDataIndicator
-            {
-                Name = name,
-                Values = values,
-                Times = times,
-            };
-            _indicators.Add(indicator);
-        }
-
-        private void AddIndicator(string name, IReadOnlyList<AnalyzableTick<decimal?>> ticks)
-        {
-            var indicator = new LearningDataIndicator
-            {
-                Name = name,
-                Values = ticks.Select(t => t.Tick.HasValue ? (float)t.Tick.Value : 0F).ToArray(),
-                Times = ticks.Select(t => t.DateTime.HasValue ? t.DateTime.Value.DateTime : new DateTime()).ToArray(),
-            };
-            _indicators.Add(indicator);
-        }
-
-        // https://www.youtube.com/watch?v=IGKSaH4yz-g
 
         private void SetDataBoundaris(TradingItemInitData itemInitData)
         {
@@ -294,51 +233,64 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             var days = (endTestDate - startTrainingDate).TotalDays;
 
             var trainingDays = days * 60 / 100;
-            var validationDays = days * 35 / 100;
-            var testDays = days * 5 / 100;
+            //var validationDays = days * 35 / 100;
+            //var testDays = days * 5 / 100;
+
+            var validationDays = days * 20 / 100;
+            var testDays = days * 20 / 100;
+
 
             var startValidationDate = startTrainingDate.AddDays(trainingDays);
             var startTestDate = startValidationDate.AddDays(validationDays);
 
-            //var startTestDate = new DateTime(2017, 12, 9);
+            var inputValues = new List<InputValues>();
+            var inputs = _inputData.GetInputs();
+            foreach (var input in inputs)
+            {
+                var values = input.GetValues(_tradingBars);
+                inputValues.Add(values);
+                if (itemInitData.InputData.Indicators.IsNormalizeValues)
+                    input.Normalize(values);
 
-            _trainingData = CreateLearningData(itemInitData, startTrainingDate, trainingDays);
-            _validationData = CreateLearningData(itemInitData, startValidationDate, validationDays);
-            _testData = CreateLearningData(itemInitData, startTestDate, testDays);
+            }
+
+            _trainingData = CreateLearningData(itemInitData, inputValues, startTrainingDate, trainingDays);
+            _validationData = CreateLearningData(itemInitData, inputValues, startValidationDate, validationDays);
+            _testData = CreateLearningData(itemInitData, inputValues, startTestDate, testDays);
 
             SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(startTrainingDate, startValidationDate, startTestDate));
         }
 
-        private LearningData CreateLearningData(TradingItemInitData itemInitData, DateTime startDate, double days)
+        private LearningData CreateLearningData(TradingItemInitData itemInitData, List<InputValues> inputValues, DateTime startDate, double days)
         {
             var result = new LearningData();
             result.Prices = _tradingBars
                 .SkipWhile(t => t.Time < startDate)
                 .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();
 
-            var indicators = new List<LearningDataIndicator>();
+            var indicators = new List<LearningInputData>();
 
 
             var firstTime = result.Prices[0].Time;
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
-            var firstIndicatorIndex = Array.IndexOf(_indicators[0].Times, firstTime) - itemInitData.HistoryWidowLength - 1;
-            var lastIndicatorIndex = Array.IndexOf(_indicators[0].Times, lastTime) - 1;
+            var initTimes = inputValues[0].Values.Select(t => t.Time).ToArray();
+            var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength - 1;
+            var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime) - 1;
 
-            foreach (var indicator in _indicators)
+            foreach (var inputValue in inputValues)
             {
-                var learningIndicator = new LearningDataIndicator
+                var learningIndicator = new LearningInputData
                 {
-                    Name = indicator.Name,
+                    Name = inputValue.Name,
                     Values = new float[lastIndicatorIndex - firstIndicatorIndex + 1],
                     Times = new DateTime[lastIndicatorIndex - firstIndicatorIndex + 1],
                 };
-
-                Array.Copy(indicator.Values, firstIndicatorIndex, learningIndicator.Values, 0, learningIndicator.Values.Length);
-                Array.Copy(indicator.Times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
+                var values = inputValue.Values.Select(t => t.Value).ToArray();
+                var times = inputValue.Values.Select(t => t.Time).ToArray();
+                Array.Copy(values, firstIndicatorIndex, learningIndicator.Values, 0, learningIndicator.Values.Length);
+                Array.Copy(times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
                 indicators.Add(learningIndicator);
-                if (itemInitData.InputData.Indicators.IsNormalizeValues)
-                    learningIndicator.Normalize();
             }
             result.Indicators = indicators.ToArray();
 
@@ -404,7 +356,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
                 using (StreamWriter writer = new StreamWriter("genetic.save"))
                 {
-                    WriteNew(writer, _indicators, item);
+                    WriteNew(writer, item);
                 }
 
                 //if (!(
@@ -491,7 +443,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             StreamWriter writer = new StreamWriter("Best/" + item.Guid.ToString() + ".save");
             try
             {
-                WriteNew(writer, _indicators, item);
+                WriteNew(writer, item);
             }
             finally
             {
@@ -499,18 +451,18 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             }
         }
 
-        private void WriteNew(TextWriter writer, List<LearningDataIndicator> indicators, TradingItem item)
+        private void WriteNew(TextWriter writer, TradingItem item)
         {
             XElement root = new XElement("genetic");
 
             item.InitData.Write(root);
 
-            WriteItem(root, indicators, item);
+            WriteItem(root, item);
             root.Save(writer);
         }
 
 
-        private void WriteItem(XElement root, List<LearningDataIndicator> indicators, TradingItem item)
+        private void WriteItem(XElement root, TradingItem item)
         {
             var itemElement = new XElement("item");
             root.Add(itemElement);
@@ -530,7 +482,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
                 var value = item.Values[i];
                 var v = new XElement("v", value.ToString(CultureInfo.InvariantCulture));
                 v.Add(new XAttribute("type", "indicator"));
-                v.Add(new XAttribute("name", indicators[(int)value].Name));
+                
+                v.Add(new XAttribute("name", _inputData.GetInputs()[(int)value].Name));
                 namedValues.Add(v);
             }
 
@@ -633,7 +586,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private float GetIndicatorIndex(LearningData learningData, string name)
         {
-            var search = new LearningDataIndicator.IndicatorSearch(name);
+            var search = new LearningInputData.IndicatorSearch(name);
             var index = learningData.Indicators.ToList().FindIndex(search.Match);
             if (index < 0)
                 throw new Exception("Invalid indicator name:" + name);

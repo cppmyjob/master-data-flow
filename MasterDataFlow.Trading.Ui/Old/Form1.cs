@@ -20,6 +20,7 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Indicators;
 using MasterDataFlow.Trading.Tester;
+using MasterDataFlow.Trading.Ui.Business.Teacher;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
 using Trady.Analysis.Indicator;
@@ -28,7 +29,7 @@ using Trady.Core.Infrastructure;
 using Trady.Importer;
 using Trady.Importer.Csv;
 using DirectionTester = MasterDataFlow.Trading.Genetic.DirectionTester;
-using RemoteEnvironment = MasterDataFlow.Trading.Ui.Business.RemoteEnvironment;
+
 
 namespace MasterDataFlow.Trading.Ui
 {
@@ -264,7 +265,7 @@ namespace MasterDataFlow.Trading.Ui
         private Bar[] _tradingBars = null;
         private int[] _zigZag = null;
         private ZigZagValue[] _zigZagLearningData = null;
-        private List<LearningDataIndicator> _indicators = null;
+        private List<LearningInputData> _indicators = null;
         private LearningData _trainingData = null;
         private LearningData _validationData = null;
         private LearningData _testData = null;
@@ -323,7 +324,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private void CreateIndicatorsValues()
         {
-            _indicators = new List<LearningDataIndicator>();
+            _indicators = new List<LearningInputData>();
 
             // RSI
             AddIndicator("RSI 3", _candles.Rsi(3));
@@ -358,7 +359,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private void AddIndicator(string name, float[] values, DateTime[] times)
         {
-            var indicator = new LearningDataIndicator
+            var indicator = new LearningInputData
                             {
                                 Name = name,
                                 Values = values,
@@ -369,7 +370,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private void AddIndicator(string name, IReadOnlyList<AnalyzableTick<decimal?>> ticks)
         {
-            var indicator = new LearningDataIndicator
+            var indicator = new LearningInputData
                             {
                                 Name = name,
                                 Values = ticks.Select(t => t.Tick.HasValue ? (float)t.Tick.Value : 0F).ToArray(),
@@ -412,7 +413,7 @@ namespace MasterDataFlow.Trading.Ui
                 .SkipWhile(t => t.Time < startDate)
                 .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();
 
-            var indicators = new List<LearningDataIndicator>();
+            var indicators = new List<LearningInputData>();
 
 
             var firstTime = result.Prices[0].Time;
@@ -423,7 +424,7 @@ namespace MasterDataFlow.Trading.Ui
 
             foreach (var indicator in _indicators)
             {
-                var learningIndicator = new LearningDataIndicator
+                var learningIndicator = new LearningInputData
                 {
                     Name = indicator.Name,
                     Values = new float[lastIndicatorIndex - firstIndicatorIndex + 1],
@@ -555,7 +556,7 @@ namespace MasterDataFlow.Trading.Ui
         }
 
 
-        public void WriteNew(TextWriter writer, List<LearningDataIndicator> indicators, TradingItem item)
+        public void WriteNew(TextWriter writer, List<LearningInputData> indicators, TradingItem item)
         {
             XElement root = new XElement("genetic");
 
@@ -566,7 +567,7 @@ namespace MasterDataFlow.Trading.Ui
         }
 
 
-        private void WriteItem(XElement root, List<LearningDataIndicator> indicators, TradingItem item)
+        private void WriteItem(XElement root, List<LearningInputData> indicators, TradingItem item)
         {
             var itemElement = new XElement("item");
             root.Add(itemElement);

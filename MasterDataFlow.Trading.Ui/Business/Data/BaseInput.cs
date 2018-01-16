@@ -7,6 +7,18 @@ using MasterDataFlow.Trading.Data;
 
 namespace MasterDataFlow.Trading.Ui.Business.Data
 {
+    public class InputValues
+    {
+        public InputValues(string name, InputValue[] values)
+        {
+            Name = name;
+            Values = values;
+        }
+
+        public string Name { get; private set; }
+        public InputValue[] Values { get; private set; }
+    }
+
     public class InputValue
     {
         public InputValue()
@@ -48,12 +60,12 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
 
         public string Name { get; private set; }
 
-        public abstract InputValue[] GetValues(Bar[] bars);
+        public abstract InputValues GetValues(Bar[] bars);
 
-        public void Normalize(InputValue[] values)
+        public void Normalize(InputValues values)
         {
-            var min = values.Select(t => t.Value).Min();
-            var max = values.Select(t => t.Value).Max();
+            var min = values.Values.Select(t => t.Value).Min();
+            var max = values.Values.Select(t => t.Value).Max();
             var diff = max - min;
             var offset = diff * 20 / 100;
             min = min - offset;
@@ -61,7 +73,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
 
             diff = max - min;
 
-            foreach (var t in values)
+            foreach (var t in values.Values)
             {
                 t.Value = (t.Value - min) / diff;
             }
