@@ -14,13 +14,15 @@ namespace MasterDataFlow.Trading.Advisors
         private readonly ITradingLogger _logger;
         private readonly ISimpleNeuron _neuron;
         private readonly TradingItem _tradingItem;
+        private readonly IInputDataCollection _inputDataCollection;
 
         public NeuralNetworkAdvisor(IAdvisorInfo advisorInfo, 
-            ITrader trader, ITradingLogger logger, ISimpleNeuron neuron, TradingItem tradingItem) : base(advisorInfo, trader, logger)
+            ITrader trader, ITradingLogger logger, ISimpleNeuron neuron, IInputDataCollection inputDataCollection, TradingItem tradingItem) : base(advisorInfo, trader, logger)
         {
             _logger = logger;
             _neuron = neuron;
             _tradingItem = tradingItem;
+            _inputDataCollection = inputDataCollection;
         }
 
         protected override AdvisorSignal GetSignal(DateTime time, decimal price)
@@ -43,9 +45,11 @@ namespace MasterDataFlow.Trading.Advisors
         private AdvisorSignal CalculateSignal()
         {
             var inputs =
-                new float[_tradingItem.InitData.HistoryWidowLength *
-                          _tradingItem.InitData.InputData.Indicators.IndicatorNumber +
+                new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber +
                           (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)];
+           
+
+
             var outputs = _neuron.NetworkCompute(inputs);
             var isBuySignal = outputs[0] > 0.5F;
             var isSellSignal = outputs[1] > 0.5F;

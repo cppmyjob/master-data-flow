@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MasterDataFlow.Trading.Data;
+using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Ui.Business.Data.Indicators;
 
 namespace MasterDataFlow.Trading.Ui.Business.Data
 {
-    public class InputData
+    public class InputDataCollection : IInputDataCollection
     {
         private IDictionary<string, BaseInput> _inputsDict = new Dictionary<string, BaseInput>();
+        private readonly List<BaseInput> _inputsList = new List<BaseInput>();
 
-        public InputData()
+        public InputDataCollection()
         {
             // RSI
             Add(new RsiIndicatorInput(3));
@@ -40,20 +44,13 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
 
         public void Add(BaseInput input)
         {
+            _inputsList.Add(input);
             _inputsDict.Add(input.Name, input);
         }
 
-        public BaseInput GetInput(string name)
+        public List<BaseInput> GetInputs()
         {
-            BaseInput result;
-            if (_inputsDict.TryGetValue(name, out result))
-                return result;
-            return null;
-        }
-
-        public BaseInput[] GetInputs()
-        {
-            return _inputsDict.Values.ToArray();
+            return _inputsList;
         }
 
     }

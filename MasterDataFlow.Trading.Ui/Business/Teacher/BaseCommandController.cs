@@ -15,6 +15,7 @@ using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Indicators;
 using MasterDataFlow.Trading.Tester;
 using MasterDataFlow.Trading.Ui.Business.Data;
+using MasterDataFlow.Trading.Ui.Business.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
@@ -102,10 +103,13 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private Bar[] _tradingBars = null;
         private int[] _zigZag = null;
         private ZigZagValue[] _zigZagLearningData = null;
-        private InputData _inputData = new InputData();
+        private readonly InputDataCollection _inputData = new InputDataCollection();
         private LearningData _trainingData = null;
         private LearningData _validationData = null;
         private LearningData _testData = null;
+
+        private readonly Reader _reader = new Reader();
+        private readonly Writer _writer = new Writer();
 
         private const int IndicatorsOffset = 50;
 
@@ -154,7 +158,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
                         DisplayChartPrices();
 
-                        var tradingItem = LoadItem(_dataObject.ItemInitData, _dataObject.TrainingData);
+                        var tradingItem = _reader.ReadItem(_dataObject.ItemInitData);
+                        DisplayBest(tradingItem);
                         if (tradingItem != null)
                         {
                             _dataObject.InitPopulation = new List<float[]>();
@@ -201,7 +206,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private async Task<TradingDataObject> CreateDataObject()
         {
-            var itemInitData = LoadItemInitData();
+            var itemInitData = _reader.ReadItemInitData();
 
             await LoadInputData(itemInitData);
 
@@ -338,276 +343,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             }
         }
 
-        #region Read Write Region 
-
-        private Guid lastGuid;
-
-        private void SaveBest(TradingItem item, TesterResult futureResult)
-        {
-            lock (this)
-            {
-
-                if (item.TrainingTesterResult == null || item.ValidationTesterResult == null)
-                    return;
-
-                if (lastGuid != null && lastGuid.ToString() == item.Guid.ToString())
-                    return;
-
-
-                using (StreamWriter writer = new StreamWriter("genetic.save"))
-                {
-                    WriteNew(writer, item);
-                }
-
-                //if (!(
-                //    item.TrainingTesterResult.Profit > 0 && item.ValidationTesterResult.Profit > 0
-                //    && futureResult.Profit > 0)
-                //) return;
-
-
-                lastGuid = item.Guid;
-
-                if (!Directory.Exists("Best"))
-                {
-                    Directory.CreateDirectory("Best");
-                }
-                string fileName = "Best/best.csv";
-
-                bool isNoFile = !File.Exists(fileName);
-
-                using (StreamWriter writer = new StreamWriter(fileName, true))
-                {
-                    if (isNoFile)
-                        AddHeader(writer);
-                    AddItemToFile(writer, item, futureResult);
-                }
-                SaveBestItem(item);
-            }
-        }
-
-        private void AddHeader(StreamWriter writer)
-        {
-            string line =
-                "Date, ";
-            line += "Guid, ";
-            line += "Fitness, ";
-            line += "StopLoss, ";
-            line += AddHeaderTestResult("tr");
-            line += AddHeaderTestResult("pr");
-            line += AddHeaderTestResult("fr");
-            writer.WriteLine(line);
-        }
-
-        private string AddHeaderTestResult(string prefix)
-        {
-            string line = "";
-            line += prefix + ".Profit, ";
-            line += prefix + ".OrderCount, ";
-            line += prefix + ".PlusCount, ";
-            line += prefix + ".MinusCount, ";
-            line += prefix + ".MaxEquity, ";
-            line += prefix + ".MinEquity, ";
-            line += prefix + ".PlusEquityCount, ";
-            line += prefix + ".MinusEquityCount, ";
-            return line;
-        }
-
-        private void AddItemToFile(StreamWriter writer, TradingItem item, TesterResult futureResult)
-        {
-            string line = DateTime.Now.ToString(CultureInfo.InvariantCulture) + ", ";
-            line += item.Guid.ToString() + ", ";
-            line += item.Fitness.ToString("F10") + ", ";
-            line += item.StopLoss.ToString("F10") + ", ";
-            line = SaveTestResult(item.TrainingTesterResult, line);
-            line = SaveTestResult(item.ValidationTesterResult, line);
-            line = SaveTestResult(futureResult, line);
-
-            writer.WriteLine(line);
-        }
-
-        private string SaveTestResult(TesterResult tr, string line)
-        {
-            line += tr.Profit.ToString("F10") + ", ";
-            line += tr.OrderCount.ToString("D") + ", ";
-            line += tr.PlusCount.ToString("D") + ", ";
-            line += tr.MinusCount.ToString("D") + ", ";
-            line += tr.MaxEquity.ToString("F10") + ", ";
-            line += tr.MinEquity.ToString("F10") + ", ";
-            line += tr.PlusEquityCount.ToString("D") + ", ";
-            line += tr.MinusEquityCount.ToString("D") + ", ";
-            return line;
-        }
-
-        private void SaveBestItem(TradingItem item)
-        {
-            StreamWriter writer = new StreamWriter("Best/" + item.Guid.ToString() + ".save");
-            try
-            {
-                WriteNew(writer, item);
-            }
-            finally
-            {
-                writer.Close();
-            }
-        }
-
-        private void WriteNew(TextWriter writer, TradingItem item)
-        {
-            XElement root = new XElement("genetic");
-
-            item.InitData.Write(root);
-
-            WriteItem(root, item);
-            root.Save(writer);
-        }
-
-
-        private void WriteItem(XElement root, TradingItem item)
-        {
-            var itemElement = new XElement("item");
-            root.Add(itemElement);
-
-            itemElement.Add(new XElement("fitness", item.Fitness.ToString(CultureInfo.InvariantCulture)));
-            itemElement.Add(new XElement("guid", item.Guid.ToString()));
-            itemElement.Add(new XElement("historyWidowLength", item.InitData.HistoryWidowLength.ToString(CultureInfo.InvariantCulture)));
-
-
-            itemElement.Add(new XElement("valuesCount", item.Values.Length.ToString(CultureInfo.InvariantCulture)));
-
-            var namedValues = new XElement("namedValues");
-            itemElement.Add(namedValues);
-
-            for (var i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
-            {
-                var value = item.Values[i];
-                var v = new XElement("v", value.ToString(CultureInfo.InvariantCulture));
-                v.Add(new XAttribute("type", "indicator"));
-                
-                v.Add(new XAttribute("name", _inputData.GetInputs()[(int)value].Name));
-                namedValues.Add(v);
-            }
-
-            var alfa = new XElement("v", item.Values[item.InitData.OFFSET_ALPHA].ToString(CultureInfo.InvariantCulture));
-            alfa.Add(new XAttribute("type", "alfa"));
-            namedValues.Add(alfa);
-
-            var stopLoss = new XElement("v", item.Values[item.InitData.OFFSET_STOPLOSS].ToString(CultureInfo.InvariantCulture));
-            stopLoss.Add(new XAttribute("type", "stopLoss"));
-            namedValues.Add(stopLoss);
-
-            var values = new XElement("values");
-            itemElement.Add(values);
-            for (var i = item.InitData.OFFSET_VALUES; i < item.Values.Length; i++)
-            {
-                var value = item.Values[i];
-                values.Add(new XElement("v", value.ToString(CultureInfo.InvariantCulture)));
-            }
-        }
-
-        private TradingItem LoadItem(TradingItemInitData itemInitData, LearningData learningData)
-        {
-            if (!File.Exists("genetic.save"))
-                return null;
-
-            StreamReader reader = new StreamReader("genetic.save");
-            try
-            {
-
-                XElement root = XElement.Load(reader, LoadOptions.None);
-                var item = CreateItem(root, itemInitData);
-                ReadItemValues(root, item, learningData);
-
-                DisplayBest(item);
-                return item;
-            }
-            finally
-            {
-                reader.Close();
-            }
-        }
-
-        private TradingItemInitData LoadItemInitData()
-        {
-            if (!File.Exists("genetic.save"))
-            {
-                return new TradingItemInitData();
-            }
-
-            StreamReader reader = new StreamReader("genetic.save");
-            try
-            {
-                XElement root = XElement.Load(reader, LoadOptions.None);
-                var result = new TradingItemInitData();
-                result.Read(root);
-                return result;
-            }
-            finally
-            {
-                reader.Close();
-            }
-        }
-
-
-        private void ReadItemValues(XElement root, TradingItem item, LearningData learningData)
-        {
-            XElement itemElement = root.Element("item");
-
-            XElement eFitness = itemElement.Element("fitness");
-            item.Fitness = Double.Parse(eFitness.Value);
-
-            XElement guid = itemElement.Element("guid");
-            item.Guid = Guid.Parse(guid.Value);
-
-            XElement eValues = itemElement.Element("namedValues");
-            int offset = 0;
-            foreach (XElement eValue in eValues.Elements("v"))
-            {
-                var attributes = eValue.Attributes().ToArray();
-                if (attributes.Any(t => t.Name.LocalName == "type" && t.Value == "indicator"))
-                {
-                    var name = attributes.Single(t => t.Name.LocalName == "name");
-                    item.Values[offset] = GetIndicatorIndex(learningData, name.Value);
-                }
-                else
-                {
-                    item.Values[offset] = ParseFloat(eValue.Value);
-                }
-                ++offset;
-            }
-
-            eValues = itemElement.Element("values");
-            foreach (XElement eValue in eValues.Elements("v"))
-            {
-                item.Values[offset] = ParseFloat(eValue.Value);
-                ++offset;
-            }
-
-        }
-
-        private float GetIndicatorIndex(LearningData learningData, string name)
-        {
-            var search = new LearningInputData.IndicatorSearch(name);
-            var index = learningData.Indicators.ToList().FindIndex(search.Match);
-            if (index < 0)
-                throw new Exception("Invalid indicator name:" + name);
-            return index;
-        }
-
-        private float ParseFloat(string value)
-        {
-            var result = Convert.ToDouble(value);
-            return (float)result;
-        }
-
-        private TradingItem CreateItem(XElement root, TradingItemInitData itemInitData)
-        {
-            TradingItem item = new TradingItem(itemInitData);
-            return item;
-        }
-
-
-        #endregion 
-
         // external 
 
         private void DisplayChartPrices()
@@ -629,7 +364,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             var testResult = tester.Run();
 
             if (isSaveBest)
-                SaveBest(neuronItem, testResult);
+                _writer.SaveBest(neuronItem, testResult);
 
         }
     }

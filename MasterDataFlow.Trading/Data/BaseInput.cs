@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MasterDataFlow.Trading.Data;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data
+namespace MasterDataFlow.Trading.Data
 {
     public class InputValues
     {
@@ -38,11 +34,11 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
 
     public abstract class BaseInput : IComparable
     {
-        public class IndicatorSearch
+        public class Search
         {
             private string _s;
 
-            public IndicatorSearch(string s)
+            public Search(string s)
             {
                 _s = s;
             }

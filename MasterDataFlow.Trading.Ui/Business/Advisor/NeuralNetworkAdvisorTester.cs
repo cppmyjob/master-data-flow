@@ -10,6 +10,7 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Tester;
+using MasterDataFlow.Trading.Ui.Business.Data;
 
 namespace MasterDataFlow.Trading.Ui.Business.Advisor
 {
@@ -17,13 +18,14 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
     {
         private readonly TradingItem _tradingItem;
         private readonly NeuralNetworkAdvisor _advisor;
+        private readonly InputDataCollection _inputData = new InputDataCollection();
 
         public NeuralNetworkAdvisorTester(IAdvisorInfo advisorInfo, ITradingLogger logger, TradingItem tradingItem, NeuronNetwork neuronNetwork, 
             decimal deposit, Bar[] prices, int @from, int length) : base(deposit, prices, @from, length)
         {
             _tradingItem = tradingItem;
             var neuron = NeuronNetwork.CreateNeuronDll(neuronNetwork, tradingItem);
-            _advisor = new NeuralNetworkAdvisor(advisorInfo, this, logger, neuron, tradingItem);
+            _advisor = new NeuralNetworkAdvisor(advisorInfo, this, logger, neuron, _inputData, tradingItem);
         }
 
         #region AbstractTester

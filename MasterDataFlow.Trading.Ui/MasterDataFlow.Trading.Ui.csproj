@@ -189,7 +189,6 @@
   <ItemGroup>
     <Compile Include="Business\Advisor\MemoryAdvisorInfo.cs" />
     <Compile Include="Business\Advisor\NeuralNetworkAdvisorController.cs" />
-    <Compile Include="Business\Data\BaseInput.cs" />
     <Compile Include="Business\Data\Indicators\EmaInput.cs" />
     <Compile Include="Business\Data\Indicators\VolumesInput.cs" />
     <Compile Include="Business\Data\Indicators\SarIndicatorInput.cs" />
@@ -200,7 +199,9 @@
     <Compile Include="Business\Data\Ohlcv.cs" />
     <Compile Include="Business\Data\TradyInput.cs" />
     <Compile Include="Business\Helper.cs" />
-    <Compile Include="Business\Data\InputData.cs" />
+    <Compile Include="Business\Data\InputDataCollection.cs" />
+    <Compile Include="Business\IO\Reader.cs" />
+    <Compile Include="Business\IO\Writer.cs" />
     <Compile Include="Business\Teacher\BaseCommandController.cs" />
     <Compile Include="Business\Teacher\RemoteEnvironment.cs" />
     <Compile Include="Business\Advisor\NeuralNetworkAdvisorTester.cs" />

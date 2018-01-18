@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
+using MasterDataFlow.Trading.Ui.Business.Data;
+using MasterDataFlow.Trading.Ui.Business.IO;
 using Trady.Core.Infrastructure;
 using Trady.Importer.Csv;
 
@@ -14,9 +16,11 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
 {
     public class NeuralNetworkAdvisorController : ITradingLogger
     {
+        private InputDataCollection _inputData = new InputDataCollection();
         private IReadOnlyList<IOhlcv> _candles;
         private Bar[] _tradingBars;
         private NeuralNetworkAdvisorTester _tester;
+        private readonly Reader _reader = new Reader();
 
         public async Task Run()
         {
@@ -24,24 +28,28 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
 
             var advisorInfo = new MemoryAdvisorInfo();
 
-           //_tester = new NeuralNetworkAdvisorTester(advisorInfo, this,)
+            var initData = _reader.ReadItemInitData();
+            var tradingItem = _reader.ReadItem(initData);
+
+            _tester = new NeuralNetworkAdvisorTester(advisorInfo, this, tradingItem, initData.NeuronNetwork, 100000,
+                _tradingBars, 0, _tradingBars.Length);
         }
 
         #region ITradingLogger
 
         void ITradingLogger.Error(string message)
         {
-            throw new NotImplementedException();
+            
         }
 
         void ITradingLogger.Error(string message, Exception ex)
         {
-            throw new NotImplementedException();
+            
         }
 
         void ITradingLogger.Info(string message)
         {
-            throw new NotImplementedException();
+            
         }
 
         #endregion
