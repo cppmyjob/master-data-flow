@@ -4,7 +4,7 @@ using MasterDataFlow.Intelligence.Interfaces;
 
 namespace MasterDataFlow.Intelligence.Random
 {
-    public class Random : IRandom
+    public class CryptoServiceRandom : IRandom
     {
         private readonly RNGCryptoServiceProvider _random = new RNGCryptoServiceProvider();
 

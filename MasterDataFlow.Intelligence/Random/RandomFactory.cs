@@ -12,7 +12,8 @@ namespace MasterDataFlow.Intelligence.Random
 
         public IRandom Create()
         {
-            return new Intelligence.Random.Random();
+            //return new Intelligence.Random.CryptoServiceRandom();
+            return new Intelligence.Random.SimpleRandom();
         }
     }
 }

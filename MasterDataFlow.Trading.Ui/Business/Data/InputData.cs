@@ -21,21 +21,21 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
             Add(new RsiIndicatorInput(28));
 
             // SAR
-            Add(new SarIndicatorInput());
+            //Add(new SarIndicatorInput());
 
             // EMA
-            Add(new EmaInput(3));
-            Add(new EmaInput(5));
-            Add(new EmaInput(10));
-            Add(new EmaInput(15));
-            Add(new EmaInput(20));
-            Add(new EmaInput(25));
+            //Add(new EmaInput(3));
+            //Add(new EmaInput(5));
+            //Add(new EmaInput(10));
+            //Add(new EmaInput(15));
+            //Add(new EmaInput(20));
+            //Add(new EmaInput(25));
 
             Add(new MacdHistogramIndicatorInput());
             Add(new MacdSignalLineIndicatorInput());
             Add(new MacdLineIndicatorInput());
 
-            Add(new VolumesInput());
+            //Add(new VolumesInput());
         }
 
         public void Add(BaseInput input)

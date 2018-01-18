@@ -214,8 +214,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private async Task LoadInputData(TradingItemInitData itemInitData)
         {
-            //var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
-            var csvImporter = new CsvImporter(@"Data\SBER.csv", new CultureInfo("en-US"));
+            var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
+            //var csvImporter = new CsvImporter(@"Data\SBER.csv", new CultureInfo("en-US"));
             _candles = await csvImporter.ImportAsync("fb");
 
             _tradingBars = Helper.CandlesToBars(_candles);
