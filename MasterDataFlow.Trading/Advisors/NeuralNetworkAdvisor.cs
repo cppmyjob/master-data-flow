@@ -47,7 +47,16 @@ namespace MasterDataFlow.Trading.Advisors
             var inputs =
                 new float[_tradingItem.InitData.HistoryWidowLength * _tradingItem.InitData.InputData.Indicators.IndicatorNumber +
                           (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)];
-           
+
+            for (int i = 0; i < _tradingItem.InitData.InputData.Indicators.IndicatorNumber; i++)
+            {
+                var indicatorIndex = (int)_tradingItem.GetIndicatorIndex(i);
+                var input = _inputDataCollection.GetInputs()[indicatorIndex];
+                //input.GetValues()
+//                var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
+//                Array.Copy(indicatorValues, index, _inputs, _tradingItem.InitData.HistoryWidowLength * i, _tradingItem.InitData.HistoryWidowLength);
+            }
+
 
 
             var outputs = _neuron.NetworkCompute(inputs);

@@ -159,9 +159,9 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
                         DisplayChartPrices();
 
                         var tradingItem = _reader.ReadItem(_dataObject.ItemInitData);
-                        DisplayBest(tradingItem);
                         if (tradingItem != null)
                         {
+                            DisplayBest(tradingItem);
                             _dataObject.InitPopulation = new List<float[]>();
                             _dataObject.InitPopulation.Add(tradingItem.Values);
                         }
