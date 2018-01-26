@@ -396,7 +396,7 @@ namespace MasterDataFlow.Trading.Tester
             _from = from;
             _length = length;
             if (_from + _length > _prices.Length)
-                throw new Exception("Выход зад диапазон");
+                throw new Exception("Out of range");
             Reset();
         }
 

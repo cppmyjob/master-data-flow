@@ -17,6 +17,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
     public class NeuralNetworkAdvisorTester : SignleOrderTester, ITrader
     {
         private readonly TradingItem _tradingItem;
+        private readonly Bar[] _prices;
         private readonly NeuralNetworkAdvisor _advisor;
         private readonly InputDataCollection _inputData = new InputDataCollection();
 
@@ -24,6 +25,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
             decimal deposit, Bar[] prices, int @from, int length) : base(deposit, prices, @from, length)
         {
             _tradingItem = tradingItem;
+            _prices = prices;
             var neuron = NeuronNetwork.CreateNeuronDll(neuronNetwork, tradingItem);
             _advisor = new NeuralNetworkAdvisor(advisorInfo, this, logger, neuron, _inputData, tradingItem);
         }
@@ -43,6 +45,20 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
         #endregion
 
         #region ITrader
+
+        public Bar[] GetBars(int index, int length)
+        {
+            var result = new Bar[length];
+            var from = CurrentBar - index - length;
+            Array.Copy(_prices, from, result, 0, length);
+            return result;
+        }
+
+        public int GetIndicatorsOffset()
+        {
+            return Constants.IndicatorsOffset;
+        }
+
         public bool IsSellOrderExists()
         {
             return _currentOrder?.Type == OrderType.Sell;
@@ -84,6 +100,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
             Sell();
             return Operationtatus.Ok;
         }
+
+
 
         #endregion
 

@@ -111,7 +111,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private readonly Reader _reader = new Reader();
         private readonly Writer _writer = new Writer();
 
-        private const int IndicatorsOffset = 50;
 
         #region Properties
         public int PopulationFactor { get; set; } = 1;
@@ -232,7 +231,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private void SetDataBoundaris(TradingItemInitData itemInitData)
         {
-            var startTrainingDate = _tradingBars[IndicatorsOffset + itemInitData.HistoryWidowLength].Time.Date.AddDays(1);
+            var startTrainingDate = _tradingBars[Constants.IndicatorsOffset + itemInitData.HistoryWidowLength].Time.Date.AddDays(1);
 
             var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
             var days = (endTestDate - startTrainingDate).TotalDays;

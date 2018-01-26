@@ -189,6 +189,7 @@
   <ItemGroup>
     <Compile Include="Business\Advisor\MemoryAdvisorInfo.cs" />
     <Compile Include="Business\Advisor\NeuralNetworkAdvisorController.cs" />
+    <Compile Include="Business\Data\Constants.cs" />
     <Compile Include="Business\Data\Indicators\EmaInput.cs" />
     <Compile Include="Business\Data\Indicators\VolumesInput.cs" />
     <Compile Include="Business\Data\Indicators\SarIndicatorInput.cs" />

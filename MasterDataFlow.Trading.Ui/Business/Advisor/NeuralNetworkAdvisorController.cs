@@ -31,8 +31,10 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
             var initData = _reader.ReadItemInitData();
             var tradingItem = _reader.ReadItem(initData);
 
+            var start = Constants.IndicatorsOffset + tradingItem.InitData.HistoryWidowLength;
+            var length = _tradingBars.Length - start;
             _tester = new NeuralNetworkAdvisorTester(advisorInfo, this, tradingItem, initData.NeuronNetwork, 100000,
-                _tradingBars, 0, _tradingBars.Length);
+                _tradingBars, start, length);
         }
 
         #region ITradingLogger
@@ -52,9 +54,12 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
             
         }
 
+        void ITradingLogger.Warn(string message)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
-
-
 
         private async Task LoadInputData()
         {
@@ -66,9 +71,5 @@ namespace MasterDataFlow.Trading.Ui.Business.Advisor
 
         }
 
-        void ITradingLogger.Warn(string message)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

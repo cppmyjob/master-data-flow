@@ -11,6 +11,7 @@ namespace MasterDataFlow.Trading.Advisors
 
     public  class NeuralNetworkAdvisor : BaseAdvisor
     {
+        private readonly ITrader _trader;
         private readonly ITradingLogger _logger;
         private readonly ISimpleNeuron _neuron;
         private readonly TradingItem _tradingItem;
@@ -19,6 +20,7 @@ namespace MasterDataFlow.Trading.Advisors
         public NeuralNetworkAdvisor(IAdvisorInfo advisorInfo, 
             ITrader trader, ITradingLogger logger, ISimpleNeuron neuron, IInputDataCollection inputDataCollection, TradingItem tradingItem) : base(advisorInfo, trader, logger)
         {
+            _trader = trader;
             _logger = logger;
             _neuron = neuron;
             _tradingItem = tradingItem;
@@ -52,12 +54,18 @@ namespace MasterDataFlow.Trading.Advisors
             {
                 var indicatorIndex = (int)_tradingItem.GetIndicatorIndex(i);
                 var input = _inputDataCollection.GetInputs()[indicatorIndex];
-                //input.GetValues()
-//                var indicatorValues = _learningData.Indicators[indicatorIndex].Values;
-//                Array.Copy(indicatorValues, index, _inputs, _tradingItem.InitData.HistoryWidowLength * i, _tradingItem.InitData.HistoryWidowLength);
+                var offset = 1;
+                var bars = _trader.GetBars(offset,
+                    _tradingItem.InitData.HistoryWidowLength + _trader.GetIndicatorsOffset());
+                var indicatorValues = input.GetValues(bars);
+                var indexFrom = _trader.GetIndicatorsOffset();
+                Array.Copy(indicatorValues.Values, indexFrom, inputs, _tradingItem.InitData.HistoryWidowLength * i, _tradingItem.InitData.HistoryWidowLength);
             }
 
+            if (TradingItemInitData.IS_RECURRENT)
+            {
 
+            }
 
             var outputs = _neuron.NetworkCompute(inputs);
             var isBuySignal = outputs[0] > 0.5F;
