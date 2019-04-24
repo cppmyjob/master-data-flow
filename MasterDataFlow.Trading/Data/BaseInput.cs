@@ -57,13 +57,15 @@ namespace MasterDataFlow.Trading.Data
         public string Name { get; private set; }
 
         public abstract InputValues GetValues(Bar[] bars);
+        public abstract float GetMax();
+        public abstract float GetMin();
 
         public void Normalize(InputValues values)
         {
-            var min = values.Values.Select(t => t.Value).Min();
-            var max = values.Values.Select(t => t.Value).Max();
+            var min = GetMin();
+            var max = GetMax();
             var diff = max - min;
-            var offset = diff * 20 / 100;
+            var offset = diff * 10 / 100;
             min = min - offset;
             max = max + offset;
 

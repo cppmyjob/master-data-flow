@@ -24,6 +24,16 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
             var data = candles.Ema(_period);
             return data;
         }
+
+        public override float GetMax()
+        {
+            return 500;
+        }
+
+        public override float GetMin()
+        {
+            return 0;
+        }
     }
 
 

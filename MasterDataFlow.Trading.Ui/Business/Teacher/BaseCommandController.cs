@@ -231,6 +231,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private void SetDataBoundaris(TradingItemInitData itemInitData)
         {
+            // Получаем первый день данных Смещение получается за счёт окна для вычисления данных Constants.IndicatorsOffset
+            // и HistoryWidowLength
             var startTrainingDate = _tradingBars[Constants.IndicatorsOffset + itemInitData.HistoryWidowLength].Time.Date.AddDays(1);
 
             var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
@@ -258,8 +260,11 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
             }
 
+            // тренировочные данные
             _trainingData = CreateLearningData(itemInitData, inputValues, startTrainingDate, trainingDays);
+            // валидационные данные
             _validationData = CreateLearningData(itemInitData, inputValues, startValidationDate, validationDays);
+            // тест дата
             _testData = CreateLearningData(itemInitData, inputValues, startTestDate, testDays);
 
             SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(startTrainingDate, startValidationDate, startTestDate));
@@ -268,6 +273,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private LearningData CreateLearningData(TradingItemInitData itemInitData, List<InputValues> inputValues, DateTime startDate, double days)
         {
             var result = new LearningData();
+            // Получаем список цен в требуем диапазоне
             result.Prices = _tradingBars
                 .SkipWhile(t => t.Time < startDate)
                 .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();

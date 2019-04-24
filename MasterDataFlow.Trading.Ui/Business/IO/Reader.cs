@@ -62,6 +62,26 @@ namespace MasterDataFlow.Trading.Ui.Business.IO
             XElement eFitness = itemElement.Element("fitness");
             item.Fitness = Double.Parse(eFitness.Value);
 
+            XElement efitnessZigZag = itemElement.Element("fitnessZigZag");
+            if (efitnessZigZag != null)
+                item.FitnessZigZag = Double.Parse(efitnessZigZag.Value);
+
+            XElement efitnessProfit = itemElement.Element("fitnessProfit");
+            if (efitnessProfit != null)
+                item.FitnessProfit = Double.Parse(efitnessProfit.Value);
+
+            XElement efitnessExpectedValue = itemElement.Element("fitnessExpectedValue");
+            if (efitnessExpectedValue != null)
+                item.FitnessExpectedValue = Double.Parse(efitnessExpectedValue.Value);
+
+            XElement efitnessPlusMinusOrdersRatio = itemElement.Element("fitnessPlusMinusOrdersRatio");
+            if (efitnessPlusMinusOrdersRatio != null)
+                item.FitnessPlusMinusOrdersRatio = Double.Parse(efitnessPlusMinusOrdersRatio.Value);
+
+            XElement efitnessPlusMinusEquityRatio = itemElement.Element("fitnessPlusMinusEquityRatio");
+            if (efitnessPlusMinusEquityRatio != null)
+                item.FitnessPlusMinusEquityRatio = Double.Parse(efitnessPlusMinusEquityRatio.Value);
+
             XElement guid = itemElement.Element("guid");
             item.Guid = Guid.Parse(guid.Value);
 

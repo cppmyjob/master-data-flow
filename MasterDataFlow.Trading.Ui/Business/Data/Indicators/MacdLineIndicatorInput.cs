@@ -22,5 +22,15 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
             var result = new InputValues(Name, values);
             return result;
         }
+
+        public override float GetMax()
+        {
+            return 7;
+        }
+
+        public override float GetMin()
+        {
+            return -7;
+        }
     }
 }

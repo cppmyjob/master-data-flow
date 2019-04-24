@@ -24,6 +24,16 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
             var data = candles.Rsi(_period);
             return data;
         }
+
+        public override float GetMax()
+        {
+            return 100;
+        }
+
+        public override float GetMin()
+        {
+            return 0;
+        }
     }
 
 

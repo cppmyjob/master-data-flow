@@ -21,6 +21,16 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
             var data = candles.Sar(0.02M, 0.2M);
             return data;
         }
+
+        public override float GetMax()
+        {
+            return 500;
+        }
+
+        public override float GetMin()
+        {
+            return 0;
+        }
     }
 
 

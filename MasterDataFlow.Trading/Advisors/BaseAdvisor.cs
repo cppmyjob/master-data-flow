@@ -8,110 +8,110 @@ using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Advisors
 {
-    public enum Operationtatus
-    {
-        Ok,
-        Repeat,
-        Error,
-    }
+    //public enum Operationtatus
+    //{
+    //    Ok,
+    //    Repeat,
+    //    Error,
+    //}
 
-    public enum AdvisorStatus
-    {
-        Init,
-    }
+    //public enum AdvisorStatus
+    //{
+    //    Init,
+    //}
 
-    public enum AdvisorSignal
-    {
-        Skip = 0,
-        Hold = 1,
-        Close = 2,
-        Sell = 3,
-        Buy = 4
-    }
+    //public enum AdvisorSignal
+    //{
+    //    Skip = 0,
+    //    Hold = 1,
+    //    Close = 2,
+    //    Sell = 3,
+    //    Buy = 4
+    //}
 
 
-    public interface IAdvisorInfo
-    {
-        bool IsLoaded { get; }
+    //public interface IAdvisorInfo
+    //{
+    //    bool IsLoaded { get; }
 
-        AdvisorStatus Status { get; }
-        DateTime? LastSignalTime { get; }
-        AdvisorSignal? LastSignal { get; }
+    //    AdvisorStatus Status { get; }
+    //    DateTime? LastSignalTime { get; }
+    //    AdvisorSignal? LastSignal { get; }
 
-        void SetLastSignal(AdvisorSignal signal, DateTime time);
-        void SetStatus(AdvisorStatus status);
+    //    void SetLastSignal(AdvisorSignal signal, DateTime time);
+    //    void SetStatus(AdvisorStatus status);
 
-        void Load();
-    }
+    //    void Load();
+    //}
 
-    public abstract class BaseAdvisor
-    {
-        private readonly IAdvisorInfo _advisorInfo;
-        private readonly ITradingLogger _logger;
-        private readonly ITrader _trader;
+    //public abstract class BaseAdvisor
+    //{
+    //    private readonly IAdvisorInfo _advisorInfo;
+    //    private readonly ITradingLogger _logger;
+    //    private readonly ITrader _trader;
 
-        protected BaseAdvisor(IAdvisorInfo advisorInfo, ITrader trader, ITradingLogger logger)
-        {
-            _advisorInfo = advisorInfo;
-            _logger = logger;
-            _trader = trader;
-        }
+    //    protected BaseAdvisor(IAdvisorInfo advisorInfo, ITrader trader, ITradingLogger logger)
+    //    {
+    //        _advisorInfo = advisorInfo;
+    //        _logger = logger;
+    //        _trader = trader;
+    //    }
 
-        public IAdvisorInfo Info
-        {
-            get { return _advisorInfo; }
-        }
+    //    public IAdvisorInfo Info
+    //    {
+    //        get { return _advisorInfo; }
+    //    }
 
-        public void Tick(DateTime time, decimal price)
-        {
-            if (_advisorInfo.Status == AdvisorStatus.Init)
-            {
-                if (!_advisorInfo.IsLoaded)
-                    _advisorInfo.Load();
-            }
+    //    public void Tick(DateTime time, decimal price)
+    //    {
+    //        if (_advisorInfo.Status == AdvisorStatus.Init)
+    //        {
+    //            if (!_advisorInfo.IsLoaded)
+    //                _advisorInfo.Load();
+    //        }
 
-            var action = GetSignal(time, price);
-            switch (action)
-            {
-                case AdvisorSignal.Sell:
-                    _advisorInfo.SetLastSignal(action, DateTime.Now);
-                    ProcessSell();
-                    break;
-                case AdvisorSignal.Buy:
-                    _advisorInfo.SetLastSignal(action, DateTime.Now);
-                    ProcessBuy();
-                    break;
-                case AdvisorSignal.Hold:
-                    _advisorInfo.SetLastSignal(action, DateTime.Now);
-                    break;
-                case AdvisorSignal.Close:
-                    _advisorInfo.SetLastSignal(action, DateTime.Now);
-                    break;
-                case AdvisorSignal.Skip:
-                    break;
-            }
+    //        var action = GetSignal(time, price);
+    //        switch (action)
+    //        {
+    //            case AdvisorSignal.Sell:
+    //                _advisorInfo.SetLastSignal(action, DateTime.Now);
+    //                ProcessSell();
+    //                break;
+    //            case AdvisorSignal.Buy:
+    //                _advisorInfo.SetLastSignal(action, DateTime.Now);
+    //                ProcessBuy();
+    //                break;
+    //            case AdvisorSignal.Hold:
+    //                _advisorInfo.SetLastSignal(action, DateTime.Now);
+    //                break;
+    //            case AdvisorSignal.Close:
+    //                _advisorInfo.SetLastSignal(action, DateTime.Now);
+    //                break;
+    //            case AdvisorSignal.Skip:
+    //                break;
+    //        }
             
-        }
+    //    }
 
-        private void ProcessBuy()
-        {
-            if (_trader.IsSellOrderExists())
-            {
-                _trader.CloseSellOrder();
-            }
-            if (!_trader.IsBuyOrderExists())
-            {
-                _trader.BuyOrder();
-            }
-        }
+    //    private void ProcessBuy()
+    //    {
+    //        if (_trader.IsSellOrderExists())
+    //        {
+    //            _trader.CloseSellOrder();
+    //        }
+    //        if (!_trader.IsBuyOrderExists())
+    //        {
+    //            _trader.BuyOrder();
+    //        }
+    //    }
 
-        private void ProcessSell()
-        {
+    //    private void ProcessSell()
+    //    {
 
-        }
+    //    }
 
-        protected abstract AdvisorSignal GetSignal(DateTime time, decimal price);
+    //    protected abstract AdvisorSignal GetSignal(DateTime time, decimal price);
 
-    }
+    //}
 
 }

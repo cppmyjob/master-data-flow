@@ -231,10 +231,10 @@ namespace MasterDataFlow.Trading.Genetic
         }
 
 
-        public bool IsExpectedValue { get; private set; } = false;
-        public bool IsPlusMinusOrdersRatio { get; private set; } = false;
-        public bool IsPlusMinusEquityRatio { get; private set; } = false;
-        public bool IsProfit { get; private set; } = false;
+        public bool IsExpectedValue { get; private set; } = true;
+        public bool IsPlusMinusOrdersRatio { get; private set; } = true;
+        public bool IsPlusMinusEquityRatio { get; private set; } = true;
+        public bool IsProfit { get; private set; } = true;
         public bool IsZigZag { get; private set; } = true;
 
 
@@ -583,6 +583,12 @@ namespace MasterDataFlow.Trading.Genetic
         public TesterResult ValidationTesterResult { get; set; }
 
         public TesterResult TrainingTesterResult { get; set; }
+
+        public double FitnessZigZag { get; set; }
+        public double FitnessExpectedValue { get; set; }
+        public double FitnessProfit { get; set; }
+        public double FitnessPlusMinusOrdersRatio { get; set; }
+        public double FitnessPlusMinusEquityRatio { get; set; }
     }
 
 
@@ -608,14 +614,14 @@ namespace MasterDataFlow.Trading.Genetic
 
 
             var dll = GetNeuronDll(item);
-            double validationZigZagCount;
+            int validationZigZagCount;
             var validationResult = GetProfit(dll, item, DataObject.ValidationData, out validationZigZagCount);
             item.ValidationTesterResult = validationResult;
 
             if (DataObject.ItemInitData.Optimizer.Validation.IsFilterBadResult && FilterBadResult(validationResult))
                 return Double.MinValue;
 
-            double trainingZigZagCount;
+            int trainingZigZagCount;
             var trainingResult = GetProfit(dll, item, DataObject.TrainingData, out trainingZigZagCount);
             item.TrainingTesterResult = trainingResult;
 
@@ -646,46 +652,90 @@ namespace MasterDataFlow.Trading.Genetic
                 return Double.MinValue;
             }
 
-            
+            //if (DataObject.ItemInitData.Optimizer.Fitness.IsZigZag)
+            //{
+            //    if (validationZigZagCount + trainingZigZagCount < 0)
+            //    {
+            //        return validationZigZagCount + trainingZigZagCount;
+            //    }
+            //}
 
-
-            if (DataObject.ItemInitData.Optimizer.Fitness.IsZigZag)
+            // ZigZag
             {
-                if (validationZigZagCount + trainingZigZagCount < 0)
-                {
-                    return validationZigZagCount + trainingZigZagCount;
-                }
+                item.FitnessZigZag = (validationZigZagCount + trainingZigZagCount);
+                if (item.FitnessZigZag < 0)
+                    item.FitnessZigZag = 1 / Math.Abs(item.FitnessZigZag);
+            }
+
+
+            // ExpectedValue
+            {
+                // https://www.mql5.com/ru/blogs/post/651765
+                //var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
+                //         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
+                var sdelki = (double)(validationResult.Orders.Count + trainingResult.Orders.Count);
+                var pplus = (validationResult.PlusCount + trainingResult.PlusCount)
+                            / sdelki;
+                var vplus = (double)(validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) +
+                             trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit))
+                            / sdelki;
+                var pminus = (validationResult.MinusCount + trainingResult.MinusCount)
+                            / sdelki;
+                var vminus = (double)Math.Abs(validationResult.Orders.Where(t => t.Profit < 0).Sum(t => t.Profit) +
+                             trainingResult.Orders.Where(t => t.Profit < 0).Sum(t => t.Profit))
+                            / sdelki;
+                var m = pplus * vplus - pminus * vminus;
+
+                item.FitnessExpectedValue = m;
+                if (item.FitnessExpectedValue < 0)
+                    item.FitnessExpectedValue = 0.000001 / Math.Abs(item.FitnessExpectedValue);
+            }
+
+            // Profit
+            {
+                item.FitnessProfit  = (double)(validationResult.Profit + trainingResult.Profit);
+            }
+
+            // PlusMinusOrdersRatio
+            {
+                var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
+                               ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
+                item.FitnessPlusMinusOrdersRatio = pmRatio;
+            }
+
+            // PlusMinusEquityRatio
+            {
+                var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
+                            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
+                item.FitnessPlusMinusEquityRatio = ecRation;
             }
 
             var fitness = 1.0;
 
-            if (DataObject.ItemInitData.Optimizer.Fitness.IsProfit)
-            {
-                fitness *= (double) (validationResult.Profit + trainingResult.Profit);
-            }
 
             if (DataObject.ItemInitData.Optimizer.Fitness.IsZigZag)
             {
-                fitness *= (double) (validationZigZagCount + trainingZigZagCount);
+                fitness *= item.FitnessZigZag;
             }
 
             if (DataObject.ItemInitData.Optimizer.Fitness.IsExpectedValue)
             {
-                var m = (validationResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / validationResult.Orders.Count +
-                         trainingResult.Orders.Where(t => t.Profit >= 0).Sum(t => t.Profit) / trainingResult.Orders.Count) / 2;
-                fitness *= (double)m;
+                fitness *= item.FitnessExpectedValue;
             }
+
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsProfit)
+            {
+                fitness *= item.FitnessProfit;
+            }
+
             if (DataObject.ItemInitData.Optimizer.Fitness.IsPlusMinusOrdersRatio)
             {
-                var pmRatio = ((double) (trainingResult.PlusCount + validationResult.PlusCount) /
-                               ((trainingResult.MinusCount + validationResult.MinusCount) > 0 ? (trainingResult.MinusCount + validationResult.MinusCount) : 1) );
-                fitness *= (double)pmRatio;
+                fitness *= item.FitnessPlusMinusOrdersRatio;
             }
+
             if (DataObject.ItemInitData.Optimizer.Fitness.IsPlusMinusEquityRatio)
             {
-                var ecRation = ((double)(trainingResult.PlusEquityCount + validationResult.PlusEquityCount) /
-                            ((trainingResult.MinusEquityCount + validationResult.MinusEquityCount) > 0 ? (trainingResult.MinusEquityCount + validationResult.MinusEquityCount) : 1));
-                fitness *= (double)ecRation;
+                fitness *= item.FitnessPlusMinusEquityRatio;
             }
 
             return fitness;
@@ -742,7 +792,7 @@ namespace MasterDataFlow.Trading.Genetic
             return false;
         }
 
-        private TesterResult GetProfit(ISimpleNeuron neuron, TradingItem item, LearningData learningData, out double zigZagCount)
+        private TesterResult GetProfit(ISimpleNeuron neuron, TradingItem item, LearningData learningData, out int zigZagCount)
         {
             var tester = new DirectionTester(neuron, item, learningData);
             TesterResult result = tester.Run();
@@ -768,20 +818,56 @@ namespace MasterDataFlow.Trading.Genetic
         }
 
 
-        //protected override void SortFitness()
-        //{
-        //    var list = (from item in _itemsArray
-        //        orderby item.Fitness descending
-        //        where item.Fitness > Double.MinValue
-        //        select item).ToList();
-        //    while (list.Count < DataObject.CommandInitData.ItemsCount)
-        //    {
-        //        var item = InternalCreateItem();
-        //        FillValues(item);
-        //        list.Add(item);
-        //    }
-        //    _itemsArray = list.ToArray();
-        //}
+        protected override void SortFitness()
+        {
+            var partLength = DataObject.CommandInitData.SurviveCount / 6;
+
+            var list = new List<TradingItem>(DataObject.CommandInitData.SurviveCount);
+
+            var tempList = (from item in _itemsArray
+                orderby item.Fitness descending
+                select item).ToList();
+            list.AddRange(tempList.Take(partLength));
+            tempList = tempList.Skip(partLength).ToList();
+
+            tempList = (from item in tempList
+                        orderby item.FitnessExpectedValue descending
+                select item).ToList();
+            list.AddRange(tempList.Take(partLength));
+            tempList = tempList.Skip(partLength).ToList();
+
+            tempList = (from item in tempList
+                orderby item.FitnessZigZag descending
+                select item).ToList();
+            list.AddRange(tempList.Take(partLength));
+            tempList = tempList.Skip(partLength).ToList();
+
+            tempList = (from item in tempList
+                orderby item.FitnessProfit descending
+                select item).ToList();
+            list.AddRange(tempList.Take(partLength));
+            tempList = tempList.Skip(partLength).ToList();
+
+            tempList = (from item in tempList
+                orderby item.FitnessPlusMinusOrdersRatio descending
+                select item).ToList();
+            list.AddRange(tempList.Take(partLength));
+            tempList = tempList.Skip(partLength).ToList();
+
+            tempList = (from item in tempList
+                orderby item.FitnessExpectedValue descending
+                select item).ToList();
+
+            list.AddRange(tempList);
+
+            while (list.Count < DataObject.CommandInitData.ItemsCount)
+            {
+                var item = InternalCreateItem();
+                FillValues(item);
+                list.Add(item);
+            }
+            _itemsArray = list.ToArray();
+        }
 
         protected override void FillValues(TradingItem item)
         {

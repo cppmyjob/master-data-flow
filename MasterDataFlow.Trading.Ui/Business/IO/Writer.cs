@@ -67,6 +67,11 @@ namespace MasterDataFlow.Trading.Ui.Business.IO
                 "Date, ";
             line += "Guid, ";
             line += "Fitness, ";
+            line += "FitnessExpectedValue, ";
+            line += "FitnessZigZag, ";
+            line += "FitnessProfit, ";
+            line += "FitnessPlusMinusOrdersRatio, ";
+            line += "FitnessPlusMinusEquityRatio, ";
             line += "StopLoss, ";
             line += AddHeaderTestResult("tr");
             line += AddHeaderTestResult("pr");
@@ -93,6 +98,11 @@ namespace MasterDataFlow.Trading.Ui.Business.IO
             string line = DateTime.Now.ToString(CultureInfo.InvariantCulture) + ", ";
             line += item.Guid.ToString() + ", ";
             line += item.Fitness.ToString("F10") + ", ";
+            line += item.FitnessExpectedValue.ToString("F10") + ", ";
+            line += item.FitnessZigZag.ToString("F10") + ", ";
+            line += item.FitnessProfit.ToString("F10") + ", ";
+            line += item.FitnessPlusMinusOrdersRatio.ToString("F10") + ", ";
+            line += item.FitnessPlusMinusEquityRatio.ToString("F10") + ", ";
             line += item.StopLoss.ToString("F10") + ", ";
             line = SaveTestResult(item.TrainingTesterResult, line);
             line = SaveTestResult(item.ValidationTesterResult, line);
@@ -144,6 +154,11 @@ namespace MasterDataFlow.Trading.Ui.Business.IO
             root.Add(itemElement);
 
             itemElement.Add(new XElement("fitness", item.Fitness.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessZigZag", item.FitnessZigZag.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessProfit", item.FitnessProfit.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessExpectedValue", item.FitnessExpectedValue.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessPlusMinusOrdersRatio", item.FitnessPlusMinusOrdersRatio.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessPlusMinusEquityRatio", item.FitnessPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("guid", item.Guid.ToString()));
             itemElement.Add(new XElement("historyWidowLength", item.InitData.HistoryWidowLength.ToString(CultureInfo.InvariantCulture)));
 

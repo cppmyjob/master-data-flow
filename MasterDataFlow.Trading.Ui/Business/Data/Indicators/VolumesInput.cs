@@ -23,6 +23,16 @@ namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
             return result;
 
         }
+
+        public override float GetMax()
+        {
+            return 500;
+        }
+
+        public override float GetMin()
+        {
+            return 0;
+        }
     }
 
 
