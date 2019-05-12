@@ -44,7 +44,7 @@ namespace MasterDataFlow.Trading.Configs
 
     public class ItemInitDataFintessOptimizerElement : ConfigurationElement
     {
-        [ConfigurationProperty("isExpectedValue", DefaultValue = false)]
+        [ConfigurationProperty("isExpectedValue", DefaultValue = true)]
         public bool IsExpectedValue
         {
             get
@@ -53,7 +53,7 @@ namespace MasterDataFlow.Trading.Configs
             }
         }
 
-        [ConfigurationProperty("isPlusMinusOrdersRatio", DefaultValue = false)]
+        [ConfigurationProperty("isPlusMinusOrdersRatio", DefaultValue = true)]
         public bool IsPlusMinusOrdersRatio
         {
             get
@@ -63,7 +63,7 @@ namespace MasterDataFlow.Trading.Configs
         }
 
 
-        [ConfigurationProperty("isPlusMinusEquityRatio", DefaultValue = false)]
+        [ConfigurationProperty("isPlusMinusEquityRatio", DefaultValue = true)]
         public bool IsPlusMinusEquityRatio
         {
             get
@@ -72,7 +72,7 @@ namespace MasterDataFlow.Trading.Configs
             }
         }
 
-        [ConfigurationProperty("isProfit", DefaultValue = false)]
+        [ConfigurationProperty("isProfit", DefaultValue = true)]
         public bool IsProfit
         {
             get

@@ -7,20 +7,26 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
-using MasterDataFlow.Trading.Ui.Business.Data;
+using MasterDataFlow.Trading.Interfaces;
 
-namespace MasterDataFlow.Trading.Ui.Business.IO
+namespace MasterDataFlow.Trading.IO
 {
     public class Reader
     {
-        private readonly InputDataCollection _inputData = new InputDataCollection();
+        private readonly IInputDataCollection _inputData;
 
-        public TradingItem ReadItem(TradingItemInitData itemInitData)
+        public Reader(IInputDataCollection inputData)
         {
-            if (!File.Exists("genetic.save"))
+            _inputData = inputData;
+        }
+
+
+        public TradingItem ReadItem(TradingItemInitData itemInitData, string filename = "genetic.save")
+        {
+            if (!File.Exists(filename))
                 return null;
 
-            StreamReader reader = new StreamReader("genetic.save");
+            StreamReader reader = new StreamReader(filename);
             try
             {
                 XElement root = XElement.Load(reader, LoadOptions.None);
@@ -34,14 +40,14 @@ namespace MasterDataFlow.Trading.Ui.Business.IO
             }
         }
 
-        public TradingItemInitData ReadItemInitData()
+        public TradingItemInitData ReadItemInitData(string filename = "genetic.save")
         {
-            if (!File.Exists("genetic.save"))
+            if (!File.Exists(filename))
             {
                 return new TradingItemInitData();
             }
 
-            StreamReader reader = new StreamReader("genetic.save");
+            StreamReader reader = new StreamReader(filename);
             try
             {
                 XElement root = XElement.Load(reader, LoadOptions.None);

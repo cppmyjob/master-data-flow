@@ -86,9 +86,9 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnTesterStart = new System.Windows.Forms.Button();
             this.btnOpenTestFile = new System.Windows.Forms.Button();
             this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
-            this.btnTesterStart = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -211,6 +211,11 @@
             // nudPopulationFactor
             // 
             this.nudPopulationFactor.Location = new System.Drawing.Point(224, 80);
+            this.nudPopulationFactor.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.nudPopulationFactor.Minimum = new decimal(new int[] {
             1,
             0,
@@ -625,6 +630,16 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Parameters";
             // 
+            // btnTesterStart
+            // 
+            this.btnTesterStart.Location = new System.Drawing.Point(472, 47);
+            this.btnTesterStart.Name = "btnTesterStart";
+            this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
+            this.btnTesterStart.TabIndex = 57;
+            this.btnTesterStart.Text = "Start";
+            this.btnTesterStart.UseVisualStyleBackColor = true;
+            this.btnTesterStart.Click += new System.EventHandler(this.btnTesterStart_Click);
+            // 
             // btnOpenTestFile
             // 
             this.btnOpenTestFile.Location = new System.Drawing.Point(215, 33);
@@ -638,16 +653,6 @@
             // ofdOpenTestFile
             // 
             this.ofdOpenTestFile.FileName = "openFileDialog1";
-            // 
-            // btnTesterStart
-            // 
-            this.btnTesterStart.Location = new System.Drawing.Point(472, 47);
-            this.btnTesterStart.Name = "btnTesterStart";
-            this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
-            this.btnTesterStart.TabIndex = 57;
-            this.btnTesterStart.Text = "Start";
-            this.btnTesterStart.UseVisualStyleBackColor = true;
-            this.btnTesterStart.Click += new System.EventHandler(this.btnTesterStart_Click);
             // 
             // MainForm
             // 

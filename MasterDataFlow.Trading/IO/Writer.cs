@@ -7,14 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using MasterDataFlow.Trading.Genetic;
+using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Tester;
-using MasterDataFlow.Trading.Ui.Business.Data;
 
-namespace MasterDataFlow.Trading.Ui.Business.IO
+
+namespace MasterDataFlow.Trading.IO
 {
     public class Writer
     {
-        private readonly InputDataCollection _inputData = new InputDataCollection();
+        private readonly IInputDataCollection _inputData;
+
+        public Writer(IInputDataCollection inputData)
+        {
+            _inputData = inputData;
+        }
 
         private Guid lastGuid;
 

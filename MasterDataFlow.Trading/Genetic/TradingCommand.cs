@@ -343,12 +343,24 @@ namespace MasterDataFlow.Trading.Genetic
 
         public const int HISTORY_WINDOW_LENGTH = 27;
 
+        //private static int[] NeuronsConfig = new int[] {
+        //    HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
+        //    1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 2,
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 8,
+        //    TradingItemInitData.OUTPUT_NUMBER,
+        //};
+
         private static int[] NeuronsConfig = new int[] {
             HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
-            1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
-            (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 2,
+            (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
+            (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
+            (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
             (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
             (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 8,
+            (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 8,
+            TradingItemInitData.OUTPUT_NUMBER,
             TradingItemInitData.OUTPUT_NUMBER,
         };
 

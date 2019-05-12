@@ -4,25 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MasterDataFlow.Trading.Data;
+using MasterDataFlow.Trading.Data.Indicators;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
 using Trady.Core.Infrastructure;
 
 namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
 {
-    public class RsiIndicatorInput : TradyInput
+    public class TradyRsiIndicatorInput : RsiIndicatorInput
     {
         private readonly int _period;
 
-        public RsiIndicatorInput(int period) : base("RSI "+period)
+        public TradyRsiIndicatorInput(int period) : base(period)
         {
             _period = period;
         }
 
-        protected override IReadOnlyList<AnalyzableTick<decimal?>> GetIndicatorData(IOhlcv[] candles)
+        public override InputValues GetValues(Bar[] bars)
         {
-            var data = candles.Rsi(_period);
-            return data;
+            var result = TradyHelper.GetValues(Name, bars, (candles => candles.Rsi(_period)));
+            return result;
         }
 
         public override float GetMax()

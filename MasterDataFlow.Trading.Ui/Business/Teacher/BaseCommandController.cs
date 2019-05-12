@@ -13,9 +13,9 @@ using MasterDataFlow.Network;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Indicators;
+using MasterDataFlow.Trading.IO;
 using MasterDataFlow.Trading.Tester;
 using MasterDataFlow.Trading.Ui.Business.Data;
-using MasterDataFlow.Trading.Ui.Business.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using Trady.Analysis;
 using Trady.Analysis.Extension;
@@ -84,9 +84,15 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
     {
         private readonly int _processorCount;
 
+        private readonly Reader _reader;
+        private readonly Writer _writer;
+
+
         public BaseCommandController(int processorCount)
         {
             _processorCount = processorCount;
+            _writer = new Writer(new InputDataCollection());
+            _reader = new Reader(new InputDataCollection());
         }
 
         public async Task Execute()
@@ -107,10 +113,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private LearningData _trainingData = null;
         private LearningData _validationData = null;
         private LearningData _testData = null;
-
-        private readonly Reader _reader = new Reader();
-        private readonly Writer _writer = new Writer();
-
 
         #region Properties
         public int PopulationFactor { get; set; } = 1;
@@ -285,8 +287,10 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             var lastTime = result.Prices[result.Prices.Length - 1].Time;
 
             var initTimes = inputValues[0].Values.Select(t => t.Time).ToArray();
-            var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength - 1;
-            var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime) - 1;
+            //var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength - 1;
+            //var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime) - 1;
+            var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength;
+            var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime);
 
             foreach (var inputValue in inputValues)
             {

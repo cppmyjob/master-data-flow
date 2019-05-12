@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MasterDataFlow.MetaTrader.Data.Indicators;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Interfaces;
-using MasterDataFlow.Trading.Ui.Business.Data.Indicators;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data
+namespace MasterDataFlow.MetaTrader.Data
 {
     public class InputDataCollection : IInputDataCollection
     {
-        private IDictionary<string, BaseInput> _inputsDict = new Dictionary<string, BaseInput>();
+        private readonly IDictionary<string, BaseInput> _inputsDict = new Dictionary<string, BaseInput>();
         private readonly List<BaseInput> _inputsList = new List<BaseInput>();
 
         public InputDataCollection()
         {
             // RSI
-            Add(new TradyRsiIndicatorInput(3));
-            Add(new TradyRsiIndicatorInput(7));
-            Add(new TradyRsiIndicatorInput(14));
-            Add(new TradyRsiIndicatorInput(21));
-            Add(new TradyRsiIndicatorInput(28));
+            Add(new MetaTraderRsiIndicatorInput(3));
+            Add(new MetaTraderRsiIndicatorInput(7));
+            Add(new MetaTraderRsiIndicatorInput(14));
+            Add(new MetaTraderRsiIndicatorInput(21));
+            Add(new MetaTraderRsiIndicatorInput(28));
 
             // SAR
             //Add(new SarIndicatorInput());
@@ -35,9 +34,9 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
             //Add(new EmaInput(20));
             //Add(new EmaInput(25));
 
-            Add(new TradyMacdHistogramIndicatorInput());
-            Add(new TradyMacdSignalLineIndicatorInput());
-            Add(new TradyMacdLineIndicatorInput());
+            Add(new MetaTraderMacdHistogramIndicatorInput());
+            Add(new MetaTraderMacdSignalLineIndicatorInput());
+            Add(new MetaTraderMacdLineIndicatorInput());
 
             //Add(new VolumesInput());
         }
@@ -52,6 +51,5 @@ namespace MasterDataFlow.Trading.Ui.Business.Data
         {
             return _inputsList;
         }
-
     }
 }

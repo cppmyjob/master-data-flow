@@ -10,9 +10,9 @@ using Trady.Core.Infrastructure;
 
 namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
 {
-    public class SarIndicatorInput : TradyInput
+    public class TradySarIndicatorInput : TradyInput
     {
-        public SarIndicatorInput() : base("SAR")
+        public TradySarIndicatorInput() : base("SAR")
         {
         }
 

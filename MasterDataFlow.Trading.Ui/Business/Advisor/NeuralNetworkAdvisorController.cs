@@ -8,7 +8,6 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Ui.Business.Data;
-using MasterDataFlow.Trading.Ui.Business.IO;
 using Trady.Core.Infrastructure;
 using Trady.Importer.Csv;
 
