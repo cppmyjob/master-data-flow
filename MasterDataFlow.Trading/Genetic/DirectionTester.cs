@@ -21,6 +21,7 @@ namespace MasterDataFlow.Trading.Genetic
         private const decimal START_DEPOSIT = 100000;
 
         private int _zigZagFitness = 0;
+        private int _zigZagAll = 0;
 
         private float[] previuosOutput = new float[TradingItemInitData.OUTPUT_NUMBER];
 
@@ -36,12 +37,15 @@ namespace MasterDataFlow.Trading.Genetic
 
         private float[] _inputs;
 
-        public int ZigZagCount
+        public double ZigZagCount
         {
             get
             {
-
-                return _zigZagFitness;
+                if (_zigZagAll == 0)
+                    return 0;
+                if (_zigZagFitness < 0)
+                    return 0.000001 * Math.Abs(_zigZagFitness);
+                return (double)_zigZagFitness / _zigZagAll;
             }
         }
 
@@ -178,6 +182,8 @@ namespace MasterDataFlow.Trading.Genetic
                 {
                     --_zigZagFitness;
                 }
+
+                ++_zigZagAll;
                 return Direction.Hold;
             }
 
@@ -192,7 +198,7 @@ namespace MasterDataFlow.Trading.Genetic
                 }
                 else
                     --_zigZagFitness;
-
+                ++_zigZagAll;
                 return Direction.Down;
             }
 
@@ -207,6 +213,7 @@ namespace MasterDataFlow.Trading.Genetic
                 }
                 else
                     --_zigZagFitness;
+                ++_zigZagAll;
                 return Direction.Up;
             }
 
@@ -215,15 +222,8 @@ namespace MasterDataFlow.Trading.Genetic
             else
                 --_zigZagFitness;
 
+            ++_zigZagAll;
             return Direction.Close;
-        }
-
-        private void SetDefaultBuyZigZagFitness(int zigzagValue)
-        {
-            if (zigzagValue == 1)
-                ++_zigZagFitness;
-            else
-                --_zigZagFitness;
         }
 
         protected override decimal GetStopLoss()

@@ -25,6 +25,12 @@ namespace MasterDataFlow.MetaTrader
             response[2] = 'u';
             response[3] = 'e';
             Log(Directory.GetCurrentDirectory());
+
+            var masterDataFlowPath = GetDataPath();
+            var csv = Path.Combine(masterDataFlowPath, "AFLT.csv");
+
+
+
             return 0;
         }
 
@@ -102,8 +108,7 @@ namespace MasterDataFlow.MetaTrader
 
         private static NeuralNetworkAlgorithm CreateAlgorithm()
         {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var masterDataFlowPath = Path.Combine(path, "MasterDataFlow");
+            var masterDataFlowPath = GetDataPath();
             var savePath = Path.Combine(masterDataFlowPath, "AFLT.save");
             var reader = new Reader(new InputDataCollection());
             var initData = reader.ReadItemInitData(savePath);
@@ -112,6 +117,13 @@ namespace MasterDataFlow.MetaTrader
             var neuron = NeuronNetwork.CreateNeuronDll(initData.NeuronNetwork, tradingItem);
 
             return new NeuralNetworkAlgorithm(tradingItem, neuron);
+        }
+
+        private static string GetDataPath()
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var masterDataFlowPath = Path.Combine(path, "MasterDataFlow");
+            return masterDataFlowPath;
         }
     }
 }
