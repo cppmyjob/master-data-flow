@@ -9,7 +9,6 @@ using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 using MasterDataFlow.Trading.Tester;
-using MasterDataFlow.Trading.Ui.Business.Data;
 
 namespace MasterDataFlow.Trading.Ui.Business.Advisor
 {

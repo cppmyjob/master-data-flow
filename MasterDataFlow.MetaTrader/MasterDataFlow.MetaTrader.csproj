@@ -47,21 +47,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Advisor.cs" />
-    <Compile Include="Data\Indicators\MetaTraderMacdHistogramIndicatorInput.cs" />
-    <Compile Include="Data\Indicators\MetaTraderMacdLineIndicatorInput.cs" />
-    <Compile Include="Data\Indicators\MetaTraderMacdSignalLineIndicatorInput.cs" />
-    <Compile Include="Data\Indicators\MetaTraderRsiIndicatorInput.cs" />
     <Compile Include="Functions.cs" />
-    <Compile Include="Data\InputDataCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">
       <Project>{E9683248-7B33-4867-9FF3-32F836B6AF58}</Project>
       <Name>MasterDataFlow.Intelligence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MasterDataFlow.Trading.Shared\MasterDataFlow.Trading.Shared.csproj">
+      <Project>{877a90f4-4820-4ba4-9553-5832442ab96e}</Project>
+      <Name>MasterDataFlow.Trading.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\MasterDataFlow.Trading\MasterDataFlow.Trading.csproj">
       <Project>{31FF804D-108B-4F80-A346-9A62CB0638C4}</Project>

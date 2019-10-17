@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Data.Indicators;
 using Trady.Analysis.Extension;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
+namespace MasterDataFlow.Trading.Shared.Data.Indicators
 {
     public class TradyMacdHistogramIndicatorInput : MacdHistogramIndicatorInput
     {

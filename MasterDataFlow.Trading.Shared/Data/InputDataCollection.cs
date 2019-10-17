@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Interfaces;
-using MasterDataFlow.Trading.Ui.Business.Data.Indicators;
+using MasterDataFlow.Trading.Shared.Data.Indicators;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data
+namespace MasterDataFlow.Trading.Shared.Data
 {
     public class InputDataCollection : IInputDataCollection
     {

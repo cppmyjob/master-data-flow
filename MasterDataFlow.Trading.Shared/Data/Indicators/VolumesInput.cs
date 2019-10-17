@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using MasterDataFlow.Trading.Data;
-using Trady.Analysis;
-using Trady.Analysis.Extension;
-using Trady.Core.Infrastructure;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data.Indicators
+namespace MasterDataFlow.Trading.Shared.Data.Indicators
 {
     public class VolumesInput : BaseInput
     {

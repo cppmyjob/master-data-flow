@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MasterDataFlow.Trading.Data;
 using Trady.Analysis;
 using Trady.Core.Infrastructure;
 
-namespace MasterDataFlow.Trading.Ui.Business.Data
+namespace MasterDataFlow.Trading.Shared.Data
 {
     public static class TradyHelper
     {

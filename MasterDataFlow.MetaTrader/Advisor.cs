@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using MasterDataFlow.Intelligence.Neuron.SimpleNeuron;
-using MasterDataFlow.MetaTrader.Data;
 using MasterDataFlow.Trading.Algorithms;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.IO;
+using MasterDataFlow.Trading.Shared.Data;
 using RGiesecke.DllExport;
 
 namespace MasterDataFlow.MetaTrader
