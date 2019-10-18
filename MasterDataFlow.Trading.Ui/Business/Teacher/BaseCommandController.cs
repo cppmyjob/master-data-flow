@@ -258,7 +258,10 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
                 var values = input.GetValues(_tradingBars);
                 inputValues.Add(values);
                 if (itemInitData.InputData.Indicators.IsNormalizeValues)
-                    input.Normalize(values);
+                {
+                    var scaler = new MinMaxScaler(input.GetMin(), input.GetMax());
+                    scaler.Transform(values);
+                }
 
             }
 
