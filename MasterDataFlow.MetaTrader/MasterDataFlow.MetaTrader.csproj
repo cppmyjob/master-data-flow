@@ -243,6 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Advisor.cs" />
+    <Compile Include="AdvisorOld.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="GenericMovingAverage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

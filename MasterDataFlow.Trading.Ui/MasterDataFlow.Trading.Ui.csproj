@@ -220,10 +220,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Business\Advisor\MemoryAdvisorInfo.cs" />
     <Compile Include="Business\Teacher\BaseCommandController.cs" />
     <Compile Include="Business\Teacher\RemoteEnvironment.cs" />
-    <Compile Include="Business\Advisor\NeuralNetworkAdvisorTester.cs" />
     <Compile Include="Old\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

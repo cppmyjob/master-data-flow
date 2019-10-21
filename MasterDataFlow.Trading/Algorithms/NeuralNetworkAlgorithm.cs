@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MasterDataFlow.Intelligence.Interfaces;
-using MasterDataFlow.Trading.Advisors;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Interfaces;
 

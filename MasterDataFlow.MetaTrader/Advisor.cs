@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using MasterDataFlow.Intelligence.Neuron.SimpleNeuron;
 using MasterDataFlow.Trading.Algorithms;
 using MasterDataFlow.Trading.Data;
 using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.IO;
 using MasterDataFlow.Trading.Shared.Data;
 using RGiesecke.DllExport;
-using Trady.Analysis.Indicator;
 
 namespace MasterDataFlow.MetaTrader
 {
@@ -21,44 +18,39 @@ namespace MasterDataFlow.MetaTrader
     {
         private static List<InputValues> _inputValues;
         private static DateTime _currenDateTime;
+        private static int _tradeMode;
 
         private static string[] _indicatorNames = {
-            "MACD Line", "RSI 3", "MACD SignalLine", "RSI 14", "RSI 7"
-        };
+                                                      "MACD Line", "RSI 3", "MACD SignalLine", "RSI 14", "RSI 7"
+                                                  };
 
         [DllExport("AdvisorInit", CallingConvention = CallingConvention.StdCall)]
-        public static int AdvisorInit([In, Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder response)
+        public static int AdvisorInit(int tradeMode)
         {
-            response[0] = 't';
-            response[1] = 'r';
-            response[2] = 'u';
-            response[3] = 'e';
-            Log(Directory.GetCurrentDirectory());
+            _tradeMode = tradeMode;
+            Log($"Trace Mode: {tradeMode}");
+            Log($"Current Directory : {Directory.GetCurrentDirectory()}");
 
-            try
+            if (_tradeMode == 1)
             {
-                var masterDataFlowPath = GetDataPath();
-                var filename = Path.Combine(masterDataFlowPath, "AFLT.csv");
-                Log(filename);
-                _inputValues = TradingComparing.LoadTrainingData(filename, true);
-            }
-            catch (Exception ex)
-            {
-                Log(ex.Message + " : " + ex.StackTrace);
-                if (ex.InnerException != null)
+                try
                 {
-                    Log(ex.InnerException.Message + " : " + ex.InnerException.StackTrace);
-                    if (ex.InnerException.InnerException != null)
-                    {
-                        Log(ex.InnerException.InnerException.Message + " : " + ex.InnerException.InnerException.StackTrace);
-                    }
-
+                    var masterDataFlowPath = GetDataPath();
+                    var filename = Path.Combine(masterDataFlowPath, "AFLT.csv");
+                    Log(filename);
+                    _inputValues = TradingComparing.LoadTrainingData(filename, true);
                 }
-
+                catch (Exception ex)
+                {
+                    Log(ex.Message + " : " + ex.StackTrace);
+                    if (ex.InnerException != null)
+                    {
+                        Log(ex.InnerException.Message + " : " + ex.InnerException.StackTrace);
+                    }
+                }
             }
             return 0;
         }
-
 
         [DllExport("AdvisorLog", CallingConvention = CallingConvention.StdCall)]
         public static int AdvisorLog([In, Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder message)
@@ -72,110 +64,57 @@ namespace MasterDataFlow.MetaTrader
         {
             var currenDateTime = DateTime.Parse(message.ToString());
             _currenDateTime = new DateTime(currenDateTime.Year, currenDateTime.Month, currenDateTime.Day,
-                currenDateTime.Hour, 0,0);
+                currenDateTime.Hour, 0, 0);
             Log($"Set CurrentTime:{message} parsed:{_currenDateTime}");
             return 0;
         }
 
         [DllExport("AdvisorTick", CallingConvention = CallingConvention.StdCall)]
-        public static int AdvisorTick([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] double[] inputData, int size)
+        public static int AdvisorTick([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]
+            double[] inputData, int size)
         {
             try
             {
                 Log($"inputData:{inputData.Length} size:{size}");
 
+                var bars = inputData.Select(t => new Bar() {
+                        Time = _currenDateTime,
+                        Close = (decimal)t,
+                        High = (decimal)t,
+                        Low = (decimal)t,
+                        Open = (decimal)t,
+                        Volume = (decimal)t,
+                    }).ToArray();
+
+                var signalData = new List<double>();
+
                 for (int i = 0; i < _indicatorNames.Length; i++)
                 {
-                    var startIndex = i * NeuronNetwork.HISTORY_WINDOW_LENGTH;
-
                     Log(_indicatorNames[i]);
-                    PrintTraningData(_indicatorNames[i]);
+                    if (_tradeMode == 1)
+                        PrintTraningData(_indicatorNames[i]);
 
-                    if (i == 2)
-                    {
-                        var signalLines = PrintSignalLine();
-                        for (int j = startIndex, k = 0; j < startIndex + NeuronNetwork.HISTORY_WINDOW_LENGTH; j++, k++)
-                        {
-                            inputData[j] = signalLines[k];
-                        }
-                    }
-                    else
-                    {
-                        var indicator = (new InputDataCollection()).GetInputs()
-                            .Single(t => t.Name == _indicatorNames[i]);
-
-
-                        var mtInputValues = new InputValues(_indicatorNames[i],
-                            inputData.Skip(startIndex).Take(NeuronNetwork.HISTORY_WINDOW_LENGTH)
-                                .Select(t => new InputValue(_currenDateTime, (float) t)).ToArray());
-
-                        var scalar = new MinMaxScaler(indicator.GetMin(), indicator.GetMax());
-                        scalar.Transform(mtInputValues);
-
-                        for (int j = startIndex, k = 0; j < startIndex + NeuronNetwork.HISTORY_WINDOW_LENGTH; j++, k++)
-                        {
-                            inputData[j] = mtInputValues.Values[k].Value;
-                        }
-
-                    }
-
-                    var sb = new StringBuilder();
-                    sb.Append("MT: ");
-                    for (int j = startIndex; j < startIndex + NeuronNetwork.HISTORY_WINDOW_LENGTH; j++)
-                    {
-                        if (j > startIndex)
-                            sb.Append(",");
-                        sb.Append(inputData[j].ToString("F10"));
-                    }
-
-                    Log(sb.ToString());
-
+                    var convertedData = ConversInputData(_indicatorNames[i], bars);
+                    var data = new double[NeuronNetwork.HISTORY_WINDOW_LENGTH];
+                    Array.Copy(convertedData, convertedData.Length - NeuronNetwork.HISTORY_WINDOW_LENGTH, data, 0, data.Length);
+                    signalData.AddRange(data);
+                    Log("MT: " + string.Join(",", data.Select(t => t.ToString("F10"))));
                 }
 
-                var result = GetSignal(inputData);
+                var result = GetSignal(signalData.ToArray());
                 Log("Signal : " + result);
                 return (int)result;
+
             }
             catch (Exception ex)
             {
                 Log(ex.Message + " : " + ex.StackTrace);
+                if (ex.InnerException != null)
+                {
+                    Log(ex.InnerException.Message + " : " + ex.InnerException.StackTrace);
+                }
                 return 0;
             }
-        }
-
-        private static double[] PrintSignalLine()
-        {
-            var inputValue = _inputValues.Single(t => t.Name == "MACD Line");
-            var index = inputValue.Values.FindIndex(t => t.Time == _currenDateTime);
-            if (index < 0)
-            {
-                Log($"No data for {_currenDateTime}");
-                return new double[NeuronNetwork.HISTORY_WINDOW_LENGTH];
-            }
-
-            var macdFloat = inputValue.Values.Skip(index - 3 * NeuronNetwork.HISTORY_WINDOW_LENGTH)
-                .Take(3*NeuronNetwork.HISTORY_WINDOW_LENGTH).Select(t => t.Value).ToArray();
-            var macd = macdFloat.Select(t => (decimal) t).ToArray();
-
-            var signal = new GenericMovingAverage(
-                i => macd[i],
-                Smoothing.Ema(9),
-                macd.Length);
-
-            var sb = new StringBuilder();
-            sb.Append("SL: ");
-            var result = new List<double>();
-            for (int i = 2 * NeuronNetwork.HISTORY_WINDOW_LENGTH; i < macd.Length; i++)
-            {
-                if (i > 2 * NeuronNetwork.HISTORY_WINDOW_LENGTH)
-                    sb.Append(",");
-                var value = signal[i].Value;
-                result.Add((double)value);
-                sb.Append(value.ToString("F10"));
-
-            }
-            Log(sb.ToString());
-            return result.ToArray();
         }
 
         private static void PrintTraningData(string name)
@@ -200,24 +139,23 @@ namespace MasterDataFlow.MetaTrader
             }
         }
 
-        public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
-        {
-            if (items == null) throw new ArgumentNullException("items");
-            if (predicate == null) throw new ArgumentNullException("predicate");
 
-            int retVal = 0;
-            foreach (var item in items)
-            {
-                if (predicate(item)) return retVal;
-                retVal++;
-            }
-            return -1;
+        private static double[] ConversInputData(string indicatorName, Bar[] bars)
+        {
+            var indicator = (new InputDataCollection()).GetInputs()
+                .Single(t => t.Name == indicatorName);
+
+            var values = indicator.GetValues(bars);
+
+            var scalar = new MinMaxScaler(indicator.GetMin(), indicator.GetMax());
+            scalar.Transform(values);
+            return values.Values.Select(t => (double) t.Value).ToArray();
         }
 
         private static void Log(string message)
         {
             var date = DateTime.Now.ToString("s");
-            File.AppendAllLines(@"c:\tmp\masterdata.log", new []{ date + " " + message });
+            File.AppendAllLines(@"c:\tmp\masterdata.log", new[] { date + " " + message });
         }
 
         private static float[] _previuosOutput = new float[TradingItemInitData.OUTPUT_NUMBER];
@@ -268,6 +206,20 @@ namespace MasterDataFlow.MetaTrader
             var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var masterDataFlowPath = Path.Combine(path, "MasterDataFlow");
             return masterDataFlowPath;
+        }
+
+        public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            if (predicate == null) throw new ArgumentNullException("predicate");
+
+            int retVal = 0;
+            foreach (var item in items)
+            {
+                if (predicate(item)) return retVal;
+                retVal++;
+            }
+            return -1;
         }
     }
 }

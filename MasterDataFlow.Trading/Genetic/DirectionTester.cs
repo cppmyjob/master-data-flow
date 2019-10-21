@@ -37,15 +37,16 @@ namespace MasterDataFlow.Trading.Genetic
 
         private float[] _inputs;
 
-        public double ZigZagCount
+        public int ZigZagCount
         {
             get
             {
-                if (_zigZagAll == 0)
-                    return 0;
-                if (_zigZagFitness < 0)
-                    return 0.000001 * Math.Abs(_zigZagFitness);
-                return (double)_zigZagFitness / _zigZagAll;
+                //if (_zigZagAll == 0)
+                //    return 0;
+                //if (_zigZagFitness < 0)
+                //    return 0.000001 * Math.Abs(_zigZagFitness);
+                //return (double)_zigZagFitness / _zigZagAll;
+                return _zigZagFitness;
             }
         }
 

@@ -43,8 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advisors\AdvisorSignal.cs" />
-    <Compile Include="Advisors\BaseAdvisor.cs" />
     <Compile Include="Algorithms\AlgorithmSignal.cs" />
     <Compile Include="Algorithms\NeuralNetworkAlgorithm.cs" />
     <Compile Include="Configs\CommandInitDataConfigSection.cs" />
@@ -62,12 +60,10 @@
     <Compile Include="Interfaces\IInputDataCollection.cs" />
     <Compile Include="Interfaces\ITradingAlgorithm.cs" />
     <Compile Include="Interfaces\ITradingLogger.cs" />
-    <Compile Include="Interfaces\ITrader.cs" />
     <Compile Include="IO\Reader.cs" />
     <Compile Include="IO\Writer.cs" />
     <Compile Include="Tester\Tester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Advisors\NeuralNetworkAdvisor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MasterDataFlow.Intelligence\MasterDataFlow.Intelligence.csproj">

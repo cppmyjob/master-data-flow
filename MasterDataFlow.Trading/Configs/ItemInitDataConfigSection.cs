@@ -89,6 +89,15 @@ namespace MasterDataFlow.Trading.Configs
                 return (bool)base["isZigZag"];
             }
         }
+        [ConfigurationProperty("validationPercent", DefaultValue = 0)]
+        public int ValidationPercent
+        {
+            get
+            {
+                return (int)base["validationPercent"];
+            }
+        }
+
 
     }
 

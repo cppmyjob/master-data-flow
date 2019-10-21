@@ -16,7 +16,7 @@ namespace MasterDataFlow.Trading.Configs
             return retval;
         }
 
-        [ConfigurationProperty("processorCount", DefaultValue = 1)]
+        [ConfigurationProperty("processorCount", DefaultValue = 0)]
         public int ProcessorCount
         {
             get

@@ -243,7 +243,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             var trainingDays = days * 60 / 100;
             //var validationDays = days * 35 / 100;
             //var testDays = days * 5 / 100;
-
             var validationDays = days * 20 / 100;
             var testDays = days * 20 / 100;
 
