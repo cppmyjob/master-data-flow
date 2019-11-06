@@ -37,6 +37,7 @@ namespace MasterDataFlow.Trading.Ui
 
             var processorCount = ((KeyValuePair<int, string>)cmbProcessors.SelectedItem).Key;
             var controller = new TradingCommandController(processorCount);
+            controller.PopulationFactor = (int)nudPopulationFactor.Value;
             controller.DisplayBestEvent += ControllerOnDisplayBestEvent;
             controller.DisplayChartPricesEvent += ControllerOnDisplayChartPricesEvent;
             controller.IterationEndEvent += ControllerOnIterationEndEvent;
