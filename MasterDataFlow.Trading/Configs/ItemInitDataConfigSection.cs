@@ -17,6 +17,15 @@ namespace MasterDataFlow.Trading.Configs
                 return (bool)base["isFilterBadResult"];
             }
         }
+
+        [ConfigurationProperty("isFilterBadResultBuySell", DefaultValue = false)]
+        public bool IsFilterBadResultBuySell
+        {
+            get
+            {
+                return (bool)base["isFilterBadResultBuySell"];
+            }
+        }
     }
 
     public class ItemInitDataTrainingOptimizerElement : ConfigurationElement
