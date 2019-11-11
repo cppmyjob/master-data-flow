@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -48,9 +50,17 @@ namespace MasterDataFlow.Trading.Ui
 
         private void ControllerOnSetPeriodsEvent(object sender, PeriodChangedArgs args)
         {
-            SetDateTimePicker(dtpStartTrainingDate, args.StartTraining);
-            SetDateTimePicker(dtpStartValidationDate, args.StartValidation);
-            SetDateTimePicker(dtpStartTestDate, args.StartTest);
+            var items = new List<string[]>();
+            for (int i = 0; i < args.Trainings.Length; i++)
+            {
+                var data = args.Trainings[i];
+                items.Add( new []{ "Training "+ i, data.StartDateTime.ToString("u") });
+            }
+
+            items.Add(new[] { "Test ", args.Test.StartDateTime.ToString("u") });
+
+            SetListView(lvDateRange, items.ToArray());
+
         }
 
         private void ControllerOnIterationEndEvent(object sender, IterationEndArgs args)
@@ -82,18 +92,14 @@ namespace MasterDataFlow.Trading.Ui
             SetText(tbStopLoss, neuronItem.StopLoss.ToString("F10"));
 
             var stories = new List<Story>();
-            if (neuronItem.TrainingTesterResult != null)
+            if (neuronItem.FinalResult != null)
             {
-                SetText(tbTrainingMinusCount, (neuronItem.TrainingTesterResult.MinusCount).ToString("D"));
-                SetText(tbTrainingOrderCount, (neuronItem.TrainingTesterResult.OrderCount).ToString("D"));
-                SetText(tbTrainingPlusCount, (neuronItem.TrainingTesterResult.PlusCount).ToString("D"));
-                SetText(tbTrainingProfit, (neuronItem.TrainingTesterResult.Profit).ToString("F10"));
-                SetText(tbTrainingDiff, (neuronItem.TrainingTesterResult.MinEquity).ToString("F10"));
-                stories.AddRange(neuronItem.TrainingTesterResult.Stories);
-            }
-            if (neuronItem.ValidationTesterResult != null)
-            {
-                stories.AddRange(neuronItem.ValidationTesterResult.Stories);
+                SetText(tbTrainingMinusCount, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.MinusCount)).ToString("D"));
+                SetText(tbTrainingOrderCount, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.OrderCount)).ToString("D"));
+                SetText(tbTrainingPlusCount, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.PlusCount)).ToString("D"));
+                SetText(tbTrainingProfit, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.Profit)).ToString("F10"));
+                SetText(tbTrainingDiff, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.MinEquity)).ToString("F10"));
+                stories.AddRange(neuronItem.FinalResult.TrainingTesterResult.SelectMany(t => t.Stories).ToArray());
             }
 
             var neuron = NeuronNetwork.CreateNeuronDll(controller.DataObject.ItemInitData.NeuronNetwork, neuronItem);
@@ -184,6 +190,43 @@ namespace MasterDataFlow.Trading.Ui
             else
             {
                 control.Value = value;
+            }
+        }
+
+
+        private delegate void SetListBoxCallback(ListBox control, object[] items);
+
+        private void SetListBox(ListBox control, object[] items)
+        {
+            if (control.InvokeRequired)
+            {
+                var d = new SetListBoxCallback(SetListBox);
+                this.Invoke(d, new object[] { control, items });
+            }
+            else
+            {
+                control.Items.Clear();
+                control.Items.AddRange(items);
+            }
+        }
+
+        private delegate void SetListViewCallback(ListView control, string[][] items);
+
+        private void SetListView(ListView control, string[][] items)
+        {
+            if (control.InvokeRequired)
+            {
+                var d = new SetListViewCallback(SetListView);
+                this.Invoke(d, new object[] { control, items });
+            }
+            else
+            {
+                control.Items.Clear();
+                for (int i = 0; i < items.Length; i++)
+                {
+                    var item = control.Items.Add(items[i][0]);
+                    item.SubItems.Add(items[i][1]);
+                }
             }
         }
 

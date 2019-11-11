@@ -29,7 +29,7 @@ namespace MasterDataFlow.Trading.IO
             lock (this)
             {
 
-                if (item.TrainingTesterResult == null || item.ValidationTesterResult == null)
+                if (item.FinalResult == null)
                     return;
 
                 if (lastGuid != null && lastGuid.ToString() == item.Guid.ToString())
@@ -73,6 +73,9 @@ namespace MasterDataFlow.Trading.IO
                 "Date, ";
             line += "Guid, ";
             line += "Fitness, ";
+            line += "FitnessOriginal, ";
+            line += "FitnessOriginalStdPercent, ";
+            line += "FitnessOriginalStd, ";
             line += "FitnessExpectedValue, ";
             line += "FitnessZigZag, ";
             line += "FitnessProfit, ";
@@ -80,7 +83,6 @@ namespace MasterDataFlow.Trading.IO
             line += "FitnessPlusMinusEquityRatio, ";
             line += "StopLoss, ";
             line += AddHeaderTestResult("tr");
-            line += AddHeaderTestResult("pr");
             line += AddHeaderTestResult("fr");
             writer.WriteLine(line);
         }
@@ -104,29 +106,36 @@ namespace MasterDataFlow.Trading.IO
             string line = DateTime.Now.ToString(CultureInfo.InvariantCulture) + ", ";
             line += item.Guid.ToString() + ", ";
             line += item.Fitness.ToString("F10") + ", ";
+            line += item.FitnessOriginal.ToString("F10") + ", ";
+            line += GetStdPercent(item).ToString("F2") + ", ";
+            line += item.FinalResult.Std.ToString("F10") + ", ";
             line += item.FitnessExpectedValue.ToString("F10") + ", ";
             line += item.FitnessZigZag.ToString("F10") + ", ";
             line += item.FitnessProfit.ToString("F10") + ", ";
             line += item.FitnessPlusMinusOrdersRatio.ToString("F10") + ", ";
             line += item.FitnessPlusMinusEquityRatio.ToString("F10") + ", ";
             line += item.StopLoss.ToString("F10") + ", ";
-            line = SaveTestResult(item.TrainingTesterResult, line);
-            line = SaveTestResult(item.ValidationTesterResult, line);
-            line = SaveTestResult(futureResult, line);
+            line = SaveTestResult(item.FinalResult.TrainingTesterResult, line);
+            line = SaveTestResult(new []{futureResult}, line);
 
             writer.WriteLine(line);
         }
 
-        private string SaveTestResult(TesterResult tr, string line)
+        private double GetStdPercent(TradingItem item)
         {
-            line += tr.Profit.ToString("F10") + ", ";
-            line += tr.OrderCount.ToString("D") + ", ";
-            line += tr.PlusCount.ToString("D") + ", ";
-            line += tr.MinusCount.ToString("D") + ", ";
-            line += tr.MaxEquity.ToString("F10") + ", ";
-            line += tr.MinEquity.ToString("F10") + ", ";
-            line += tr.PlusEquityCount.ToString("D") + ", ";
-            line += tr.MinusEquityCount.ToString("D") + ", ";
+            return item.FinalResult.Std * 100 / item.FitnessOriginal;
+        }
+
+        private string SaveTestResult(TesterResult[] tr, string line)
+        {
+            line += tr.Sum(t => t.Profit).ToString("F10") + ", ";
+            line += tr.Sum(t => t.OrderCount).ToString("D") + ", ";
+            line += tr.Sum(t => t.PlusCount).ToString("D") + ", ";
+            line += tr.Sum(t => t.MinusCount).ToString("D") + ", ";
+            line += tr.Sum(t => t.MaxEquity).ToString("F10") + ", ";
+            line += tr.Sum(t => t.MinEquity).ToString("F10") + ", ";
+            line += tr.Sum(t => t.PlusEquityCount).ToString("D") + ", ";
+            line += tr.Sum(t => t.MinusEquityCount).ToString("D") + ", ";
             return line;
         }
 

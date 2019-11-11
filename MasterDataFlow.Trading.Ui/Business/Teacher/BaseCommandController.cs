@@ -65,16 +65,14 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
     public class PeriodChangedArgs
     {
-        public PeriodChangedArgs(DateTime startTraining, DateTime startValidation, DateTime startTest)
+        public PeriodChangedArgs(LearningData[] trainings, LearningData test)
         {
-            StartTraining = startTraining;
-            StartValidation = startValidation;
-            StartTest = startTest;
+            Trainings = trainings;
+            Test = test;
         }
 
-        public DateTime StartTraining { get; private set; }
-        public DateTime StartValidation { get; private set; }
-        public DateTime StartTest { get; private set; }
+        public LearningData[] Trainings { get; private set; }
+        public LearningData Test { get; private set; }
 
     }
 
@@ -110,9 +108,8 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
         private int[] _zigZag = null;
         private ZigZagValue[] _zigZagLearningData = null;
         private readonly InputDataCollection _inputData = new InputDataCollection();
-        private LearningData _trainingData = null;
-        private LearningData _validationData = null;
         private LearningData _testData = null;
+        private List<LearningData> _trainings = new List<LearningData>();
 
         #region Properties
         public int PopulationFactor { get; set; } = 1;
@@ -156,7 +153,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
                     {
 
                         _dataObject = await CreateDataObject();
-
                         DisplayChartPrices();
 
                         var tradingItem = _reader.ReadItem(_dataObject.ItemInitData);
@@ -211,7 +207,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
             await LoadInputData(itemInitData);
 
-            var result = new TradingDataObject(itemInitData, _trainingData, _validationData,
+            var result = new TradingDataObject(itemInitData, _trainings.ToArray(),
                 100 * PopulationFactor, 33 * PopulationFactor, _processorCount);
 
             return result;
@@ -240,15 +236,13 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
             var days = (endTestDate - startTrainingDate).TotalDays;
 
-            var trainingDays = days * 60 / 100;
-            var validationDays = days * 35 / 100;
-            var testDays = days * 5 / 100;
-//            var validationDays = days * 20 / 100;
-//            var testDays = days * 20 / 100;
-
-
-            var startValidationDate = startTrainingDate.AddDays(trainingDays);
-            var startTestDate = startValidationDate.AddDays(validationDays);
+            var testDays = 14;
+            var trainingDays = days - testDays;
+            var foldsCount = 10;
+            var foldsDays = (int) (trainingDays / foldsCount);
+            trainingDays = foldsDays * foldsCount;
+            var startTestDate = endTestDate.AddDays(-testDays);
+            startTrainingDate = startTestDate.AddDays(-trainingDays);
 
             var inputValues = new List<InputValues>();
             var inputs = _inputData.GetInputs();
@@ -264,19 +258,23 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
             }
 
-            // тренировочные данные
-            _trainingData = CreateLearningData(itemInitData, inputValues, startTrainingDate, trainingDays);
-            // валидационные данные
-            _validationData = CreateLearningData(itemInitData, inputValues, startValidationDate, validationDays);
+            for (int i = 0; i < foldsCount; i++)
+            {
+                var startFoldDate = startTrainingDate.AddDays(i * foldsDays);
+                var trainingData = CreateLearningData(itemInitData, inputValues, startFoldDate, foldsDays);
+                _trainings.Add(trainingData);
+            }
+
             // тест дата
             _testData = CreateLearningData(itemInitData, inputValues, startTestDate, testDays);
 
-            SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(startTrainingDate, startValidationDate, startTestDate));
+            SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(_trainings.ToArray(), _testData));
         }
 
         private LearningData CreateLearningData(TradingItemInitData itemInitData, List<InputValues> inputValues, DateTime startDate, double days)
         {
             var result = new LearningData();
+            result.StartDateTime = startDate;
             // Получаем список цен в требуем диапазоне
             result.Prices = _tradingBars
                 .SkipWhile(t => t.Time < startDate)

@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -44,12 +44,6 @@
             this.btnStart = new System.Windows.Forms.Button();
             this.nudPopulationFactor = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
-            this.dtpStartTestDate = new System.Windows.Forms.DateTimePicker();
-            this.dtpStartValidationDate = new System.Windows.Forms.DateTimePicker();
-            this.dtpStartTrainingDate = new System.Windows.Forms.DateTimePicker();
-            this.label21 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
             this.cmbProcessors = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
             this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -89,6 +83,9 @@
             this.btnTesterStart = new System.Windows.Forms.Button();
             this.btnOpenTestFile = new System.Windows.Forms.Button();
             this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
+            this.lvDateRange = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -139,17 +136,17 @@
             // 
             // tradingChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.tradingChart.ChartAreas.Add(chartArea1);
+            chartArea3.Name = "ChartArea1";
+            this.tradingChart.ChartAreas.Add(chartArea3);
             this.tradingChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.tradingChart.Legends.Add(legend1);
+            legend3.Name = "Legend1";
+            this.tradingChart.Legends.Add(legend3);
             this.tradingChart.Location = new System.Drawing.Point(3, 16);
             this.tradingChart.Name = "tradingChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.tradingChart.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.tradingChart.Series.Add(series3);
             this.tradingChart.Size = new System.Drawing.Size(1166, 350);
             this.tradingChart.TabIndex = 0;
             this.tradingChart.Text = "chart1";
@@ -180,15 +177,10 @@
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage3.Controls.Add(this.lvDateRange);
             this.tabPage3.Controls.Add(this.btnStart);
             this.tabPage3.Controls.Add(this.nudPopulationFactor);
             this.tabPage3.Controls.Add(this.label23);
-            this.tabPage3.Controls.Add(this.dtpStartTestDate);
-            this.tabPage3.Controls.Add(this.dtpStartValidationDate);
-            this.tabPage3.Controls.Add(this.dtpStartTrainingDate);
-            this.tabPage3.Controls.Add(this.label21);
-            this.tabPage3.Controls.Add(this.label20);
-            this.tabPage3.Controls.Add(this.label19);
             this.tabPage3.Controls.Add(this.cmbProcessors);
             this.tabPage3.Controls.Add(this.label15);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
@@ -200,7 +192,7 @@
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(646, 36);
+            this.btnStart.Location = new System.Drawing.Point(1013, 27);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(112, 34);
             this.btnStart.TabIndex = 56;
@@ -210,7 +202,7 @@
             // 
             // nudPopulationFactor
             // 
-            this.nudPopulationFactor.Location = new System.Drawing.Point(224, 80);
+            this.nudPopulationFactor.Location = new System.Drawing.Point(164, 68);
             this.nudPopulationFactor.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -225,85 +217,31 @@
             this.nudPopulationFactor.Size = new System.Drawing.Size(50, 20);
             this.nudPopulationFactor.TabIndex = 55;
             this.nudPopulationFactor.Value = new decimal(new int[] {
-            100,
+            10,
             0,
             0,
             0});
             // 
             // label23
             // 
-            this.label23.Location = new System.Drawing.Point(91, 84);
+            this.label23.Location = new System.Drawing.Point(31, 72);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(127, 18);
             this.label23.TabIndex = 54;
             this.label23.Text = "Population Count 100x :";
             // 
-            // dtpStartTestDate
-            // 
-            this.dtpStartTestDate.CustomFormat = "dd/MM/yyyy HH:MM";
-            this.dtpStartTestDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpStartTestDate.Location = new System.Drawing.Point(409, 82);
-            this.dtpStartTestDate.Name = "dtpStartTestDate";
-            this.dtpStartTestDate.Size = new System.Drawing.Size(153, 20);
-            this.dtpStartTestDate.TabIndex = 53;
-            this.dtpStartTestDate.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            // 
-            // dtpStartValidationDate
-            // 
-            this.dtpStartValidationDate.CustomFormat = "dd/MM/yyyy HH:MM";
-            this.dtpStartValidationDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpStartValidationDate.Location = new System.Drawing.Point(409, 59);
-            this.dtpStartValidationDate.Name = "dtpStartValidationDate";
-            this.dtpStartValidationDate.Size = new System.Drawing.Size(153, 20);
-            this.dtpStartValidationDate.TabIndex = 52;
-            this.dtpStartValidationDate.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            // 
-            // dtpStartTrainingDate
-            // 
-            this.dtpStartTrainingDate.CustomFormat = "dd/MM/yyyy HH:MM";
-            this.dtpStartTrainingDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpStartTrainingDate.Location = new System.Drawing.Point(409, 36);
-            this.dtpStartTrainingDate.Name = "dtpStartTrainingDate";
-            this.dtpStartTrainingDate.Size = new System.Drawing.Size(153, 20);
-            this.dtpStartTrainingDate.TabIndex = 51;
-            this.dtpStartTrainingDate.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            // 
-            // label21
-            // 
-            this.label21.Location = new System.Drawing.Point(292, 82);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(119, 18);
-            this.label21.TabIndex = 50;
-            this.label21.Text = "End Predication Date :";
-            // 
-            // label20
-            // 
-            this.label20.Location = new System.Drawing.Point(297, 59);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(113, 18);
-            this.label20.TabIndex = 49;
-            this.label20.Text = "Start Validation Date :";
-            // 
-            // label19
-            // 
-            this.label19.Location = new System.Drawing.Point(304, 38);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(113, 18);
-            this.label19.TabIndex = 48;
-            this.label19.Text = "Start Training Date :";
-            // 
             // cmbProcessors
             // 
             this.cmbProcessors.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbProcessors.FormattingEnabled = true;
-            this.cmbProcessors.Location = new System.Drawing.Point(197, 39);
+            this.cmbProcessors.Location = new System.Drawing.Point(137, 27);
             this.cmbProcessors.Name = "cmbProcessors";
             this.cmbProcessors.Size = new System.Drawing.Size(77, 21);
             this.cmbProcessors.TabIndex = 47;
             // 
             // label15
             // 
-            this.label15.Location = new System.Drawing.Point(111, 42);
+            this.label15.Location = new System.Drawing.Point(51, 30);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(80, 16);
             this.label15.TabIndex = 46;
@@ -603,17 +541,17 @@
             // 
             // chart1
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea4.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea4);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend4.Name = "Legend1";
+            this.chart1.Legends.Add(legend4);
             this.chart1.Location = new System.Drawing.Point(3, 3);
             this.chart1.Name = "chart1";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.chart1.Series.Add(series2);
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            this.chart1.Series.Add(series4);
             this.chart1.Size = new System.Drawing.Size(1172, 471);
             this.chart1.TabIndex = 1;
             this.chart1.Text = "chart1";
@@ -654,6 +592,29 @@
             // 
             this.ofdOpenTestFile.FileName = "openFileDialog1";
             // 
+            // lvDateRange
+            // 
+            this.lvDateRange.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.lvDateRange.HideSelection = false;
+            this.lvDateRange.Location = new System.Drawing.Point(286, 6);
+            this.lvDateRange.Name = "lvDateRange";
+            this.lvDateRange.Size = new System.Drawing.Size(447, 197);
+            this.lvDateRange.TabIndex = 57;
+            this.lvDateRange.UseCompatibleStateImageBehavior = false;
+            this.lvDateRange.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Type";
+            this.columnHeader1.Width = 173;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Date";
+            this.columnHeader2.Width = 229;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -693,12 +654,6 @@
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.NumericUpDown nudPopulationFactor;
         private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.DateTimePicker dtpStartTestDate;
-        private System.Windows.Forms.DateTimePicker dtpStartValidationDate;
-        private System.Windows.Forms.DateTimePicker dtpStartTrainingDate;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.Label label19;
         private System.Windows.Forms.ComboBox cmbProcessors;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TabPage tabPage4;
@@ -737,5 +692,8 @@
         private System.Windows.Forms.Button btnOpenTestFile;
         private System.Windows.Forms.OpenFileDialog ofdOpenTestFile;
         private System.Windows.Forms.Button btnTesterStart;
+        private System.Windows.Forms.ListView lvDateRange;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }

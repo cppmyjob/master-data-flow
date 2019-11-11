@@ -72,6 +72,7 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class LearningData
     {
+        public DateTime StartDateTime { get; set; }
         public Bar[] Prices { get; set; }
         public LearningInputData[] Indicators { get; set; }
         //public LearningDataIndicator Values { get; set; }
@@ -563,14 +564,12 @@ namespace MasterDataFlow.Trading.Genetic
     [Serializable]
     public class TradingDataObject : GeneticFloatDataObject<TradingItemInitData, TradingItem>
     {
-        public LearningData TrainingData { get; }
-        public LearningData ValidationData { get; }
+        public LearningData[] TrainingData { get; }
 
-        public TradingDataObject(TradingItemInitData itemInitData, LearningData trainingData, LearningData validationData,
+        public TradingDataObject(TradingItemInitData itemInitData, LearningData[] trainingData, 
             int itemsCount, int surviveCount, int processorsCount)
         {
             TrainingData = trainingData;
-            ValidationData = validationData;
             ItemInitData = itemInitData;
             CommandInitData = new GeneticCommandInitData(itemsCount, surviveCount, 3000000, processorsCount);
         }
@@ -594,6 +593,13 @@ namespace MasterDataFlow.Trading.Genetic
         public double FitnessPlusMinusOrdersRatio { get; set; }
         public double FitnessPlusMinusEquityRatio { get; set; }
     }
+
+    [Serializable]
+    public class FinalResult
+    {
+        public double Std { get; set; }
+        public TesterResult[] TrainingTesterResult { get; set; }
+    } 
 
     [Serializable]
     public class TradingItem : GeneticFloatItem<TradingItemInitData>, IFitness
@@ -625,10 +631,9 @@ namespace MasterDataFlow.Trading.Genetic
             get { return Values[InitData.OFFSET_STOPLOSS] * TradingItemInitData.MAX_STOPLOSS; }
         }
 
-        public TesterResult ValidationTesterResult { get; set; }
+        public FinalResult FinalResult { get; set; }
 
-        public TesterResult TrainingTesterResult { get; set; }
-
+        public double FitnessOriginal { get; set; }
         public double FitnessZigZag { get; set; }
         public double FitnessExpectedValue { get; set; }
         public double FitnessProfit { get; set; }
@@ -726,14 +731,23 @@ namespace MasterDataFlow.Trading.Genetic
                 fitness *= result.FitnessPlusMinusEquityRatio;
             }
 
+            fitness *= NormalizeValue(testerResult.MinusEquityCount + testerResult.PlusEquityCount);
+
             result.Fitness = fitness;
 
             return result;
         }
 
+        private class TrainingProgress
+        {
+            public TesterResult TesterResult { get; set; }
+            public int ZizZagCount { get; set; }
+            public IFitness Fintess { get; set; }
+        }
+
         public override double CalculateFitness(TradingItem item)
         {
-            bool[] oldValues = new bool[DataObject.TrainingData.Indicators.Length];
+            bool[] oldValues = new bool[DataObject.TrainingData[0].Indicators.Length];
             for (int i = 0; i < item.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var index = (int)item.Values[i];
@@ -744,82 +758,113 @@ namespace MasterDataFlow.Trading.Genetic
 
 
             var dll = GetNeuronDll(item);
-
-            int trainingZigZagCount;
-            var trainingResult = GetProfit(dll, item, DataObject.TrainingData, out trainingZigZagCount);
-            item.TrainingTesterResult = trainingResult;
-
-            if (trainingResult.Profit <= 0)
+            var progress = new List<TrainingProgress>();
+            for (int i = 0; i < DataObject.TrainingData.Length; i++)
             {
-                return Double.MinValue;
-            }
+                var trainingData = DataObject.TrainingData[i];
 
-            if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResult && FilterBadResult(trainingResult))
-            {
-                return Double.MinValue;
-            }
+                int trainingZigZagCount;
+                var trainingResult = GetProfit(dll, item, trainingData, out trainingZigZagCount);
 
-            if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResultBuySell && FilterBadResultBuySell(trainingResult))
-            {
-                return Double.MinValue;
-            }
-
-            int validationZigZagCount;
-            var validationResult = GetProfit(dll, item, DataObject.ValidationData, out validationZigZagCount);
-            item.ValidationTesterResult = validationResult;
-
-            if (validationResult.Profit <= 0)
-            {
-                return Double.MinValue;
-            }
-
-            if (DataObject.ItemInitData.Optimizer.Validation.IsFilterBadResult && FilterBadResult(validationResult))
-                return Double.MinValue;
-
-            if (DataObject.ItemInitData.Optimizer.Validation.IsFilterBadResultBuySell && FilterBadResultBuySell(validationResult))
-            {
-                return Double.MinValue;
-            }
-
-            if (DataObject.ItemInitData.Optimizer.IsValidationPlusMinusRatioLessTraining)
-            {
-                if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
+                if (trainingResult.Profit <= 0)
                 {
-                    if (((float)validationResult.PlusCount / validationResult.MinusCount) <
-                        ((float)trainingResult.PlusCount / trainingResult.MinusCount))
-                    {
-                        return Double.MinValue;
-                    }
+                    return -DataObject.TrainingData.Length + i;
                 }
+
+                if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResult && FilterBadResult(trainingResult))
+                {
+                    return -DataObject.TrainingData.Length + i;
+                }
+
+                if (DataObject.ItemInitData.Optimizer.Training.IsFilterBadResultBuySell && FilterBadResultBuySell(trainingResult))
+                {
+                    return -DataObject.TrainingData.Length + i;
+                }
+
+                progress.Add(new TrainingProgress {
+                                 TesterResult = trainingResult,
+                                 ZizZagCount = trainingZigZagCount
+                            });
             }
 
+            //if (DataObject.ItemInitData.Optimizer.IsValidationPlusMinusRatioLessTraining)
+            //{
+            //    if (validationResult.MinusCount > 0 && trainingResult.MinusCount > 0)
+            //    {
+            //        if (((float)validationResult.PlusCount / validationResult.MinusCount) <
+            //            ((float)trainingResult.PlusCount / trainingResult.MinusCount))
+            //        {
+            //            return Double.MinValue;
+            //        }
+            //    }
+            //}
 
-            var trainingFitness = GetFitness(trainingResult, trainingZigZagCount);
+            for (int i = 0; i < progress.Count; i++)
+            {
+                progress[i].Fintess = GetFitness(progress[i].TesterResult, progress[i].ZizZagCount);
+            }
 
-            var validationFitness = GetFitness(validationResult, validationZigZagCount);
-
-            item.FitnessZigZag = trainingFitness.FitnessZigZag + validationFitness.FitnessZigZag;
-            item.FitnessExpectedValue = trainingFitness.FitnessExpectedValue + validationFitness.FitnessExpectedValue;
-            item.FitnessProfit = trainingFitness.FitnessProfit + validationFitness.FitnessProfit;
-            item.FitnessPlusMinusOrdersRatio = trainingFitness.FitnessPlusMinusOrdersRatio + validationFitness.FitnessPlusMinusOrdersRatio;
-            item.FitnessPlusMinusEquityRatio = trainingFitness.FitnessPlusMinusEquityRatio + validationFitness.FitnessPlusMinusEquityRatio;
+            item.FitnessZigZag = progress.Sum(t => t.Fintess.FitnessZigZag) / progress.Count;
+            item.FitnessExpectedValue = progress.Sum(t => t.Fintess.FitnessExpectedValue) / progress.Count;
+            item.FitnessProfit = progress.Sum(t => t.Fintess.FitnessProfit) / progress.Count; ;
+            item.FitnessPlusMinusOrdersRatio = progress.Sum(t => t.Fintess.FitnessPlusMinusOrdersRatio) / progress.Count;
+            item.FitnessPlusMinusEquityRatio = progress.Sum(t => t.Fintess.FitnessPlusMinusEquityRatio) / progress.Count; ;
 
             var validationPercent = DataObject.ItemInitData.Optimizer.Fitness.ValidationPercent;
+            //if (validationPercent > 0)
+            //{
+            //    var percentMin = 1 - (validationPercent / (double)100);
+            //    var percentMax = 1 + (validationPercent / (double)100);
 
+            //    var min = trainingFitness.Fitness * percentMin;
+            //    var max = trainingFitness.Fitness * percentMax;
+            //    if (!(min <= validationFitness.Fitness && validationFitness.Fitness <= max))
+            //    {
+            //        return Double.MinValue;
+            //    }
+            //}
+            var std = CalculateStdDev(progress.Select(t => t.Fintess.Fitness));
+            var mean = CalculateMean(progress.Select(t => t.Fintess.Fitness));
+            item.FitnessOriginal = mean;
+            
             if (validationPercent > 0)
             {
-                var percentMin = 1 - (validationPercent / (double)100);
-                var percentMax = 1 + (validationPercent / (double)100);
+                var maxDeviation = mean * (validationPercent / (double)100);
 
-                var min = trainingFitness.Fitness * percentMin;
-                var max = trainingFitness.Fitness * percentMax;
-                if (!(min <= validationFitness.Fitness && validationFitness.Fitness <= max))
+                if (std > maxDeviation)
                 {
-                    return Double.MinValue;
+                    return - 0.5;
                 }
             }
 
-            return trainingFitness.Fitness + validationFitness.Fitness;
+            var finalResult = new FinalResult {
+                TrainingTesterResult = progress.Select(t => t.TesterResult).ToArray(),
+                Std = std,
+            };
+
+            item.FinalResult = finalResult;
+
+            return mean * NormalizeValue(1 / std);
+        }
+
+        private double CalculateStdDev(IEnumerable<double> values)
+        {
+            double ret = 0;
+            if (values.Count() > 0)
+            {
+                //Compute the Average      
+                double avg = values.Average();
+                //Perform the Sum of (value-avg)_2_2      
+                double sum = values.Sum(d => Math.Pow(d - avg, 2));
+                //Put it all together      
+                ret = Math.Sqrt((sum) / (values.Count() - 1));
+            }
+            return ret;
+        }
+
+        private double CalculateMean(IEnumerable<double> values)
+        {
+            return values.Average();
         }
 
         /*
@@ -1286,7 +1331,7 @@ namespace MasterDataFlow.Trading.Genetic
 
         private int[] GetUniqueIndicatorIndexes()
         {
-            var result = new int[DataObject.TrainingData.Indicators.Length];
+            var result = new int[DataObject.TrainingData[0].Indicators.Length];
 
             if (!string.IsNullOrEmpty(DataObject.ItemInitData.InputData.Indicators.PredefinedNames))
             {
@@ -1305,7 +1350,7 @@ namespace MasterDataFlow.Trading.Genetic
                         {
                             var name = names[i];
                             var search = new LearningInputData.IndicatorSearch(name);
-                            var index = DataObject.TrainingData.Indicators.ToList().FindIndex(search.Match);
+                            var index = DataObject.TrainingData[0].Indicators.ToList().FindIndex(search.Match);
                             if (index < 0)
                                 throw new Exception("Invalid indicator name:" + name);
                             result[i] = index;
