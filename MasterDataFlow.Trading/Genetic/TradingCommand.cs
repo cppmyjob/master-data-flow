@@ -236,6 +236,8 @@ namespace MasterDataFlow.Trading.Genetic
                 IsProfit = configSection.Optimizer.Fitness.IsProfit;
                 IsZigZag = configSection.Optimizer.Fitness.IsZigZag;
                 ValidationPercent = configSection.Optimizer.Fitness.ValidationPercent;
+                IsTradingCount = configSection.Optimizer.Fitness.IsTradingCount;
+                IsOrderCount = configSection.Optimizer.Fitness.IsOrderCount;
             }
         }
 
@@ -243,6 +245,8 @@ namespace MasterDataFlow.Trading.Genetic
         public bool IsExpectedValue { get; private set; } = true;
         public bool IsPlusMinusOrdersRatio { get; private set; } = true;
         public bool IsPlusMinusEquityRatio { get; private set; } = true;
+        public bool IsTradingCount { get; private set; } = true;
+        public bool IsOrderCount { get; private set; } = true;
         public bool IsProfit { get; private set; } = true;
         public bool IsZigZag { get; private set; } = true;
 
@@ -261,6 +265,12 @@ namespace MasterDataFlow.Trading.Genetic
             IsProfit = Convert.ToBoolean(eFitness.Element("isProfit").Value);
             IsZigZag = Convert.ToBoolean(eFitness.Element("isZigZag").Value);
 
+            if (eFitness.Element("isTradingCount") != null)
+                IsTradingCount = Convert.ToBoolean(eFitness.Element("isTradingCount").Value);
+
+            if (eFitness.Element("isOrderCount") != null)
+                IsOrderCount = Convert.ToBoolean(eFitness.Element("isOrderCount").Value);
+
             if (eFitness.Element("validationPercent") != null)
                 ValidationPercent = Convert.ToInt32(eFitness.Element("validationPercent").Value);
         }
@@ -275,6 +285,8 @@ namespace MasterDataFlow.Trading.Genetic
             eFitness.Add(new XElement("isPlusMinusEquityRatio", IsPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("isProfit", IsProfit.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("isZigZag", IsZigZag.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isTradingCount", IsTradingCount.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isOrderCount", IsOrderCount.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("validationPercent", ValidationPercent.ToString(CultureInfo.InvariantCulture)));
         }
     }
@@ -371,11 +383,13 @@ namespace MasterDataFlow.Trading.Genetic
         //    HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0),
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) * 1,
+        //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 4,
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 8,
         //    (1 * (HISTORY_WINDOW_LENGTH * Indicators.INDICATOR_NUMBER)  + (TradingItemInitData.IS_RECURRENT ? TradingItemInitData.OUTPUT_NUMBER : 0)) / 8,
-        //    TradingItemInitData.OUTPUT_NUMBER,
         //    TradingItemInitData.OUTPUT_NUMBER,
         //};
 
@@ -583,6 +597,8 @@ namespace MasterDataFlow.Trading.Genetic
         double FitnessProfit { get; set; }
         double FitnessPlusMinusOrdersRatio { get; set; }
         double FitnessPlusMinusEquityRatio { get; set; }
+        double FitnessTradingCount { get; set; }
+        double FitnessOrderCount { get; set; }
     }
 
     public class FitnessData : IFitness {
@@ -592,6 +608,8 @@ namespace MasterDataFlow.Trading.Genetic
         public double FitnessProfit { get; set; }
         public double FitnessPlusMinusOrdersRatio { get; set; }
         public double FitnessPlusMinusEquityRatio { get; set; }
+        public double FitnessTradingCount { get; set; }
+        public double FitnessOrderCount { get; set; }
     }
 
     [Serializable]
@@ -639,6 +657,8 @@ namespace MasterDataFlow.Trading.Genetic
         public double FitnessProfit { get; set; }
         public double FitnessPlusMinusOrdersRatio { get; set; }
         public double FitnessPlusMinusEquityRatio { get; set; }
+        public double FitnessTradingCount { get; set; }
+        public double FitnessOrderCount { get; set; }
     }
 
 
@@ -703,6 +723,21 @@ namespace MasterDataFlow.Trading.Genetic
                 result.FitnessPlusMinusEquityRatio = NormalizeValue(ecRation);
             }
 
+            // TradingCount
+            {
+                result.FitnessTradingCount = NormalizeValue(testerResult.TradingCount);
+            }
+
+            // Orders.Count
+            {
+                if (testerResult.Orders.Count > 0)
+                {
+                    result.FitnessOrderCount = NormalizeValue(1 / (double)testerResult.Orders.Count);
+                }
+                else
+                    result.FitnessOrderCount = 0;
+            }
+
             var fitness = 1.0;
 
 
@@ -731,7 +766,15 @@ namespace MasterDataFlow.Trading.Genetic
                 fitness *= result.FitnessPlusMinusEquityRatio;
             }
 
-            fitness *= NormalizeValue(testerResult.MinusEquityCount + testerResult.PlusEquityCount);
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsTradingCount)
+            {
+                fitness *= result.FitnessTradingCount;
+            }
+
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsOrderCount)
+            {
+                fitness *= result.FitnessOrderCount;
+            }
 
             result.Fitness = fitness;
 
@@ -809,6 +852,9 @@ namespace MasterDataFlow.Trading.Genetic
             item.FitnessProfit = progress.Sum(t => t.Fintess.FitnessProfit) / progress.Count; ;
             item.FitnessPlusMinusOrdersRatio = progress.Sum(t => t.Fintess.FitnessPlusMinusOrdersRatio) / progress.Count;
             item.FitnessPlusMinusEquityRatio = progress.Sum(t => t.Fintess.FitnessPlusMinusEquityRatio) / progress.Count; ;
+
+            item.FitnessTradingCount = progress.Sum(t => t.Fintess.FitnessTradingCount) / progress.Count;
+            item.FitnessOrderCount = progress.Sum(t => t.Fintess.FitnessOrderCount) / progress.Count;
 
             var validationPercent = DataObject.ItemInitData.Optimizer.Fitness.ValidationPercent;
             //if (validationPercent > 0)

@@ -40,7 +40,7 @@ namespace MasterDataFlow.Trading.Configs
         }
 
 
-        [ConfigurationProperty("isFilterBadResultBuySell", DefaultValue = false)]
+        [ConfigurationProperty("isFilterBadResultBuySell", DefaultValue = true)]
         public bool IsFilterBadResultBuySell
         {
             get
@@ -107,6 +107,24 @@ namespace MasterDataFlow.Trading.Configs
             }
         }
 
+
+        [ConfigurationProperty("isTradingCount", DefaultValue = true)]
+        public bool IsTradingCount
+        {
+            get
+            {
+                return (bool)base["isTradingCount"];
+            }
+        }
+
+        [ConfigurationProperty("isOrderCount", DefaultValue = false)]
+        public bool IsOrderCount
+        {
+            get
+            {
+                return (bool)base["isOrderCount"];
+            }
+        }
 
     }
 

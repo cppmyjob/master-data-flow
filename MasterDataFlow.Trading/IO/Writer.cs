@@ -81,6 +81,8 @@ namespace MasterDataFlow.Trading.IO
             line += "FitnessProfit, ";
             line += "FitnessPlusMinusOrdersRatio, ";
             line += "FitnessPlusMinusEquityRatio, ";
+            line += "FitnessTradingCount, ";
+            line += "FitnessOrderCount, ";
             line += "StopLoss, ";
             line += AddHeaderTestResult("tr");
             line += AddHeaderTestResult("fr");
@@ -114,6 +116,8 @@ namespace MasterDataFlow.Trading.IO
             line += item.FitnessProfit.ToString("F10") + ", ";
             line += item.FitnessPlusMinusOrdersRatio.ToString("F10") + ", ";
             line += item.FitnessPlusMinusEquityRatio.ToString("F10") + ", ";
+            line += item.FitnessTradingCount.ToString("F10") + ", ";
+            line += item.FitnessOrderCount.ToString("F10") + ", ";
             line += item.StopLoss.ToString("F10") + ", ";
             line = SaveTestResult(item.FinalResult.TrainingTesterResult, line);
             line = SaveTestResult(new []{futureResult}, line);
@@ -132,8 +136,8 @@ namespace MasterDataFlow.Trading.IO
             line += tr.Sum(t => t.OrderCount).ToString("D") + ", ";
             line += tr.Sum(t => t.PlusCount).ToString("D") + ", ";
             line += tr.Sum(t => t.MinusCount).ToString("D") + ", ";
-            line += tr.Sum(t => t.MaxEquity).ToString("F10") + ", ";
-            line += tr.Sum(t => t.MinEquity).ToString("F10") + ", ";
+            line += tr.Average(t => t.MaxEquity).ToString("F10") + ", ";
+            line += tr.Average(t => t.MinEquity).ToString("F10") + ", ";
             line += tr.Sum(t => t.PlusEquityCount).ToString("D") + ", ";
             line += tr.Sum(t => t.MinusEquityCount).ToString("D") + ", ";
             return line;
@@ -174,6 +178,9 @@ namespace MasterDataFlow.Trading.IO
             itemElement.Add(new XElement("fitnessExpectedValue", item.FitnessExpectedValue.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("fitnessPlusMinusOrdersRatio", item.FitnessPlusMinusOrdersRatio.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("fitnessPlusMinusEquityRatio", item.FitnessPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessTradingCount", item.FitnessTradingCount.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessOrderCount", item.FitnessOrderCount.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessOriginal", item.FitnessOriginal.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("guid", item.Guid.ToString()));
             itemElement.Add(new XElement("historyWidowLength", item.InitData.HistoryWidowLength.ToString(CultureInfo.InvariantCulture)));
 

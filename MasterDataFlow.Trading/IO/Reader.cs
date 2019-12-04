@@ -88,6 +88,19 @@ namespace MasterDataFlow.Trading.IO
             if (efitnessPlusMinusEquityRatio != null)
                 item.FitnessPlusMinusEquityRatio = Double.Parse(efitnessPlusMinusEquityRatio.Value);
 
+            XElement efitnessFitnessTradingCount = itemElement.Element("fitnessFitnessTradingCount");
+            if (efitnessFitnessTradingCount != null)
+                item.FitnessTradingCount = Double.Parse(efitnessFitnessTradingCount.Value);
+
+            XElement efitnessFitnessOrderCount = itemElement.Element("fitnessFitnessOrderCount");
+            if (efitnessFitnessOrderCount != null)
+                item.FitnessOrderCount = Double.Parse(efitnessFitnessOrderCount.Value);
+
+            XElement efitnessFitnessOriginal = itemElement.Element("fitnessFitnessOriginal");
+            if (efitnessFitnessOriginal != null)
+                item.FitnessOriginal = Double.Parse(efitnessFitnessOriginal.Value);
+
+
             XElement guid = itemElement.Element("guid");
             item.Guid = Guid.Parse(guid.Value);
 

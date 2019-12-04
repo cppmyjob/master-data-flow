@@ -43,6 +43,8 @@ namespace MasterDataFlow.Trading.Tester
         private List<Story> _stories = new List<Story>();
         private List<Order> _orders = new List<Order>();
 
+        public int TradingCount { get; internal set; } = 0;
+
         public bool ForceStop
         {
             get { return _forceStop; }
@@ -425,7 +427,7 @@ namespace MasterDataFlow.Trading.Tester
                     break;
                 _currentBar = i;
                 MakeTicks();
-
+                SetTradingCount();
             }
             while (_orders.Keys.Count > 0)
             {
@@ -463,6 +465,12 @@ namespace MasterDataFlow.Trading.Tester
                 }
                 OnTick();
             }
+        }
+
+        private void SetTradingCount()
+        {
+            if (_orders.Keys.Count > 0)
+                ++_result.TradingCount;
         }
 
         private void MakeStopLoss()

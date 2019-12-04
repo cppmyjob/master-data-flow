@@ -238,7 +238,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
             var testDays = 14;
             var trainingDays = days - testDays;
-            var foldsCount = 10;
+            var foldsCount = 5;
             var foldsDays = (int) (trainingDays / foldsCount);
             trainingDays = foldsDays * foldsCount;
             var startTestDate = endTestDate.AddDays(-testDays);

@@ -98,7 +98,7 @@ namespace MasterDataFlow.Trading.Ui
                 SetText(tbTrainingOrderCount, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.OrderCount)).ToString("D"));
                 SetText(tbTrainingPlusCount, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.PlusCount)).ToString("D"));
                 SetText(tbTrainingProfit, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.Profit)).ToString("F10"));
-                SetText(tbTrainingDiff, (neuronItem.FinalResult.TrainingTesterResult.Sum(t => t.MinEquity)).ToString("F10"));
+                SetText(tbTrainingDiff, (neuronItem.FinalResult.TrainingTesterResult.Average(t => t.MinEquity)).ToString("F10"));
                 stories.AddRange(neuronItem.FinalResult.TrainingTesterResult.SelectMany(t => t.Stories).ToArray());
             }
 
