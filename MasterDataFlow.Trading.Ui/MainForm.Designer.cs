@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend10 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -41,6 +44,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lvDateRange = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnStart = new System.Windows.Forms.Button();
             this.nudPopulationFactor = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
@@ -78,14 +84,19 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.tabControl3 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.testChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label16 = new System.Windows.Forms.Label();
+            this.cmbStocks = new System.Windows.Forms.ComboBox();
+            this.tradingUserInfo1 = new MasterDataFlow.Trading.Ui.TradingUserInfo();
             this.btnTesterStart = new System.Windows.Forms.Button();
-            this.btnOpenTestFile = new System.Windows.Forms.Button();
-            this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
-            this.lvDateRange = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.tableLayoutPanel1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -96,9 +107,43 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudPopulationFactor)).BeginInit();
             this.tabPage4.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            this.tabControl3.SuspendLayout();
+            this.tabPage5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.testChart)).BeginInit();
+            this.tabPage6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox3.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // ofdOpenTestFile
+            // 
+            this.ofdOpenTestFile.DefaultExt = "save";
+            this.ofdOpenTestFile.Filter = "Saved Data|*.save";
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1186, 655);
+            this.tableLayoutPanel1.TabIndex = 2;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.tabControl1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 53);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1180, 599);
+            this.panel1.TabIndex = 0;
             // 
             // tabControl1
             // 
@@ -108,8 +153,8 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1186, 655);
-            this.tabControl1.TabIndex = 1;
+            this.tabControl1.Size = new System.Drawing.Size(1180, 599);
+            this.tabControl1.TabIndex = 2;
             // 
             // tabPage1
             // 
@@ -118,7 +163,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1178, 629);
+            this.tabPage1.Size = new System.Drawing.Size(1172, 573);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Learning";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -129,25 +174,25 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(3, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1172, 369);
+            this.groupBox2.Size = new System.Drawing.Size(1166, 313);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Chart";
             // 
             // tradingChart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.tradingChart.ChartAreas.Add(chartArea3);
+            chartArea9.Name = "ChartArea1";
+            this.tradingChart.ChartAreas.Add(chartArea9);
             this.tradingChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend3.Name = "Legend1";
-            this.tradingChart.Legends.Add(legend3);
+            legend9.Name = "Legend1";
+            this.tradingChart.Legends.Add(legend9);
             this.tradingChart.Location = new System.Drawing.Point(3, 16);
             this.tradingChart.Name = "tradingChart";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.tradingChart.Series.Add(series3);
-            this.tradingChart.Size = new System.Drawing.Size(1166, 350);
+            series9.ChartArea = "ChartArea1";
+            series9.Legend = "Legend1";
+            series9.Name = "Series1";
+            this.tradingChart.Series.Add(series9);
+            this.tradingChart.Size = new System.Drawing.Size(1160, 294);
             this.tradingChart.TabIndex = 0;
             this.tradingChart.Text = "chart1";
             // 
@@ -156,9 +201,9 @@
             this.groupBox1.BackColor = System.Drawing.SystemColors.Control;
             this.groupBox1.Controls.Add(this.tabControl2);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox1.Location = new System.Drawing.Point(3, 372);
+            this.groupBox1.Location = new System.Drawing.Point(3, 316);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1172, 254);
+            this.groupBox1.Size = new System.Drawing.Size(1166, 254);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Parameters";
@@ -171,7 +216,7 @@
             this.tabControl2.Location = new System.Drawing.Point(3, 16);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(1166, 235);
+            this.tabControl2.Size = new System.Drawing.Size(1160, 235);
             this.tabControl2.TabIndex = 46;
             // 
             // tabPage3
@@ -186,9 +231,32 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1158, 209);
+            this.tabPage3.Size = new System.Drawing.Size(1152, 209);
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Input";
+            // 
+            // lvDateRange
+            // 
+            this.lvDateRange.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.lvDateRange.HideSelection = false;
+            this.lvDateRange.Location = new System.Drawing.Point(286, 6);
+            this.lvDateRange.Name = "lvDateRange";
+            this.lvDateRange.Size = new System.Drawing.Size(447, 197);
+            this.lvDateRange.TabIndex = 57;
+            this.lvDateRange.UseCompatibleStateImageBehavior = false;
+            this.lvDateRange.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Type";
+            this.columnHeader1.Width = 173;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Date";
+            this.columnHeader2.Width = 229;
             // 
             // btnStart
             // 
@@ -283,7 +351,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1158, 209);
+            this.tabPage4.Size = new System.Drawing.Size(1152, 209);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Output";
             // 
@@ -529,101 +597,142 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.chart1);
+            this.tabPage2.Controls.Add(this.tabControl3);
             this.tabPage2.Controls.Add(this.groupBox3);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1178, 629);
+            this.tabPage2.Size = new System.Drawing.Size(1172, 573);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Test";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // chart1
+            // tabControl3
             // 
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
-            this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend4.Name = "Legend1";
-            this.chart1.Legends.Add(legend4);
-            this.chart1.Location = new System.Drawing.Point(3, 3);
-            this.chart1.Name = "chart1";
-            series4.ChartArea = "ChartArea1";
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.chart1.Series.Add(series4);
-            this.chart1.Size = new System.Drawing.Size(1172, 471);
-            this.chart1.TabIndex = 1;
-            this.chart1.Text = "chart1";
+            this.tabControl3.Controls.Add(this.tabPage5);
+            this.tabControl3.Controls.Add(this.tabPage6);
+            this.tabControl3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl3.Location = new System.Drawing.Point(3, 3);
+            this.tabControl3.Name = "tabControl3";
+            this.tabControl3.SelectedIndex = 0;
+            this.tabControl3.Size = new System.Drawing.Size(1166, 386);
+            this.tabControl3.TabIndex = 1;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.testChart);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(1158, 360);
+            this.tabPage5.TabIndex = 0;
+            this.tabPage5.Text = "Chart";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // testChart
+            // 
+            chartArea10.Name = "ChartArea1";
+            this.testChart.ChartAreas.Add(chartArea10);
+            this.testChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend10.Name = "Legend1";
+            this.testChart.Legends.Add(legend10);
+            this.testChart.Location = new System.Drawing.Point(3, 3);
+            this.testChart.Name = "testChart";
+            series10.ChartArea = "ChartArea1";
+            series10.Legend = "Legend1";
+            series10.Name = "Series1";
+            this.testChart.Series.Add(series10);
+            this.testChart.Size = new System.Drawing.Size(1152, 354);
+            this.testChart.TabIndex = 1;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.dataGridView1);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(1158, 360);
+            this.tabPage6.TabIndex = 1;
+            this.tabPage6.Text = "Grid";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(3, 3);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(1152, 354);
+            this.dataGridView1.TabIndex = 0;
             // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.btnTesterStart);
-            this.groupBox3.Controls.Add(this.btnOpenTestFile);
+            this.groupBox3.Controls.Add(this.tradingUserInfo1);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox3.Location = new System.Drawing.Point(3, 474);
+            this.groupBox3.Location = new System.Drawing.Point(3, 389);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1172, 152);
+            this.groupBox3.Size = new System.Drawing.Size(1166, 181);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Parameters";
             // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.cmbStocks);
+            this.panel2.Controls.Add(this.label16);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 3);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1180, 44);
+            this.panel2.TabIndex = 1;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(11, 15);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(40, 13);
+            this.label16.TabIndex = 0;
+            this.label16.Text = "Stocks";
+            // 
+            // cmbStocks
+            // 
+            this.cmbStocks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbStocks.FormattingEnabled = true;
+            this.cmbStocks.Location = new System.Drawing.Point(57, 12);
+            this.cmbStocks.Name = "cmbStocks";
+            this.cmbStocks.Size = new System.Drawing.Size(171, 21);
+            this.cmbStocks.TabIndex = 1;
+            // 
+            // tradingUserInfo1
+            // 
+            this.tradingUserInfo1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tradingUserInfo1.Location = new System.Drawing.Point(3, 16);
+            this.tradingUserInfo1.Name = "tradingUserInfo1";
+            this.tradingUserInfo1.Size = new System.Drawing.Size(1160, 162);
+            this.tradingUserInfo1.TabIndex = 58;
+            // 
             // btnTesterStart
             // 
-            this.btnTesterStart.Location = new System.Drawing.Point(472, 47);
+            this.btnTesterStart.Location = new System.Drawing.Point(971, 36);
             this.btnTesterStart.Name = "btnTesterStart";
             this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
-            this.btnTesterStart.TabIndex = 57;
+            this.btnTesterStart.TabIndex = 59;
             this.btnTesterStart.Text = "Start";
             this.btnTesterStart.UseVisualStyleBackColor = true;
-            this.btnTesterStart.Click += new System.EventHandler(this.btnTesterStart_Click);
-            // 
-            // btnOpenTestFile
-            // 
-            this.btnOpenTestFile.Location = new System.Drawing.Point(215, 33);
-            this.btnOpenTestFile.Name = "btnOpenTestFile";
-            this.btnOpenTestFile.Size = new System.Drawing.Size(75, 23);
-            this.btnOpenTestFile.TabIndex = 0;
-            this.btnOpenTestFile.Text = "Open File";
-            this.btnOpenTestFile.UseVisualStyleBackColor = true;
-            this.btnOpenTestFile.Click += new System.EventHandler(this.btnOpenTestFile_Click);
-            // 
-            // ofdOpenTestFile
-            // 
-            this.ofdOpenTestFile.FileName = "openFileDialog1";
-            // 
-            // lvDateRange
-            // 
-            this.lvDateRange.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.lvDateRange.HideSelection = false;
-            this.lvDateRange.Location = new System.Drawing.Point(286, 6);
-            this.lvDateRange.Name = "lvDateRange";
-            this.lvDateRange.Size = new System.Drawing.Size(447, 197);
-            this.lvDateRange.TabIndex = 57;
-            this.lvDateRange.UseCompatibleStateImageBehavior = false;
-            this.lvDateRange.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Type";
-            this.columnHeader1.Width = 173;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Date";
-            this.columnHeader2.Width = 229;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1186, 655);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "MainForm";
             this.Text = "Form2";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -635,22 +744,32 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            this.tabControl3.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.testChart)).EndInit();
+            this.tabPage6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox3.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
+        private System.Windows.Forms.OpenFileDialog ofdOpenTestFile;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.DataVisualization.Charting.Chart tradingChart;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.ListView lvDateRange;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.NumericUpDown nudPopulationFactor;
         private System.Windows.Forms.Label label23;
@@ -687,13 +806,17 @@
         private System.Windows.Forms.TextBox tbFitness;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabControl tabControl3;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.DataVisualization.Charting.Chart testChart;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
-        private System.Windows.Forms.Button btnOpenTestFile;
-        private System.Windows.Forms.OpenFileDialog ofdOpenTestFile;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ComboBox cmbStocks;
+        private System.Windows.Forms.Label label16;
+        private TradingUserInfo tradingUserInfo1;
         private System.Windows.Forms.Button btnTesterStart;
-        private System.Windows.Forms.ListView lvDateRange;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }

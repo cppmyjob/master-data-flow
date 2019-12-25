@@ -21,7 +21,7 @@ namespace MasterDataFlow.Trading.IO
         }
 
 
-        public TradingItem ReadItem(TradingItemInitData itemInitData, string filename = "genetic.save")
+        public TradingItem ReadItem(TradingItemInitData itemInitData, string filename)
         {
             if (!File.Exists(filename))
                 return null;

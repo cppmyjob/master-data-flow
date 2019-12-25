@@ -2,7 +2,8 @@
 {
     public class TradingCommandController : BaseCommandController
     {
-        public TradingCommandController(int processorCount) : base(processorCount)
+        public TradingCommandController(DataProvider dataProvider, int processorCount) : 
+            base(dataProvider, processorCount)
         {
         }
     }

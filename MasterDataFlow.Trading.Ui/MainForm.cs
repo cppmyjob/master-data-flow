@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -16,19 +17,20 @@ using MasterDataFlow.Trading.Genetic;
 using MasterDataFlow.Trading.Tester;
 using MasterDataFlow.Trading.Ui.Business;
 using MasterDataFlow.Trading.Ui.Business.Teacher;
-using DirectionTester = MasterDataFlow.Trading.Tester.DirectionTester;
 
 namespace MasterDataFlow.Trading.Ui
 {
     public partial class MainForm : Form
     {
-        private TradingChart _tradingChart;
+        private TradingChartHandler _tradingChartHandler;
+        private TradingChartHandler _testChartHandler;
 
         public MainForm()
         {
             InitializeComponent();
 
-            _tradingChart = new TradingChart(tradingChart);
+            _tradingChartHandler = new TradingChartHandler(tradingChart);
+            _testChartHandler = new TradingChartHandler(testChart);
         }
 
         #region Explorer
@@ -37,13 +39,17 @@ namespace MasterDataFlow.Trading.Ui
         {
             btnStart.Enabled = false;
 
+            var stockName = (string)cmbStocks.SelectedItem;
+
+            var dataProvider = new DataProvider(stockName);
+            dataProvider.DisplayChartPricesEvent += DisplayTradingPricesEvent;
+            dataProvider.SetPeriodsEvent += ControllerOnSetPeriodsEvent;
+
             var processorCount = ((KeyValuePair<int, string>)cmbProcessors.SelectedItem).Key;
-            var controller = new TradingCommandController(processorCount);
+            var controller = new TradingCommandController(dataProvider, processorCount);
             controller.PopulationFactor = (int)nudPopulationFactor.Value;
             controller.DisplayBestEvent += ControllerOnDisplayBestEvent;
-            controller.DisplayChartPricesEvent += ControllerOnDisplayChartPricesEvent;
             controller.IterationEndEvent += ControllerOnIterationEndEvent;
-            controller.SetPeriodsEvent += ControllerOnSetPeriodsEvent;
 
             await controller.Execute();
         }
@@ -67,14 +73,6 @@ namespace MasterDataFlow.Trading.Ui
         {
             SetText(tbIteration, args.Iteration.ToString("D"));
             SetText(tbSpeed, args.ElapsedMilliseconds.ToString("F10"));
-        }
-
-        private void ControllerOnDisplayChartPricesEvent(object sender, DisplayChartPricesArgs args)
-        {
-            var controller = (BaseCommandController)sender;
-            Bar[] prices = controller.TradingBars;
-            int[] zigZag = controller.ZigZag;
-            SetChartPrices(prices, zigZag);
         }
 
         private void ControllerOnDisplayBestEvent(object sender, DisplayBestArgs args)
@@ -130,35 +128,39 @@ namespace MasterDataFlow.Trading.Ui
 
         #endregion
 
-        #region Tester
-
-        private void btnOpenTestFile_Click(object sender, EventArgs e)
-        {
-            if (ofdOpenTestFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                // ofdOpenTestFile.FileName
-            }
-
-        }
-
-        #endregion
-
-
         // -----------------------------------------------------------------
 
-        private delegate void SetChartPricesCallBack(Bar[] prices, int[] zigZag);
-
-        private void SetChartPrices(Bar[] prices, int[] zigZag)
+        private void DisplayTradingPricesEvent(object sender, DisplayChartPricesArgs args)
         {
-            if (tradingChart.InvokeRequired)
+            var dataProvider = (DataProvider)sender;
+            Bar[] prices = dataProvider.TradingBars;
+            int[] zigZag = dataProvider.ZigZag;
+            SetChartPrices(tradingChart, _tradingChartHandler, prices, zigZag);
+        }
+
+        private void DisplayTestPricesEvent(object sender, DisplayChartPricesArgs args)
+        {
+            var dataProvider = (DataProvider)sender;
+            Bar[] prices = dataProvider.TradingBars;
+            int[] zigZag = dataProvider.ZigZag;
+            SetChartPrices(testChart, _testChartHandler, prices, zigZag);
+        }
+
+
+        private delegate void SetChartPricesCallBack(Chart chart, TradingChartHandler chartHandler, 
+            Bar[] prices, int[] zigZag);
+
+        private void SetChartPrices(Chart chart, TradingChartHandler chartHandler, Bar[] prices, int[] zigZag)
+        {
+            if (chart.InvokeRequired)
             {
                 var d = new SetChartPricesCallBack(SetChartPrices);
                 this.Invoke(d, new object[] { prices, zigZag });
             }
             else
             {
-                _tradingChart.SetPrices(prices);
-                _tradingChart.SetZigZag(zigZag);
+                chartHandler.SetPrices(prices);
+                chartHandler.SetZigZag(zigZag);
             }
         }
 
@@ -173,7 +175,7 @@ namespace MasterDataFlow.Trading.Ui
             }
             else
             {
-                _tradingChart.SetStories(stories);
+                _tradingChartHandler.SetStories(stories);
             }
         }
 
@@ -247,7 +249,28 @@ namespace MasterDataFlow.Trading.Ui
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //cmbProcessors.Add
+            SetStocks();
+            SetProcessors();
+        }
+
+        private void SetStocks()
+        {
+            cmbStocks.Items.Clear();
+            var files = Directory.GetFiles("Data");
+            foreach (var file in files)
+            {
+                var extension = Path.GetExtension(file);
+                if (!string.IsNullOrEmpty(extension) && extension.ToLower() == ".csv")
+                {
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    cmbStocks.Items.Add(name.ToUpper());
+                }
+            }
+            cmbStocks.SelectedIndex = 0;
+        }
+
+        private void SetProcessors()
+        {
             var data = new Dictionary<int, string>
                        {
                            {-1, "No restrctions"}
@@ -255,7 +278,7 @@ namespace MasterDataFlow.Trading.Ui
 
             for (var i = 0; i < Environment.ProcessorCount; i++)
             {
-                data.Add(i + 1, (i+1).ToString());
+                data.Add(i + 1, (i + 1).ToString());
             }
 
             cmbProcessors.DataSource = new BindingSource(data, null);
@@ -268,7 +291,7 @@ namespace MasterDataFlow.Trading.Ui
             {
                 for (int i = 0; i < cmbProcessors.Items.Count; i++)
                 {
-                    var item = (KeyValuePair<int, string>)cmbProcessors.Items[i];
+                    var item = (KeyValuePair<int, string>) cmbProcessors.Items[i];
                     if (item.Key == commandInitDataConfig.ProcessorCount)
                     {
                         cmbProcessors.SelectedIndex = i;
@@ -276,12 +299,22 @@ namespace MasterDataFlow.Trading.Ui
                     }
                 }
             }
-            
         }
 
-        private void btnTesterStart_Click(object sender, EventArgs e)
+        private async void btnTesterStart_Click(object sender, EventArgs e)
         {
+            if (ofdOpenTestFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var fileName = ofdOpenTestFile.FileName;
 
+                var stockName = (string)cmbStocks.SelectedItem;
+
+                var dataProvider = new DataProvider(stockName);
+                dataProvider.DisplayChartPricesEvent += DisplayTestPricesEvent;
+//            dataProvider.SetPeriodsEvent += ControllerOnSetPeriodsEvent;
+                await dataProvider.LoadData(fileName);
+                var tradingItem = dataProvider.ReadTradingItem(fileName);
+            }
         }
     }
 }

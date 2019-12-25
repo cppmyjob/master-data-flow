@@ -25,16 +25,6 @@ using DirectionTester = MasterDataFlow.Trading.Genetic.DirectionTester;
 
 namespace MasterDataFlow.Trading.Ui.Business.Teacher
 {
-    public class DisplayChartPricesArgs
-    {
-        public DisplayChartPricesArgs()
-        {
-        }
-    }
-
-    public delegate void DisplayChartPricesHandler(object sender, DisplayChartPricesArgs args);
-
-
     public class IterationEndArgs
     {
         public IterationEndArgs(int iteration, long elapsedMilliseconds)
@@ -63,34 +53,18 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
     public delegate void DisplayBestHandler(object sender, DisplayBestArgs args);
 
-    public class PeriodChangedArgs
-    {
-        public PeriodChangedArgs(LearningData[] trainings, LearningData test)
-        {
-            Trainings = trainings;
-            Test = test;
-        }
-
-        public LearningData[] Trainings { get; private set; }
-        public LearningData Test { get; private set; }
-
-    }
-
-    public delegate void PeriodChangedHandler(object sender, PeriodChangedArgs args);
-
     public class BaseCommandController
     {
         private readonly int _processorCount;
 
-        private readonly Reader _reader;
         private readonly Writer _writer;
+        private readonly DataProvider _dataProvider;
 
-
-        public BaseCommandController(int processorCount)
+        public BaseCommandController(DataProvider dataProvider, int processorCount)
         {
+            _dataProvider = dataProvider;
             _processorCount = processorCount;
             _writer = new Writer(new InputDataCollection());
-            _reader = new Reader(new InputDataCollection());
         }
 
         public async Task Execute()
@@ -103,13 +77,6 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
 
         private TradingDataObject _dataObject = null;
         private int _iteration;
-        private IEnumerable<IOhlcv> _candles = null;
-        private Bar[] _tradingBars = null;
-        private int[] _zigZag = null;
-        private ZigZagValue[] _zigZagLearningData = null;
-        private readonly InputDataCollection _inputData = new InputDataCollection();
-        private LearningData _testData = null;
-        private List<LearningData> _trainings = new List<LearningData>();
 
         #region Properties
         public int PopulationFactor { get; set; } = 1;
@@ -119,28 +86,14 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             get { return _dataObject; }
         }
 
-        public LearningData TestData
-        {
-            get { return _testData; }
-        }
-
-        public Bar[] TradingBars
-        {
-            get { return _tradingBars; }
-        }
-
-        public int[] ZigZag
-        {
-            get { return _zigZag; }
-        }
+        public LearningData TestData => _dataProvider.TestData;
 
         #endregion
 
         #region Events
-        public event PeriodChangedHandler SetPeriodsEvent;
+
         public event DisplayBestHandler DisplayBestEvent;
         public event IterationEndHandler IterationEndEvent;
-        public event DisplayChartPricesHandler DisplayChartPricesEvent;
 
         #endregion
         private async Task ExecuteCommand(CommandWorkflow commandWorkflow)
@@ -151,11 +104,10 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
                 {
                     try
                     {
+                        await _dataProvider.LoadData();
+                        _dataObject = CreateDataObject();
 
-                        _dataObject = await CreateDataObject();
-                        DisplayChartPrices();
-
-                        var tradingItem = _reader.ReadItem(_dataObject.ItemInitData);
+                        var tradingItem = _dataProvider.ReadTradingItem();
                         if (tradingItem != null)
                         {
                             DisplayBest(tradingItem);
@@ -201,163 +153,17 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             });
         }
 
-        private async Task<TradingDataObject> CreateDataObject()
+        private TradingDataObject CreateDataObject()
         {
-            var itemInitData = _reader.ReadItemInitData();
-
-            await LoadInputData(itemInitData);
-
-            var result = new TradingDataObject(itemInitData, _trainings.ToArray(),
+            var result = new TradingDataObject(_dataProvider.ItemInitData, _dataProvider.Trainings.ToArray(),
                 100 * PopulationFactor, 33 * PopulationFactor, _processorCount);
 
             return result;
         }
 
 
-        private async Task LoadInputData(TradingItemInitData itemInitData)
-        {
-            var csvImporter = new CsvImporter(@"Data\AFLT.csv", new CultureInfo("en-US"));
-            //var csvImporter = new CsvImporter(@"Data\SBER.csv", new CultureInfo("en-US"));
-            _candles = await csvImporter.ImportAsync("fb");
-
-            _tradingBars = Helper.CandlesToBars(_candles);
-
-            CalculateZigZag();
-
-            SetDataBoundaris(itemInitData);
-        }
-
-        private void SetDataBoundaris(TradingItemInitData itemInitData)
-        {
-            // Получаем первый день данных Смещение получается за счёт окна для вычисления данных Constants.IndicatorsOffset
-            // и HistoryWidowLength
-            var startTrainingDate = _tradingBars[Constants.IndicatorsOffset + itemInitData.HistoryWidowLength].Time.Date.AddDays(1);
-
-            var endTestDate = _tradingBars[_tradingBars.Length - 1].Time.Date;
-            var days = (endTestDate - startTrainingDate).TotalDays;
-
-            var testDays = 14;
-            var trainingDays = days - testDays;
-            var foldsCount = 5;
-            var foldsDays = (int) (trainingDays / foldsCount);
-            trainingDays = foldsDays * foldsCount;
-            var startTestDate = endTestDate.AddDays(-testDays);
-            startTrainingDate = startTestDate.AddDays(-trainingDays);
-
-            var inputValues = new List<InputValues>();
-            var inputs = _inputData.GetInputs();
-            foreach (var input in inputs)
-            {
-                var values = input.GetValues(_tradingBars);
-                inputValues.Add(values);
-                if (itemInitData.InputData.Indicators.IsNormalizeValues)
-                {
-                    var scaler = new MinMaxScaler(input.GetMin(), input.GetMax());
-                    scaler.Transform(values);
-                }
-
-            }
-
-            for (int i = 0; i < foldsCount; i++)
-            {
-                var startFoldDate = startTrainingDate.AddDays(i * foldsDays);
-                var trainingData = CreateLearningData(itemInitData, inputValues, startFoldDate, foldsDays);
-                _trainings.Add(trainingData);
-            }
-
-            // тест дата
-            _testData = CreateLearningData(itemInitData, inputValues, startTestDate, testDays);
-
-            SetPeriodsEvent?.Invoke(this, new PeriodChangedArgs(_trainings.ToArray(), _testData));
-        }
-
-        private LearningData CreateLearningData(TradingItemInitData itemInitData, List<InputValues> inputValues, DateTime startDate, double days)
-        {
-            var result = new LearningData();
-            result.StartDateTime = startDate;
-            // Получаем список цен в требуем диапазоне
-            result.Prices = _tradingBars
-                .SkipWhile(t => t.Time < startDate)
-                .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();
-
-            var indicators = new List<LearningInputData>();
-
-
-            var firstTime = result.Prices[0].Time;
-            var lastTime = result.Prices[result.Prices.Length - 1].Time;
-
-            var initTimes = inputValues[0].Values.Select(t => t.Time).ToArray();
-            //var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength - 1;
-            //var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime) - 1;
-            var firstIndicatorIndex = Array.IndexOf(initTimes, firstTime) - itemInitData.HistoryWidowLength;
-            var lastIndicatorIndex = Array.IndexOf(initTimes, lastTime);
-
-            foreach (var inputValue in inputValues)
-            {
-                var learningIndicator = new LearningInputData
-                {
-                    Name = inputValue.Name,
-                    Values = new float[lastIndicatorIndex - firstIndicatorIndex + 1],
-                    Times = new DateTime[lastIndicatorIndex - firstIndicatorIndex + 1],
-                };
-                var values = inputValue.Values.Select(t => t.Value).ToArray();
-                var times = inputValue.Values.Select(t => t.Time).ToArray();
-                Array.Copy(values, firstIndicatorIndex, learningIndicator.Values, 0, learningIndicator.Values.Length);
-                Array.Copy(times, firstIndicatorIndex, learningIndicator.Times, 0, learningIndicator.Times.Length);
-                indicators.Add(learningIndicator);
-            }
-            result.Indicators = indicators.ToArray();
-
-            result.ZigZags = _zigZagLearningData
-                .SkipWhile(t => t.Time < startDate)
-                .TakeWhile(t => t.Time < startDate.AddDays(days)).ToArray();
-
-            return result;
-        }
-
-        private void CalculateZigZag()
-        {
-            _zigZag = ZigZagIndicator.Calculate(_tradingBars, 0, _tradingBars.Length - 1, 3.5m).ToArray();
-            _zigZagLearningData = _tradingBars.Select(t => new ZigZagValue { Time = t.Time, Value = Int32.MinValue }).ToArray();
-
-            var isHigh = _tradingBars[_zigZag[0]].High > _tradingBars[_zigZag[1]].Low;
-
-            for (int i = 1; i < _zigZag.Length; i++)
-            {
-                int jBegin;
-                if (i != 1)
-                {
-                    jBegin = _zigZag[i - 1] + 1;
-                    _zigZagLearningData[_zigZag[i]].Value = 0;
-                }
-                else
-                {
-                    jBegin = _zigZag[i - 1];
-                }
-                if (isHigh)
-                {
-                    for (int j = jBegin; j < _zigZag[i]; j++)
-                    {
-                        _zigZagLearningData[j].Value = -1;
-                    }
-                }
-                else
-                {
-                    for (int j = jBegin; j < _zigZag[i]; j++)
-                    {
-                        _zigZagLearningData[j].Value = 1;
-                    }
-                }
-                isHigh = !isHigh;
-            }
-        }
 
         // external 
-
-        private void DisplayChartPrices()
-        {
-            DisplayChartPricesEvent?.Invoke(this, new DisplayChartPricesArgs());
-        }
 
         private void IterationEnd(int iteration, long elapsedMilliseconds)
         {
@@ -369,7 +175,7 @@ namespace MasterDataFlow.Trading.Ui.Business.Teacher
             DisplayBestEvent?.Invoke(this, new DisplayBestArgs(neuronItem));
 
             var dll = NeuronNetwork.CreateNeuronDll(_dataObject.ItemInitData.NeuronNetwork, neuronItem);
-            var tester = new DirectionTester(dll, neuronItem, _testData);
+            var tester = new DirectionTester(dll, neuronItem, _dataProvider.TestData);
             var testResult = tester.Run();
 
             if (isSaveBest)

@@ -11,7 +11,7 @@ using MasterDataFlow.Trading.Tester;
 
 namespace MasterDataFlow.Trading.Ui
 {
-    public class TradingChart
+    public class TradingChartHandler
     {
         private readonly Chart _chart;
         private readonly Series _pricesSeries;
@@ -25,7 +25,7 @@ namespace MasterDataFlow.Trading.Ui
 
         private Bar[] _prices;
 
-        public TradingChart(Chart chart)
+        public TradingChartHandler(Chart chart)
         {
             _chart = chart;
             _chart.DataManipulator.IsEmptyPointIgnored = false;
