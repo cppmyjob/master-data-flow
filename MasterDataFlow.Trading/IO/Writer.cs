@@ -83,6 +83,8 @@ namespace MasterDataFlow.Trading.IO
             line += "FitnessPlusMinusEquityRatio, ";
             line += "FitnessTradingCount, ";
             line += "FitnessOrderCount, ";
+            line += "FitnessProfitEquityDifferent, ";
+            line += "FitnessMinimumMinusEquity, ";
             line += "StopLoss, ";
             line += AddHeaderTestResult("tr");
             line += AddHeaderTestResult("fr");
@@ -118,6 +120,8 @@ namespace MasterDataFlow.Trading.IO
             line += item.FitnessPlusMinusEquityRatio.ToString("F10") + ", ";
             line += item.FitnessTradingCount.ToString("F10") + ", ";
             line += item.FitnessOrderCount.ToString("F10") + ", ";
+            line += item.FitnessProfitEquityDifferent.ToString("F10") + ", ";
+            line += item.FitnessMinimumMinusEquity.ToString("F10") + ", ";
             line += item.StopLoss.ToString("F10") + ", ";
             line = SaveTestResult(item.FinalResult.TrainingTesterResult, line);
             line = SaveTestResult(new []{futureResult}, line);
@@ -180,6 +184,8 @@ namespace MasterDataFlow.Trading.IO
             itemElement.Add(new XElement("fitnessPlusMinusEquityRatio", item.FitnessPlusMinusEquityRatio.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("fitnessTradingCount", item.FitnessTradingCount.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("fitnessOrderCount", item.FitnessOrderCount.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessProfitEquityDifferent", item.FitnessProfitEquityDifferent.ToString(CultureInfo.InvariantCulture)));
+            itemElement.Add(new XElement("fitnessFitnessMinimumMinusEquity", item.FitnessMinimumMinusEquity.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("fitnessOriginal", item.FitnessOriginal.ToString(CultureInfo.InvariantCulture)));
             itemElement.Add(new XElement("guid", item.Guid.ToString()));
             itemElement.Add(new XElement("historyWidowLength", item.InitData.HistoryWidowLength.ToString(CultureInfo.InvariantCulture)));

@@ -249,6 +249,9 @@ namespace MasterDataFlow.Trading.Genetic
         public bool IsOrderCount { get; private set; } = true;
         public bool IsProfit { get; private set; } = true;
         public bool IsZigZag { get; private set; } = true;
+        public bool IsMinimumMinusEquity { get; private set; } = true;
+        public bool IsProfitEquityDifferent { get; private set; } = true;
+
 
         public int ValidationPercent { get; private set; } = 0;
 
@@ -271,6 +274,12 @@ namespace MasterDataFlow.Trading.Genetic
             if (eFitness.Element("isOrderCount") != null)
                 IsOrderCount = Convert.ToBoolean(eFitness.Element("isOrderCount").Value);
 
+            if (eFitness.Element("isMinimumMinusEquity") != null)
+                IsMinimumMinusEquity = Convert.ToBoolean(eFitness.Element("isMinimumMinusEquity").Value);
+
+            if (eFitness.Element("isProfitEquityDifferent") != null)
+                IsProfitEquityDifferent = Convert.ToBoolean(eFitness.Element("isProfitEquityDifferent").Value);
+
             if (eFitness.Element("validationPercent") != null)
                 ValidationPercent = Convert.ToInt32(eFitness.Element("validationPercent").Value);
         }
@@ -287,6 +296,8 @@ namespace MasterDataFlow.Trading.Genetic
             eFitness.Add(new XElement("isZigZag", IsZigZag.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("isTradingCount", IsTradingCount.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("isOrderCount", IsOrderCount.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isMinimumMinusEquity", IsMinimumMinusEquity.ToString(CultureInfo.InvariantCulture)));
+            eFitness.Add(new XElement("isProfitEquityDifferent", IsProfitEquityDifferent.ToString(CultureInfo.InvariantCulture)));
             eFitness.Add(new XElement("validationPercent", ValidationPercent.ToString(CultureInfo.InvariantCulture)));
         }
     }
@@ -599,6 +610,9 @@ namespace MasterDataFlow.Trading.Genetic
         double FitnessPlusMinusEquityRatio { get; set; }
         double FitnessTradingCount { get; set; }
         double FitnessOrderCount { get; set; }
+        double FitnessMinimumMinusEquity { get; set; }
+        double FitnessProfitEquityDifferent { get; set; }
+
     }
 
     public class FitnessData : IFitness {
@@ -610,6 +624,8 @@ namespace MasterDataFlow.Trading.Genetic
         public double FitnessPlusMinusEquityRatio { get; set; }
         public double FitnessTradingCount { get; set; }
         public double FitnessOrderCount { get; set; }
+        public double FitnessMinimumMinusEquity { get; set; }
+        public double FitnessProfitEquityDifferent { get; set; }
     }
 
     [Serializable]
@@ -659,6 +675,8 @@ namespace MasterDataFlow.Trading.Genetic
         public double FitnessPlusMinusEquityRatio { get; set; }
         public double FitnessTradingCount { get; set; }
         public double FitnessOrderCount { get; set; }
+        public double FitnessMinimumMinusEquity { get; set; }
+        public double FitnessProfitEquityDifferent { get; set; }
     }
 
 
@@ -738,6 +756,31 @@ namespace MasterDataFlow.Trading.Genetic
                     result.FitnessOrderCount = 0;
             }
 
+            // MinimumMinusEquity
+            {
+                if (testerResult.MinEquity < 0)
+                    result.FitnessMinimumMinusEquity = NormalizeValue(1 / (double) -testerResult.MinEquity);
+                else
+                    result.FitnessMinimumMinusEquity = 0;
+            }
+
+            // ProfitEquityDifferent
+            {
+                var differents = testerResult.Orders.Where(t => t.MaxEquity > 0).Select(t => (double) (t.MaxEquity - t.Profit)).ToArray();
+                if (differents.Length > 1)
+                {
+                    var stdev = CalculateStdDev(differents);
+                    if (stdev <= 0)
+                        result.FitnessProfitEquityDifferent = 0;
+                    else
+                        result.FitnessProfitEquityDifferent = NormalizeValue(1 / stdev);
+                }
+                else
+                {
+                    result.FitnessProfitEquityDifferent = 0;
+                }
+            }
+
             var fitness = 1.0;
 
 
@@ -774,6 +817,16 @@ namespace MasterDataFlow.Trading.Genetic
             if (DataObject.ItemInitData.Optimizer.Fitness.IsOrderCount)
             {
                 fitness *= result.FitnessOrderCount;
+            }
+
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsProfitEquityDifferent)
+            {
+                fitness *= result.FitnessProfitEquityDifferent;
+            }
+
+            if (DataObject.ItemInitData.Optimizer.Fitness.IsMinimumMinusEquity)
+            {
+                fitness *= result.FitnessMinimumMinusEquity;
             }
 
             result.Fitness = fitness;
@@ -855,6 +908,8 @@ namespace MasterDataFlow.Trading.Genetic
 
             item.FitnessTradingCount = progress.Sum(t => t.Fintess.FitnessTradingCount) / progress.Count;
             item.FitnessOrderCount = progress.Sum(t => t.Fintess.FitnessOrderCount) / progress.Count;
+            item.FitnessProfitEquityDifferent = progress.Sum(t => t.Fintess.FitnessProfitEquityDifferent) / progress.Count;
+            item.FitnessMinimumMinusEquity = progress.Sum(t => t.Fintess.FitnessMinimumMinusEquity) / progress.Count;
 
             var validationPercent = DataObject.ItemInitData.Optimizer.Fitness.ValidationPercent;
             //if (validationPercent > 0)
@@ -896,14 +951,15 @@ namespace MasterDataFlow.Trading.Genetic
         private double CalculateStdDev(IEnumerable<double> values)
         {
             double ret = 0;
-            if (values.Count() > 0)
+            var enumerable = values as double[] ?? values.ToArray();
+            if (enumerable.Any())
             {
                 //Compute the Average      
-                double avg = values.Average();
+                double avg = enumerable.Average();
                 //Perform the Sum of (value-avg)_2_2      
-                double sum = values.Sum(d => Math.Pow(d - avg, 2));
+                double sum = enumerable.Sum(d => Math.Pow(d - avg, 2));
                 //Put it all together      
-                ret = Math.Sqrt((sum) / (values.Count() - 1));
+                ret = Math.Sqrt((sum) / (enumerable.Count() - 1));
             }
             return ret;
         }

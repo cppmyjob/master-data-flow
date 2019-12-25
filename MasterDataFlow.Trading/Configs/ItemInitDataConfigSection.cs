@@ -126,6 +126,24 @@ namespace MasterDataFlow.Trading.Configs
             }
         }
 
+        [ConfigurationProperty("isMinimumMinusEquity", DefaultValue = true)]
+        public bool IsMinimumMinusEquity
+        {
+            get
+            {
+                return (bool)base["isMinimumMinusEquity"];
+            }
+        }
+
+        [ConfigurationProperty("isProfitEquityDifferent", DefaultValue = true)]
+        public bool IsProfitEquityDifferent
+        {
+            get
+            {
+                return (bool)base["isProfitEquityDifferent"];
+            }
+        }
+
     }
 
 

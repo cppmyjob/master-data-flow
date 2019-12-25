@@ -153,13 +153,15 @@ namespace MasterDataFlow.Trading.Tester
         private int _openBarIndex;
         private int _closeBarIndex;
 
+
         //private decimal _volume = 0.1m; // TODO now fixing
 
-        public Order(OrderType type, decimal price, decimal stopLoss)
+        public Order(OrderType type, decimal price, decimal stopLoss, decimal spread)
         {
             _price = price;
             _type = type;
             _stopLoss = stopLoss;
+            MinEquity = -spread;
         }
 
 
@@ -187,6 +189,8 @@ namespace MasterDataFlow.Trading.Tester
         }
 
         public decimal Profit { get; internal set; }
+        public decimal MaxEquity { get; internal set; }
+        public decimal MinEquity { get; internal set; }
 
         public OrderType Type
         {
@@ -323,7 +327,7 @@ namespace MasterDataFlow.Trading.Tester
             {
                 stopLoss = CurrentPrice - stopLossValue;
             }
-            Order order = new Order(OrderType.Buy, CurrentPrice, stopLoss);
+            Order order = new Order(OrderType.Buy, CurrentPrice, stopLoss, Spred);
             Buy(order);
             return order;
         }
@@ -336,7 +340,7 @@ namespace MasterDataFlow.Trading.Tester
             {
                 stopLoss = CurrentPrice + stopLossValue;
             }
-            Order order = new Order(OrderType.Sell, CurrentPrice, stopLoss);
+            Order order = new Order(OrderType.Sell, CurrentPrice, stopLoss, Spred);
             Sell(order);
             return order;
         }
@@ -456,8 +460,9 @@ namespace MasterDataFlow.Trading.Tester
             {
                 _tickNumber = i;
                 // TODO Непонятно когда правильно вычислять  Equity
-                MakeStopLoss();
                 CalculateEquity(CurrentPrice);
+                CalculateOrdersEquity(CurrentPrice);
+                MakeStopLoss();
                 if (_deposit + (_result.Profit + _result.Equities[_currentBar]) < 0)
                 {
                     _result.ForceStop = true;
@@ -465,6 +470,36 @@ namespace MasterDataFlow.Trading.Tester
                 }
                 OnTick();
             }
+        }
+
+        private void CalculateOrdersEquity(decimal price)
+        {
+            foreach (var pair in _orders)
+            {
+                Order order = pair.Value;
+                decimal profit = 0;
+                switch (order.Type)
+                {
+                    case OrderType.Buy:
+                        profit = price - order.Price - _spred;
+                        break;
+                    case OrderType.Sell:
+                        profit = order.Price - price - _spred;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                SetOrderEquity(profit, order);
+            }
+        }
+
+        private static void SetOrderEquity(decimal profit, Order order)
+        {
+            if (profit > order.MaxEquity)
+                order.MaxEquity = profit;
+            if (profit < order.MinEquity)
+                order.MinEquity = profit;
         }
 
         private void SetTradingCount()
@@ -632,6 +667,8 @@ namespace MasterDataFlow.Trading.Tester
                 default:
                     throw new NotImplementedException();
             }
+            // TODO looks like it needs not
+            SetOrderEquity(profit, order);
             _orders.Remove(ticket);
             order.CloseBarIndex = CurrentBar;
             _history.Add(new HistoryItem(order, profit));
