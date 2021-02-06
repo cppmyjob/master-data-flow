@@ -55,6 +55,7 @@
     <Compile Include="Data\Indicators\RsiIndicatorInput.cs" />
     <Compile Include="Data\MinMaxScaler.cs" />
     <Compile Include="Genetic\DirectionTester.cs" />
+    <Compile Include="Genetic\FitnessCalculator.cs" />
     <Compile Include="Genetic\TradingCommand.cs" />
     <Compile Include="Indicators\ZigZagIndicator.cs" />
     <Compile Include="Interfaces\IInputDataCollection.cs" />

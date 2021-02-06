@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend10 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.ofdOpenTestFile = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -90,11 +90,11 @@
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label16 = new System.Windows.Forms.Label();
-            this.cmbStocks = new System.Windows.Forms.ComboBox();
-            this.tradingUserInfo1 = new MasterDataFlow.Trading.Ui.TradingUserInfo();
             this.btnTesterStart = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.cmbStocks = new System.Windows.Forms.ComboBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.tuiTesting = new MasterDataFlow.Trading.Ui.TradingUserInfo();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -181,17 +181,17 @@
             // 
             // tradingChart
             // 
-            chartArea9.Name = "ChartArea1";
-            this.tradingChart.ChartAreas.Add(chartArea9);
+            chartArea1.Name = "ChartArea1";
+            this.tradingChart.ChartAreas.Add(chartArea1);
             this.tradingChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend9.Name = "Legend1";
-            this.tradingChart.Legends.Add(legend9);
+            legend1.Name = "Legend1";
+            this.tradingChart.Legends.Add(legend1);
             this.tradingChart.Location = new System.Drawing.Point(3, 16);
             this.tradingChart.Name = "tradingChart";
-            series9.ChartArea = "ChartArea1";
-            series9.Legend = "Legend1";
-            series9.Name = "Series1";
-            this.tradingChart.Series.Add(series9);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.tradingChart.Series.Add(series1);
             this.tradingChart.Size = new System.Drawing.Size(1160, 294);
             this.tradingChart.TabIndex = 0;
             this.tradingChart.Text = "chart1";
@@ -631,17 +631,17 @@
             // 
             // testChart
             // 
-            chartArea10.Name = "ChartArea1";
-            this.testChart.ChartAreas.Add(chartArea10);
+            chartArea2.Name = "ChartArea1";
+            this.testChart.ChartAreas.Add(chartArea2);
             this.testChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend10.Name = "Legend1";
-            this.testChart.Legends.Add(legend10);
+            legend2.Name = "Legend1";
+            this.testChart.Legends.Add(legend2);
             this.testChart.Location = new System.Drawing.Point(3, 3);
             this.testChart.Name = "testChart";
-            series10.ChartArea = "ChartArea1";
-            series10.Legend = "Legend1";
-            series10.Name = "Series1";
-            this.testChart.Series.Add(series10);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.testChart.Series.Add(series2);
             this.testChart.Size = new System.Drawing.Size(1152, 354);
             this.testChart.TabIndex = 1;
             // 
@@ -668,7 +668,7 @@
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.btnTesterStart);
-            this.groupBox3.Controls.Add(this.tradingUserInfo1);
+            this.groupBox3.Controls.Add(this.tuiTesting);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBox3.Location = new System.Drawing.Point(3, 389);
             this.groupBox3.Name = "groupBox3";
@@ -676,6 +676,16 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Parameters";
+            // 
+            // btnTesterStart
+            // 
+            this.btnTesterStart.Location = new System.Drawing.Point(971, 36);
+            this.btnTesterStart.Name = "btnTesterStart";
+            this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
+            this.btnTesterStart.TabIndex = 59;
+            this.btnTesterStart.Text = "Open";
+            this.btnTesterStart.UseVisualStyleBackColor = true;
+            this.btnTesterStart.Click += new System.EventHandler(this.btnTesterStart_Click);
             // 
             // panel2
             // 
@@ -687,15 +697,6 @@
             this.panel2.Size = new System.Drawing.Size(1180, 44);
             this.panel2.TabIndex = 1;
             // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(11, 15);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(40, 13);
-            this.label16.TabIndex = 0;
-            this.label16.Text = "Stocks";
-            // 
             // cmbStocks
             // 
             this.cmbStocks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -705,22 +706,22 @@
             this.cmbStocks.Size = new System.Drawing.Size(171, 21);
             this.cmbStocks.TabIndex = 1;
             // 
-            // tradingUserInfo1
+            // label16
             // 
-            this.tradingUserInfo1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tradingUserInfo1.Location = new System.Drawing.Point(3, 16);
-            this.tradingUserInfo1.Name = "tradingUserInfo1";
-            this.tradingUserInfo1.Size = new System.Drawing.Size(1160, 162);
-            this.tradingUserInfo1.TabIndex = 58;
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(11, 15);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(40, 13);
+            this.label16.TabIndex = 0;
+            this.label16.Text = "Stocks";
             // 
-            // btnTesterStart
+            // tuiTesting
             // 
-            this.btnTesterStart.Location = new System.Drawing.Point(971, 36);
-            this.btnTesterStart.Name = "btnTesterStart";
-            this.btnTesterStart.Size = new System.Drawing.Size(112, 34);
-            this.btnTesterStart.TabIndex = 59;
-            this.btnTesterStart.Text = "Start";
-            this.btnTesterStart.UseVisualStyleBackColor = true;
+            this.tuiTesting.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tuiTesting.Location = new System.Drawing.Point(3, 16);
+            this.tuiTesting.Name = "tuiTesting";
+            this.tuiTesting.Size = new System.Drawing.Size(1160, 162);
+            this.tuiTesting.TabIndex = 58;
             // 
             // MainForm
             // 
@@ -816,7 +817,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ComboBox cmbStocks;
         private System.Windows.Forms.Label label16;
-        private TradingUserInfo tradingUserInfo1;
+        private TradingUserInfo tuiTesting;
         private System.Windows.Forms.Button btnTesterStart;
     }
 }

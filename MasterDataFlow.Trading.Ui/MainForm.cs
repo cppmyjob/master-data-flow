@@ -83,7 +83,7 @@ namespace MasterDataFlow.Trading.Ui
 
             double fitness = neuronItem.Fitness;
 
-            var indicators = GetIndicators(controller, neuronItem);
+            var indicators = GetIndicators(controller.TestData, neuronItem);
             SetText(tbIndicators, indicators);
 
             SetText(tbFitness, (fitness).ToString("F10"));
@@ -114,13 +114,13 @@ namespace MasterDataFlow.Trading.Ui
             SetChartHistory(tradingChart, stories);
         }
 
-        private string GetIndicators(BaseCommandController controller, TradingItem neuronItem)
+        private string GetIndicators(LearningData testData, TradingItem neuronItem)
         {
             var names = new List<string>();
             for (int i = 0; i < neuronItem.InitData.InputData.Indicators.IndicatorNumber; i++)
             {
                 var indicatorIndex = (int)neuronItem.GetIndicatorIndex(i);
-                var name = controller.TestData.Indicators[indicatorIndex].Name;
+                var name = testData.Indicators[indicatorIndex].Name;
                 names.Add(name);
             }
             return string.Join(",", names);
@@ -303,17 +303,51 @@ namespace MasterDataFlow.Trading.Ui
 
         private async void btnTesterStart_Click(object sender, EventArgs e)
         {
-            if (ofdOpenTestFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            btnTesterStart.Enabled = false;
+            try
             {
-                var fileName = ofdOpenTestFile.FileName;
+                if (ofdOpenTestFile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    var fileName = ofdOpenTestFile.FileName;
 
-                var stockName = (string)cmbStocks.SelectedItem;
+                    var stockName = (string) cmbStocks.SelectedItem;
 
-                var dataProvider = new DataProvider(stockName);
-                dataProvider.DisplayChartPricesEvent += DisplayTestPricesEvent;
-//            dataProvider.SetPeriodsEvent += ControllerOnSetPeriodsEvent;
-                await dataProvider.LoadData(fileName);
-                var tradingItem = dataProvider.ReadTradingItem(fileName);
+                    var dataProvider = new DataProvider(stockName);
+                    dataProvider.DisplayChartPricesEvent += DisplayTestPricesEvent;
+                    //            dataProvider.SetPeriodsEvent += ControllerOnSetPeriodsEvent;
+                    await dataProvider.LoadData(fileName);
+                    var tradingItem = dataProvider.ReadTradingItem(fileName);
+
+                    var stories = new List<Story>();
+
+                    var neuron = NeuronNetwork.CreateNeuronDll(dataProvider.ItemInitData.NeuronNetwork, tradingItem);
+                    tradingItem.Fitness =
+                        FitnessCalculator.Execute(tradingItem, dataProvider.Trainings.ToArray(), neuron);
+                    stories.AddRange(tradingItem.FinalResult.TrainingTesterResult.SelectMany(t => t.Stories).ToArray());
+
+                    var tester =
+                        new MasterDataFlow.Trading.Genetic.DirectionTester(neuron, tradingItem, dataProvider.TestData);
+                    var testResult = tester.Run();
+                    stories.AddRange(testResult.Stories);
+
+                    var indicators = GetIndicators(dataProvider.TestData, tradingItem);
+
+                    var userInfoData = new TradingUserInfo.Data
+                                       {
+                                           FinalResult = tradingItem.FinalResult,
+                                           Fitness = tradingItem.Fitness,
+                                           StopLoss = tradingItem.StopLoss,
+                                           TestResult = testResult,
+                                           Indicators = indicators
+                                       };
+                    tuiTesting.SetData(userInfoData);
+
+                    SetChartHistory(testChart, stories);
+                }
+            }
+            finally
+            {
+                btnTesterStart.Enabled = true;
             }
         }
     }
